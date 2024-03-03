@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:easy_date_timeline/easy_date_timeline.dart';
+import 'package:doctor_nyang/widgets/widget_scheduel.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -16,87 +17,115 @@ class _HomeScreenState extends State<HomeScreen> {
     double width = screenSize.width;
     double height = screenSize.height;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          //title: Text('Doctor Nyang'),
-          backgroundColor: Colors.white,
-          leading: Container(),
-        ),
+    // return SafeArea(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        //title: Text('Doctor Nyang'),
+        toolbarHeight: 10,
         backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child:Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: Column(
-              children: [
-                SizedBox(height: 100),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
+        leading: Container(),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 15),
+                    child: Text(
                       '$user님 안녕하세요',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.w900),
                     ),
-                    SizedBox(
-                      width: 30,
-                      height: 35,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/userRoom');
-                        },
-                        child: Text(
-                          '>',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.w900),
-                        ),
-                      ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 24,
                     ),
-                  ],
-                ),
-                SizedBox(height: 100),
-                Container(
-                  child: InkWell(
-                    onTap: () {
-                      print('채팅방으로 이동');
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/user');
                     },
-                    child: Image.asset("이미지 나중에 가져와서 넣기"),
-                  ),
-                ),
-                SizedBox(height: 30),
-
-                GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: 4,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: (width - 200) / 2 / 120,
-                  ),
-                  itemBuilder: (context, index) {
-                    return Card(
-                      color: Colors.blue[index * 100],
-                      child: Center(
-                        child: Text(
-                          '$index',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    );
+                  )
+                ],
+              ),
+              SizedBox(height: 30),
+              Container(
+                child: InkWell(
+                  onTap: () {
+                    print('채팅방으로 이동');
                   },
+                  child: Image.asset("이미지 나중에 가져와서 넣기"),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: 30),
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(left: 15),
+                // child: Text(
+                //   '할 일',
+                //   style: const TextStyle(
+                //       fontSize: 18, fontWeight: FontWeight.w700),
+                // ),
+              ),
+              EasyDateTimeLine(
+                locale: "ko",
+                initialDate: DateTime.now(),
+                onDateChange: (selectedDate) {
+                  //`selectedDate` the new date selected.
+                },
+                activeColor: const Color(0xffFFD6D6),
+                headerProps: const EasyHeaderProps(
+                  monthPickerType: MonthPickerType.switcher,
+                  dateFormatter: DateFormatter.monthOnly(),
+                ),
+                dayProps: const EasyDayProps(
+                  height: 56.0,
+                  width: 56.0,
+                  dayStructure: DayStructure.dayNumDayStr,
+                  inactiveDayStyle: DayStyle(
+                    borderRadius: 48.0,
+                    dayNumStyle: TextStyle(
+                      fontSize: 18.0,
+                    ),
+                  ),
+                  activeDayStyle: DayStyle(
+                    dayNumStyle: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                height: 45,
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  padding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFEBEB),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: const Column(
+                    children: [
+                      ScheduleWidget(
+                        startTime: 12,
+                        content: '난정 만나러 가기',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
     return Scaffold();
-
-
   }
 }

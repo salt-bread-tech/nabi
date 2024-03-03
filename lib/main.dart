@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Login(),//MyHomePage(key: UniqueKey(),),
+      home: MyHomePage(key: UniqueKey(),),
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
@@ -58,8 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
     double width = screenSize.width;
     double height = screenSize.height;
 
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
         body: _children[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           onTap: onTabTapped,
@@ -81,7 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
           ],
         ),
-      ),
     );
   }
 }
