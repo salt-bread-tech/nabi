@@ -35,17 +35,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(left: 15),
+                    padding: EdgeInsets.only(left: 5),
                     child: Text(
                       '$user님 안녕하세요',
                       style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.w900),
+                          fontSize: 22, fontWeight: FontWeight.w900),
                     ),
                   ),
                   IconButton(
                     icon: const Icon(
                       Icons.arrow_forward_ios,
-                      size: 24,
+                      size: 21,
                     ),
                     onPressed: () {
                       Navigator.pushNamed(context, '/user');
@@ -121,6 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              SizedBox(height: 30),
+
             ],
           ),
         ),
