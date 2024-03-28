@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
-import 'package:doctor_nyang/widgets/widget_scheduel.dart';
+import 'package:doctor_nyang/widgets/widget_schedule.dart';
+import '../services/service_schedule.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,14 +11,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   get user => '연재';
   int selectedTab = 0;
+  int userUid = 1;
+  DateTime selectedDate = DateTime.now();
 
+  void _updateSelectedDate(DateTime newDate) {
+    setState(() {
+      selectedDate = newDate;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    double width = screenSize.width;
-    double height = screenSize.height;
 
-    // return SafeArea(
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -66,63 +71,79 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.only(left: 15),
-                // child: Text(
-                //   '할 일',
-                //   style: const TextStyle(
-                //       fontSize: 18, fontWeight: FontWeight.w700),
-                // ),
               ),
-              EasyDateTimeLine(
-                locale: "ko",
-                initialDate: DateTime.now(),
-                onDateChange: (selectedDate) {
-                  //`selectedDate` the new date selected.
-                },
-                activeColor: const Color(0xffFFD6D6),
-                headerProps: const EasyHeaderProps(
-                  monthPickerType: MonthPickerType.switcher,
-                  dateFormatter: DateFormatter.monthOnly(),
-                ),
-                dayProps: const EasyDayProps(
-                  height: 56.0,
-                  width: 56.0,
-                  dayStructure: DayStructure.dayNumDayStr,
-                  inactiveDayStyle: DayStyle(
-                    borderRadius: 48.0,
-                    dayNumStyle: TextStyle(
-                      fontSize: 18.0,
-                    ),
+              SizedBox(
+                child: EasyDateTimeLine(
+                  locale: "ko",
+                  initialDate: DateTime.now(),
+                  onDateChange:(DateTime newDate) {
+                    _updateSelectedDate(newDate);
+                  },
+                  activeColor: const Color(0xffFFD6D6),
+                  headerProps: const EasyHeaderProps(
+                    monthPickerType: MonthPickerType.switcher,
+                    dateFormatter: DateFormatter.monthOnly(),
                   ),
-                  activeDayStyle: DayStyle(
-                    dayNumStyle: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
+                  dayProps: const EasyDayProps(
+                    height: 56.0,
+                    width: 56.0,
+                    dayStructure: DayStructure.dayNumDayStr,
+                    inactiveDayStyle: DayStyle(
+                      borderRadius: 48.0,
+                      dayNumStyle: TextStyle(
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    activeDayStyle: DayStyle(
+                      dayNumStyle: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
               SizedBox(height: 20),
-              SizedBox(
-                height: 45,
-                child: Container(
+              Container(
+                  height: 45,
                   margin: EdgeInsets.symmetric(horizontal: 10),
-                  padding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
                   decoration: BoxDecoration(
                     color: Color(0xFFFFEBEB),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  child: const Column(
-                    children: [
-                      ScheduleWidget(
-                        startTime: 12,
-                        content: '난정 만나러 가기',
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
-
+                  child: FutureBuilder<List<Schedule>>(
+                    future: fetchSchedules(userUid, DateTime.now().toString().substring(0,10)),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('${snapshot.error}');
+                      } else {
+                        return ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            Schedule schedule = snapshot.data![index];
+                            return SizedBox(
+                              height: 45,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 7, horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFEBEB),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: ScheduleWidget(
+                                  time: schedule.date.hour,
+                                  minute: schedule.date.minute,
+                                  content: schedule.text,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
+                  )),
             ],
           ),
         ),
