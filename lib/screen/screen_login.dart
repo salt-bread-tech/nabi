@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../services/service_auth.dart';
+import '../widgets/widget_custom_textFormField.dart';
 
 class Login extends StatelessWidget {
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -16,9 +15,7 @@ class Login extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 100,
-            ),
+            SizedBox(height: 100),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -29,68 +26,24 @@ class Login extends StatelessWidget {
               ],
             ),
             SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 3,
-                    blurRadius: 2,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Color(0xFF98CBFA),
-                      )),
+            Column(
+              children: <Widget>[
+                CustomTextFormField(
+                  keyboardType: TextInputType.emailAddress,
                   labelText: '이메일',
-                  hintText: 'email@example.com',
+                  hintText: 'example@gmail.com',
+                  controller: emailController,
+                  isPassword: false,
                 ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 3,
-                    blurRadius: 2,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Color(0xFF98CBFA),
-                      )),
+                SizedBox(height: 20),
+                CustomTextFormField(
                   labelText: '비밀번호',
-                ),
-              ),
+                  hintText: '비밀번호 입력',
+                  controller: passwordController,
+                  keyboardType: TextInputType.visiblePassword,
+                  isPassword: true,
+                )
+              ],
             ),
             SizedBox(height: 20),
             Row(
@@ -132,7 +85,8 @@ class Login extends StatelessWidget {
                     TextSpan(text: '계정이 없으신가요? '),
                     TextSpan(
                         text: '회원가입',
-                        style: TextStyle(color: Color(0xFF2144FF))),
+                        style: TextStyle(color: Color(0xFF2144FF)),
+                    ),
                     TextSpan(text: '하기'),
                   ],
                 ),
