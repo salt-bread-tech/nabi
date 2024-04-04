@@ -2,6 +2,8 @@ import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_register.dart';
 import 'package:flutter/material.dart';
+// flutter_tts 사용을 위한 라이브러리 임포트
+import 'package:flutter_tts/flutter_tts.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Login(),//MyHomePage(key: UniqueKey(),),
+      home: MyHomePage(key: UniqueKey(),),//Login(),//MyHomePage(key: UniqueKey(),),
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
@@ -37,7 +39,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final FlutterTts tts = FlutterTts();
+  final TextEditingController con = TextEditingController();
   int _currentIndex = 0;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    // setLanguage: 언어 설정 / setSpeechRate(): 읽기 속도 설정(0.0~1.0) & 0.0이 제일 느림 
+    tts.setLanguage("ko-KR");
+    tts.setSpeechRate(0);
+    // tts.speak(""); -> tts.speak()으로 말할 내용
+  }
+
   final List<Widget> _children = [
     HomeScreen(),
     //SignUpScreen(),
@@ -72,7 +88,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             new BottomNavigationBarItem(
               icon: Icon(Icons.mic), label: '임시',),
-
             new BottomNavigationBarItem(
               icon: Icon(Icons.mail),
               label: 'Messages',
