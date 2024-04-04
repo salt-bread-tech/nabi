@@ -1,6 +1,8 @@
 import 'package:doctor_nyang/screen/screen_home.dart';
+import 'package:doctor_nyang/screen/screen_intro.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_register.dart';
+import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:flutter/material.dart';
 // flutter_tts 사용을 위한 라이브러리 임포트
 import 'package:flutter_tts/flutter_tts.dart';
@@ -21,6 +23,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+
       home: MyHomePage(key: UniqueKey(),),//Login(),//MyHomePage(key: UniqueKey(),),
       routes: {
         '/login': (context) => Login(),
@@ -56,8 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _children = [
     HomeScreen(),
-    //SignUpScreen(),
-    //ChatRoomListScreen(),
+    HomeScreen(),
+    UserScreen(),
   ];
 
   static get chatRoomId => null;
@@ -84,13 +87,13 @@ class _MyHomePageState extends State<MyHomePage> {
           items: [
             new BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Home',
+              label: 'chat',
             ),
             new BottomNavigationBarItem(
-              icon: Icon(Icons.mic), label: '임시',),
+              icon: Icon(Icons.home), label: 'home',),
             new BottomNavigationBarItem(
-              icon: Icon(Icons.mail),
-              label: 'Messages',
+              icon: Icon(Icons.person),
+              label: 'mypage',
             ),
 
           ],

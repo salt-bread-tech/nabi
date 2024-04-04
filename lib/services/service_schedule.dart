@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'globals.dart';
+
 class Schedule {
   final int userUid;
   final String text;
@@ -18,7 +20,6 @@ class Schedule {
 }
 
 Future<void> registerSchedule(int userUid, String text, String dateTime) async {
-  final String baseUrl = "http://localhost:8080";
   final url = Uri.parse('$baseUrl/schedule/register');
   final response = await http.post(
     url,
@@ -40,7 +41,6 @@ Future<void> registerSchedule(int userUid, String text, String dateTime) async {
 }
 
 Future<List<Schedule>> fetchSchedules(int userUid, String dateTime) async {
-  const String baseUrl = "http://localhost:8080";
   final url = Uri.parse('$baseUrl/schedule/weekly-calendar');
   final response = await http.post(
     url,

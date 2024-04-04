@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'globals.dart' as globals;
+import 'globals.dart';
 
 Future<void> login(String id, String password, BuildContext context) async {
-  final url = Uri.parse('${globals.baseUrl}/user/login');
+  final url = Uri.parse('$baseUrl/user/login');
 
   try {
     final response = await http.post(
@@ -31,7 +32,6 @@ Future<void> login(String id, String password, BuildContext context) async {
 
 
 Future<void> register(String id, String password, String nickname, String birthDate, BuildContext context) async {
-  final String baseUrl = "http://localhost:8080";
   final url = Uri.parse('$baseUrl/user/register');
 
   try {
