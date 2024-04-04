@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(key: UniqueKey(),),
+      home: Login(),//MyHomePage(key: UniqueKey(),),
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
