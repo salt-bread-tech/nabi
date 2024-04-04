@@ -108,6 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: 20),
               Container(
                   height: 45,
+                  width: 330,
                   margin: EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: Color(0xFFFFEBEB),
@@ -126,8 +127,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             Schedule schedule = snapshot.data![index];
+                            int schedules = snapshot.data!.length;
                             return SizedBox(
-                              height: 45,
+                              height: 45 + schedules*20,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 7, horizontal: 10),
