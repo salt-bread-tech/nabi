@@ -1,8 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'globals.dart';
+
 Future<void> registerRoutinePrototype(String routineName) async {
-  final String baseUrl = "http://localhost:8080";
   final url = Uri.parse('$baseUrl/routine/register');
   final response = await http.post(
     url,
@@ -28,7 +29,6 @@ Future<void> registerDailyRoutine({
   required DateTime endDate,
   required int maxPerform,
 }) async {
-  final String baseUrl = "http://localhost:8080";
   final url = Uri.parse('$baseUrl/set-routine/register');
   final response = await http.post(
     url,
@@ -52,7 +52,6 @@ Future<void> registerDailyRoutine({
 }
 
 Future<List<dynamic>> fetchRegisteredRoutines(int userUid) async {
-  final String baseUrl = "http://localhost:8080";
   final response = await http.get(
     Uri.parse('$baseUrl/get-routine/$userUid'),
     headers: <String, String>{
