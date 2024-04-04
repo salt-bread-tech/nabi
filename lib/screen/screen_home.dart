@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
 import '../services/service_schedule.dart';
+import '../widgets/widget_diet.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -19,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedDate = newDate;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
@@ -76,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: EasyDateTimeLine(
                   locale: "ko",
                   initialDate: DateTime.now(),
-                  onDateChange:(DateTime newDate) {
+                  onDateChange: (DateTime newDate) {
                     _updateSelectedDate(newDate);
                   },
                   activeColor: const Color(0xffFFD6D6),
@@ -106,13 +108,15 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: 20),
               Container(
                   height: 45,
+                  width: 330,
                   margin: EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: Color(0xFFFFEBEB),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   child: FutureBuilder<List<Schedule>>(
-                    future: fetchSchedules(userUid, DateTime.now().toString().substring(0,10)),
+                    future: fetchSchedules(
+                        userUid, DateTime.now().toString().substring(0, 10)),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -123,8 +127,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             Schedule schedule = snapshot.data![index];
+                            int schedules = snapshot.data!.length;
                             return SizedBox(
-                              height: 45,
+                              height: 45 + schedules*20,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 7, horizontal: 10),
@@ -144,6 +149,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     },
                   )),
+              SizedBox(height: 20),
+              WidgetDiet(
+                userCalories: 2000,
+                breakfastCalories: 400,
+                lunchCalories: 500,
+                dinnerCalories: 500,
+                snackCalories: 500,
+                totalCarb: 24,
+                totalFat: 50,
+                totalProtein: 20,
+              )
             ],
           ),
         ),
