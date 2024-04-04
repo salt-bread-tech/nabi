@@ -2,6 +2,7 @@ import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_register.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 void main() {
   runApp(MyApp());
@@ -37,7 +38,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final FlutterTts tts = FlutterTts();
+  final TextEditingController con = TextEditingController();
   int _currentIndex = 0;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    tts.setLanguage("ko-KR");
+    tts.setSpeechRate(0);
+    tts.speak("뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 뭐라고 써야할지 모르겠다 ");
+  }
+
   final List<Widget> _children = [
     HomeScreen(),
     //SignUpScreen(),
@@ -72,7 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             new BottomNavigationBarItem(
               icon: Icon(Icons.mic), label: '임시',),
-
             new BottomNavigationBarItem(
               icon: Icon(Icons.mail),
               label: 'Messages',
