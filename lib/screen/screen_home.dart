@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
+import '../services/globals.dart';
 import '../services/service_schedule.dart';
 import '../widgets/widget_diet.dart';
 
@@ -10,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  get user => '연재';
+  get user => userNickname;
   int selectedTab = 0;
   int userUid = 1;
   DateTime selectedDate = DateTime.now();
