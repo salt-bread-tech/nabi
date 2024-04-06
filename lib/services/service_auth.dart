@@ -5,7 +5,34 @@ import 'dart:convert';
 import 'globals.dart' as globals;
 import 'globals.dart';
 
-Future<void> login(String id, String password, BuildContext context) async {
+
+Map<String, dynamic> userInfo = {};
+
+Future<void> fetchUserInfo() async {
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/user/show-info/${globals.userId}'),
+    );
+    if (response.statusCode == 200) {
+      userInfo = jsonDecode(response.body);
+      {
+        globals.nickName = userInfo['nickName'];
+        globals.id = userInfo['id'];
+        globals.birth = userInfo['birth'];
+        globals.height = userInfo['height'];
+        globals.weight = userInfo['weight'];
+        print({globals.nickName});
+      };
+    } else {
+      throw Exception('유저 정보 불러오기 실패');
+    }
+  } catch (error) {
+    print('네트워크 오류: $error');
+  }
+}
+
+// 로그인
+Future<bool> login(String id, String password, BuildContext context) async {
   final url = Uri.parse('$baseUrl/user/login');
 
   try {
@@ -15,23 +42,34 @@ Future<void> login(String id, String password, BuildContext context) async {
       body: json.encode({'id': id, 'password': password}),
     );
 
-    final responseData = int.tryParse(response.body);
+    final responseData = json.decode(response.body);
 
-    if (responseData != null) {
+    if (responseData == 100) {
+      print('로그인 실패: 존재하지 않는 아이디');
+      return false;
+    } else if (responseData == 300) {
+      print('로그인 실패: 비밀번호 오류');
+      return false;
+    } else if (responseData == 400) {
+      print('유저 정보를 찾을 수 없음');
+      return false;
+    } else {
+      //로그인 성공 시 user 정보 저장
       globals.userId = responseData;
       print('로그인 성공: userID = ${globals.userId}');
+      await fetchUserInfo();
       Navigator.pushNamed(context, '/MyHomePage');
-    } else {
-      print('오류: ${response.body}');
+      return true;
     }
   } catch (error) {
     print('네트워크 오류: $error');
+    return false;
   }
 }
 
-
-
-Future<void> register(String id, String password, String nickname, String birthDate, BuildContext context) async {
+Future<void> register(String id, String password, String nickname,
+    String birthDate, BuildContext context) async {
+  final String baseUrl = "http://localhost:8080";
   final url = Uri.parse('$baseUrl/user/register');
 
   try {
@@ -72,3 +110,4 @@ Future<void> register(String id, String password, String nickname, String birthD
     print('$id,$nickname,$birthDate,네트워크 오류: $error');
   }
 }
+

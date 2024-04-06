@@ -11,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  get user => userNickname;
+  get user => nickName;
   int selectedTab = 0;
   int userUid = 1;
   DateTime selectedDate = DateTime.now();
