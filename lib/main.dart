@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
 
-      home: MyHomePage(key: UniqueKey(),),//Login(),//MyHomePage(key: UniqueKey(),),
+      home: Login(),//MyHomePage(key: UniqueKey(),),//Login(),//MyHomePage(key: UniqueKey(),),
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),

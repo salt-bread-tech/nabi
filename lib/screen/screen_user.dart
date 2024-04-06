@@ -1,8 +1,34 @@
 import 'package:flutter/material.dart';
+import '../services/globals.dart' as globals;
+import '../services/service_auth.dart';
 
-class UserScreen extends StatelessWidget {
+class UserScreen extends StatefulWidget {
+  @override
+  _UserScreenState createState() => _UserScreenState();
+}
+
+class _UserScreenState extends State<UserScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserInfo().then((_) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -18,7 +44,7 @@ class UserScreen extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start, // 새로운 줄
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(height: 20),
             Row(
@@ -27,32 +53,25 @@ class UserScreen extends StatelessWidget {
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.grey,
+                  //사진 추가??
                 ),
                 SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('이름',style: TextStyle(fontSize: 20),),
+                    Text(globals.nickName ?? '이름', style: TextStyle(fontSize: 20)),
                     SizedBox(height: 5),
-                    Text('111@gmail.com'),
+                    Text(globals.birth ?? '생년월일', style: TextStyle(fontSize: 12)),
+                    Row(
+                      children: [
+                        Text('${globals.height?.toString() ?? '키'}cm', style: TextStyle(fontSize: 12)),
+                        SizedBox(width: 5),
+                        Text('${globals.weight?.toString() ?? '몸무게'}kg', style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
                   ],
                 ),
               ],
-            ),
-            SizedBox(height: 20),
-            Text('기능 목록',style: TextStyle(fontSize: 16)),
-            Divider(),
-            ListTile(
-              title: Text('약 복용 루틴'), //임시
-              onTap: () {
-                Navigator.pushNamed(context, '/PillSchedule');
-              },
-            ),
-            ListTile(
-              title: Text('약물 추가 화면'), //임시
-              onTap: () {
-                Navigator.pushNamed(context, '/DosageSearch');
-              },
             ),
           ],
         ),
