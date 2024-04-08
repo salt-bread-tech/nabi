@@ -2,10 +2,34 @@ import 'package:flutter/material.dart';
 import '../services/service_auth.dart';
 import '../widgets/widget_custom_textFormField.dart';
 
-class Login extends StatelessWidget {
+
+
+
+class Login extends StatefulWidget {
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  bool showError = false;
+
+  void attemptLogin() async {
+    final id = emailController.text;
+    final password = passwordController.text;
+    bool success = await login(id, password, context);
+    if (!success) {
+      setState(() {
+        showError = true;
+      });
+    } else {
+      setState(() {
+        showError = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +70,13 @@ class Login extends StatelessWidget {
                 )
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
+            // Error message
+            Visibility(
+              visible: showError,
+              child: Text('아이디 또는 비밀번호를 다시 확인하세요.', style: TextStyle(color: Colors.red,fontSize: 12)),
+            ),
+            SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -59,9 +89,7 @@ class Login extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
                     onPressed: () async {
-                      final id = emailController.text;
-                      final password = passwordController.text;
-                      await login(id, password, context);
+                      attemptLogin();
                     },
                     child: Text(
                       '로그인',
@@ -85,8 +113,8 @@ class Login extends StatelessWidget {
                   children: <TextSpan>[
                     TextSpan(text: '계정이 없으신가요? '),
                     TextSpan(
-                        text: '회원가입',
-                        style: TextStyle(color: Color(0xFF2144FF)),
+                      text: '회원가입',
+                      style: TextStyle(color: Color(0xFF2144FF)),
                     ),
                     TextSpan(text: '하기'),
                   ],
