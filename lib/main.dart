@@ -1,3 +1,4 @@
+import 'package:doctor_nyang/screen/screen_chat.dart';
 import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:doctor_nyang/screen/screen_intro.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => Register(),
         '/home': (context) => HomeScreen(),
         '/MyHomePage': (context) => MyHomePage(key: UniqueKey()),
+        '/chat': (context) => ChatScreen(),
       },
     );
   }
