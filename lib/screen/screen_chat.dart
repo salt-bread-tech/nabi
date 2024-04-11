@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
@@ -22,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> getChats(int uid) async {
-    final url = Uri.parse('$baseUrl/chats/1');
+    final url = Uri.parse('$baseUrl/chats/$userId');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
     });
@@ -35,7 +36,6 @@ class _ChatScreenState extends State<ChatScreen> {
           final String text = data['content'];
           final String timestamp = data['createAt'];
           final String messageId = DateTime.now().toString();
-          print(chatData);
           return types.TextMessage(
             author: isUser ? _user : types.User(id: 'nabi'),
             createdAt: DateTime.parse(timestamp).millisecondsSinceEpoch,
@@ -88,10 +88,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSendPressed(types.PartialText message) async {
-    final int uid = 1;
+    final int? uid = userId;
     final content = message.text;
 
-    final success = await sendChat(uid, content);
+    final success = await sendChat(uid!, content);
     if (!success) {
       print('메시지 전송 실패');
     }
