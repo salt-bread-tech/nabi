@@ -1,3 +1,4 @@
+import 'package:doctor_nyang/services/urls.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -67,9 +68,8 @@ Future<bool> login(String id, String password, BuildContext context) async {
   }
 }
 
-Future<void> register(String id, String password, String nickname,
-    String birthDate, BuildContext context) async {
-  final String baseUrl = "http://localhost:8080";
+Future<void> register(String nickname,String id, String password,
+    String birthDate, String sex, double height, double weight, int age, BuildContext context) async {
   final url = Uri.parse('$baseUrl/user/register');
 
   try {
@@ -77,10 +77,14 @@ Future<void> register(String id, String password, String nickname,
       url,
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
+        'nickname': nickname,
         'id': id,
         'password': password,
-        'nickname': nickname,
         'birthDate': birthDate,
+        'sex': sex,
+        'height': height,
+        'weight' : weight,
+        'age' : age,
       }),
     );
 
@@ -90,7 +94,7 @@ Future<void> register(String id, String password, String nickname,
       switch (responseData) {
         case 200:
           print('$id,$nickname,$birthDate, 회원가입 성공');
-          Navigator.pushNamed(context, '/MyHomePage');
+          Navigator.pushNamed(context, '/login');
           break;
         case 100:
           print('$id,$nickname,$birthDate,회원가입 실패: 아이디 중복');
@@ -105,7 +109,6 @@ Future<void> register(String id, String password, String nickname,
           print('$id,$nickname,$birthDate,알 수 없는 오류');
       }
     }
-    //print('$id,$nickname,$birthDate,응답 본문: ${response.body}');
   } catch (error) {
     print('$id,$nickname,$birthDate,네트워크 오류: $error');
   }

@@ -5,6 +5,8 @@ import '../services/globals.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:http/http.dart' as http;
 
+import '../services/urls.dart';
+
 class ChatScreen extends StatefulWidget {
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -21,8 +23,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> getChats(int uid) async {
-    const url = 'http://localhost:8080/chats/1';
-    final response = await http.get(Uri.parse(url), headers: {
+    final url = Uri.parse('$baseUrl/chats/1');
+    final response = await http.get(Uri.parse(url as String), headers: {
       "Content-Type": "application/json; charset=UTF-8",
     });
 
@@ -63,7 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<bool> sendChat(int uid, String content) async {
-    const url = 'http://localhost:8080/chat';
+    final url = Uri.parse('$baseUrl/chat');
     final headers = {"Content-Type": "application/json"};
     final body = json.encode({
       'uid': uid,
@@ -71,7 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     try {
-      final response = await http.post(Uri.parse(url), headers: headers, body: body);
+      final response = await http.post(Uri.parse(url as String), headers: headers, body: body);
 
       if (response.statusCode == 200) {
         getChats(uid);
