@@ -1,5 +1,4 @@
 import 'package:doctor_nyang/screen/screen_medicine_info.dart';
-import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

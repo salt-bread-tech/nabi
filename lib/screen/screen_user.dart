@@ -31,11 +31,11 @@ class _UserScreenState extends State<UserScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        actions: [
+        automaticallyImplyLeading: false,
+        actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              // 설정 기능 나중에 넣기
             },
           ),
         ],

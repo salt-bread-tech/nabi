@@ -1,4 +1,3 @@
-
 String? nickName;
 String? birth;
 double? height;

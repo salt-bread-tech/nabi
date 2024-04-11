@@ -1,6 +1,7 @@
 import 'package:doctor_nyang/screen/screen_chat.dart';
 import 'package:doctor_nyang/screen/screen_dosage_schedule.dart';
 import 'package:doctor_nyang/screen/screen_home.dart';
+import 'package:doctor_nyang/screen/screen_intro.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_medicine_search.dart';
 import 'package:doctor_nyang/screen/screen_register.dart';
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         highlightColor: Colors.transparent, // 하이라이트 투명하게
       ),
 
-      home: Login(),//MyHomePage(key: UniqueKey(),),
+      home: IntroPage(),//Login(),//MyHomePage(key: UniqueKey(),),
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
@@ -49,7 +50,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final FlutterTts tts = FlutterTts();
   final TextEditingController con = TextEditingController();
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
 
   @override
@@ -63,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final List<Widget> _children = [
-    HomeScreen(),
+    ChatScreen(),
     HomeScreen(),
     UserScreen(),
   ];
@@ -85,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
           currentIndex: _currentIndex,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.chat_bubble_rounded),
               label: 'chat',
             ),
             BottomNavigationBarItem(

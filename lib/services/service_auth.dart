@@ -15,7 +15,8 @@ Future<void> fetchUserInfo() async {
       Uri.parse('$baseUrl/user/show-info/${globals.userId}'),
     );
     if (response.statusCode == 200) {
-      userInfo = jsonDecode(response.body);
+      String responseBody = utf8.decode(response.bodyBytes);
+      userInfo = jsonDecode(responseBody);
       {
         globals.nickName = userInfo['nickName'];
         globals.id = userInfo['id'];

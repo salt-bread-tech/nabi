@@ -45,7 +45,7 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
-                  '닥터냥 로그인하기',
+                  '로그인하기',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
                 ),
               ],
