@@ -89,7 +89,7 @@ class _UserScreenState extends State<UserScreen> {
                   },
                 ),
                 ListTile(
-                  title: Text('약물 추가 화면'),
+                  title: Text('복용할 약 추가'),
                   onTap: () {
                     Navigator.pushNamed(context, '/MedicineSearch');
                   },

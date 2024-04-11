@@ -143,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 totalFat: 50,
                 totalProtein: 20,
               ),
+              SizedBox(height: 20),
               RoutineStatusWidget(),
             ],
           ),
