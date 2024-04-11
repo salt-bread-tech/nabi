@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final List<Widget> _children = [
-    HomeScreen(),
+    ChatScreen(),
     HomeScreen(),
     UserScreen(),
   ];
@@ -85,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
           currentIndex: _currentIndex,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.chat_bubble_rounded),
               label: 'chat',
             ),
             BottomNavigationBarItem(
