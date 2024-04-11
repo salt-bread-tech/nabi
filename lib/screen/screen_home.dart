@@ -1,7 +1,7 @@
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:flutter/material.dart';
-import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
+import 'package:intl/intl.dart';
 import '../services/globals.dart';
 import '../services/service_schedule.dart';
 import '../widgets/widget_diet.dart';
@@ -14,12 +14,26 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
-  DateTime selectedDate = DateTime.now();
+  late DateTime selectedDate;
 
-  void _updateSelectedDate(DateTime newDate) {
-    setState(() {
-      selectedDate = newDate;
-    });
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = DateTime.now();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
   }
 
   @override
@@ -54,35 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.only(left: 15),
               ),
-              SizedBox(
-                child: EasyDateTimeLine(
-                  locale: "ko",
-                  initialDate: DateTime.now(),
-                  onDateChange: (DateTime newDate) {
-                    _updateSelectedDate(newDate);
-                  },
-                  activeColor: const Color(0xffFFD6D6),
-                  headerProps: const EasyHeaderProps(
-                    monthPickerType: MonthPickerType.switcher,
-                    dateFormatter: DateFormatter.monthOnly(),
-                  ),
-                  dayProps: const EasyDayProps(
-                    height: 56.0,
-                    width: 56.0,
-                    dayStructure: DayStructure.dayNumDayStr,
-                    inactiveDayStyle: DayStyle(
-                      borderRadius: 48.0,
-                      dayNumStyle: TextStyle(
-                        fontSize: 18.0,
-                      ),
-                    ),
-                    activeDayStyle: DayStyle(
-                      dayNumStyle: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+              GestureDetector(
+                onTap: () => _selectDate(context),
+                child: Text(
+                  DateFormat('yyyy년 MM월 dd일 EEEE').format(selectedDate),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
               ),
               SizedBox(height: 20),
@@ -96,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: FutureBuilder<List<Schedule>>(
                     future: fetchSchedules(
-                        userId!, DateTime.now().toString().substring(0, 10)),
+                        userId!, selectedDate.toString().substring(0, 10)),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -109,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Schedule schedule = snapshot.data![index];
                             int schedules = snapshot.data!.length;
                             return SizedBox(
-                              height: 45 + schedules * 20,
+                              height: 45 + (schedules - 1) * 5,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 7, horizontal: 10),
@@ -132,7 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: 20),
               WidgetDiet(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => DietSchedule()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => DietSchedule()));
                 },
                 userCalories: 2000,
                 breakfastCalories: 400,

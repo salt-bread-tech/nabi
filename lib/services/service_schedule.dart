@@ -53,7 +53,9 @@ Future<List<Schedule>> fetchSchedules(int userUid, String dateTime) async {
     }),
   );
   List<Schedule> schedules = [];
-  dynamic data = json.decode(response.body);
+  final decodedBody = utf8.decode(response.bodyBytes);
+  final data = json.decode(decodedBody);
+
   if (data is int) {
     throw Exception('조회 실패 ${response.statusCode}');
   }
@@ -64,6 +66,6 @@ Future<List<Schedule>> fetchSchedules(int userUid, String dateTime) async {
     Schedule schedule = Schedule(userUid: userUid, text: text, date: datetime);
     schedules.add(schedule);
   }
-
+  schedules.sort((a, b) => a.date.compareTo(b.date));
   return schedules;
 }
