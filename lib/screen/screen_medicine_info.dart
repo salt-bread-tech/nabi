@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../services/globals.dart';
+import '../services/urls.dart';
 
 class MedicineInfo extends StatefulWidget {
   final String name;

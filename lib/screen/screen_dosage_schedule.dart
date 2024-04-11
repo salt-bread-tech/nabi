@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../services/urls.dart';
+
 
 class DosageSchedule extends StatefulWidget {
   @override
@@ -53,8 +55,8 @@ class _DosageScheduleState extends State<DosageSchedule> {
   }
 
   //일정 토글
-  Future<void> toggleDosage(int userUid,int medicineId, String date,String times) async {
-    final String url = '$baseUrl/dosage/dosage-management';
+  Future<void> toggleDosage(int userUid,int medicineId, String date,int times) async {
+    final String url = '$baseUrl/dosage/management';
 
     try {
       final response = await http.post(
@@ -94,6 +96,22 @@ class _DosageScheduleState extends State<DosageSchedule> {
       });
     }
   }
+
+  Map<String, int> timesToInt = {
+    '아침 식전': 0,
+    '아침 식후': 1,
+    '점심 식전': 2,
+    '점심 식후': 3,
+    '저녁 식전': 4,
+    '저녁 식후': 5,
+    '자기 전': 6,
+    '공복': 7,
+    '아침 식사': 8,
+    '점심 식사': 9,
+    '저녁 식사': 10,
+    '간식': 11,
+  };
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,19 +154,23 @@ class _DosageScheduleState extends State<DosageSchedule> {
                 itemBuilder: (context, index) {
                   var dosage = dosageSchedule[index];
                   return Card(
+                    shadowColor: Colors.black,
+                    elevation: 0,
+                    color: dosage['medicineTaken'] ? Color(0xFFD3EAFF) : Color(0xFFF1F1F1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: ListTile(
                       title: Text('${dosage['medicineName']}'),
-                      subtitle: Text('복용 시간: ${dosage['times']},${dosage['date']}'),
+                      subtitle: Text(dosage['times']),
                       trailing: Icon(
-                        dosage['medicineTaken'] ? Icons.check_circle : Icons.check_circle_outline,
-                        color: dosage['medicineTaken'] ? Colors.green : Colors.grey,
+                        dosage['medicineTaken'] ? Icons.check : Icons.check,
+                        color: dosage['medicineTaken'] ? Color(0xFF6696DE) : Colors.grey,
                       ),
-                      onTap: () {
-                        toggleDosage(userId!,dosage['medicineId'], dosage['date'], dosage['times']);
-                        print('userId: $userId, medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: ${dosage['times']}');
+                      onTap: () async {
+                        int timeValue = timesToInt[dosage['times']] ?? -1;
+                        await toggleDosage(userId!, dosage['medicineId'], dosage['date'], timeValue);
+                        print('userId: $userId, medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
                       },
                     ),
                   );
