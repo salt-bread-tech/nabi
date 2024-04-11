@@ -71,8 +71,31 @@ class _UserScreenState extends State<UserScreen> {
                     ),
                   ],
                 ),
+
               ],
             ),
+            SizedBox(height: 20),
+            //임시
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 20),
+                Text('기능 목록',style: TextStyle(fontSize: 16)),
+                Divider(),
+                ListTile(
+                  title: Text('약 복용 루틴'),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/DosageSchedule');
+                  },
+                ),
+                ListTile(
+                  title: Text('약물 추가 화면'),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/MedicineSearch');
+                  },
+                ),
+              ],
+            )
           ],
         ),
       ),
