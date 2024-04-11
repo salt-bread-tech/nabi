@@ -22,6 +22,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        splashColor: Colors.transparent, // 잉크 투명하게
+        highlightColor: Colors.transparent, // 하이라이트 투명하게
       ),
 
       home: Login(),//MyHomePage(key: UniqueKey(),),

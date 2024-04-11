@@ -1,3 +1,4 @@
+import 'package:doctor_nyang/screen/screen_register2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,83 +16,10 @@ class _RegisterState extends State<Register> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
   final TextEditingController confirmPWController = TextEditingController();
-  final TextEditingController birthDateController = TextEditingController();
-  final TextEditingController genderController = TextEditingController();
-  final TextEditingController heightController = TextEditingController();
-  final TextEditingController weightController = TextEditingController();
-
-  DateTime selectedDate = DateTime.now(); //
-
-
-
-
-  String _formatDate(DateTime dateTime) {
-    return DateFormat('yyyy-MM-dd').format(dateTime);
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext builder) {
-        final initDate=
-            DateFormat('yyyy-MM-dd').parse('2000-01-01');
-
-        return Container(
-          height: MediaQuery.of(context).copyWith().size.height / 3,
-          color: Colors.white,
-          child: CupertinoDatePicker(
-            mode: CupertinoDatePickerMode.date,
-            dateOrder: DatePickerDateOrder.ymd,
-            onDateTimeChanged: (picked) {
-              if (picked != null && picked != selectedDate)
-                setState(() {
-                  selectedDate = picked;
-                  birthDateController.text = _formatDate(picked);
-                });
-            },
-            initialDateTime: initDate,
-            minimumYear: 1900,
-            maximumYear: DateTime.now().year,
-            maximumDate: DateTime.now(),
-          ),
-        );
-      },
-    );
-  }
-
-  String _selectedGender = 'none';
-  Widget genderButton(String gender) {
-    bool isSelected = _selectedGender == gender;
-
-    return Ink(
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB),
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB)),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10.0),
-        onTap: () {
-          setState(() {
-            _selectedGender = gender;
-          });
-        },
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal:65.0, vertical: 15.0),
-          alignment: Alignment.center,
-          child: Text(gender == 'male' ? '남성' : '여성'),
-        ),
-      ),
-    );
-  }
-
 
 
   @override
   Widget build(BuildContext context) {
-    Gender? _selectedGender;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -251,47 +179,11 @@ class _RegisterState extends State<Register> {
               ),
             ),
             SizedBox(height: 20),
-            //생년월일
-            GestureDetector(
-              onTap: () => _selectDate(context),
-              child: AbsorbPointer(
-                child: TextFormField(
-                  controller: birthDateController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.white)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Color(0xFF98CBFA),
-                        )),
-                    labelText: '생년월일',
-                    hintText: _formatDate(selectedDate),
-                    suffixIcon: Icon(Icons.calendar_today),
-                  ),
-                ),
-              ),
-            ),
-
-            SizedBox(height: 20),
-            Container(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  genderButton('male'), // 남성 버튼
-                  SizedBox(width: 10), // 버튼 사이의 공간
-                  genderButton('female'), // 여성 버튼
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
-                  width: 85,
+                  width: MediaQuery.of(context).size.width - 60,
                   height: 35,
                   child: TextButton(
                     style: ElevatedButton.styleFrom(
@@ -302,12 +194,20 @@ class _RegisterState extends State<Register> {
                       final nickname = nicknameController.text;
                       final id = emailController.text;
                       final password = passwordController.text;
-                      final birthDate = _formatDate(selectedDate);
 
-                      await register(nickname, id, password, birthDate, context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Register2(
+                            nickname: nickname,
+                            email : id,
+                            password: password,
+                          ),
+                        ),
+                      );
                     },
                     child: Text(
-                      '로그인',
+                      '계속하기',
                       style: TextStyle(color: Colors.black),
                     ),
                   ),
