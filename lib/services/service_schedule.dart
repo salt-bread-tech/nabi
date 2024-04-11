@@ -50,6 +50,7 @@ Future<List<Schedule>> fetchSchedules(int userUid, String dateTime) async {
     },
     body: jsonEncode({
       'userUid': userUid,
+      'dateTime': dateTime,
     }),
   );
   List<Schedule> schedules = [];
