@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-import '../services/globals.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:http/http.dart' as http;
 
@@ -24,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> getChats(int uid) async {
     final url = Uri.parse('$baseUrl/chats/1');
-    final response = await http.get(Uri.parse(url as String), headers: {
+    final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
     });
 
@@ -73,7 +72,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     try {
-      final response = await http.post(Uri.parse(url as String), headers: headers, body: body);
+      final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         getChats(uid);
