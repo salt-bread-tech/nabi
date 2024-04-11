@@ -9,7 +9,9 @@ class IntroPage extends StatefulWidget {
 
 class _IntroPageState extends State<IntroPage> {
   int activeIndex = 0;
-  final List<String> images = ['images/1.png', 'images/2.png', 'images/3.png'];
+  final List<String> images = ['images/image1.png', 'images/image2.png', 'images/image3.png'];
+  final List<String> texts = ['복용 일정 놓치지 않고 간편하게', '쉽고 빠른 위젯 관리하기', '건강을 위한 식단 관리하기'];
+  final List<String> texts2 = ['처방전을 등록해 내 약물 일정을 관리할 수 있어요', '다양한 위젯과 함께 건강한 일상생활 만들기', '식단 추가를 통해 건강 관리하기'];
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +22,10 @@ class _IntroPageState extends State<IntroPage> {
         padding: EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: <Widget>[
-            Text('닥터냥 시작하기',textAlign: TextAlign.center,style: TextStyle(color: Colors.black),),
-            SizedBox(height: 20),
+            Text(texts[activeIndex],textAlign: TextAlign.center,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),),
+            SizedBox(height: 10),
+            Text(texts2[activeIndex],textAlign: TextAlign.center,style: TextStyle(color: Colors.black,fontSize: 13),),
+            SizedBox(height: 30),
             Expanded(
               child: introslider(images, screenHeight),
             ),
@@ -52,7 +56,7 @@ class _IntroPageState extends State<IntroPage> {
           Navigator.pushNamed(context, '/register');
         },
         child: Text(
-          '닥터냥 시작하기',
+          '시작하기',
           style: TextStyle(color: Colors.black),
         ),
       ),
