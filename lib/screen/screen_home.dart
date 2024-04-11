@@ -4,6 +4,7 @@ import 'package:doctor_nyang/widgets/widget_schedule.dart';
 import '../services/globals.dart';
 import '../services/service_schedule.dart';
 import '../widgets/widget_diet.dart';
+import '../widgets/widget_weekly_routine.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -137,7 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 totalCarb: 24,
                 totalFat: 50,
                 totalProtein: 20,
-              )
+              ),
+              RoutineStatusWidget(),
             ],
           ),
         ),
