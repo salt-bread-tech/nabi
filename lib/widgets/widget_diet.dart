@@ -13,6 +13,8 @@ class WidgetDiet extends StatelessWidget {
   final double totalProtein;
   final double totalFat;
 
+  final VoidCallback onTap;
+
   WidgetDiet({
     required this.breakfastCalories,
     required this.lunchCalories,
@@ -22,6 +24,7 @@ class WidgetDiet extends StatelessWidget {
     required this.totalCarb,
     required this.totalProtein,
     required this.totalFat,
+    required this.onTap,
   });
 
   @override
@@ -69,7 +72,9 @@ class WidgetDiet extends StatelessWidget {
           value: remainCalories, color: remainColor, title: '', radius: 10)
     ];
 
-    return Stack(
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
       children: [
         Align(
           child: Container(
@@ -194,6 +199,7 @@ class WidgetDiet extends StatelessWidget {
               ])
             ]))
       ],
+    )
     );
   }
 }

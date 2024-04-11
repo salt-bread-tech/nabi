@@ -94,6 +94,12 @@ class _UserScreenState extends State<UserScreen> {
                     Navigator.pushNamed(context, '/MedicineSearch');
                   },
                 ),
+                ListTile(
+                  title: Text('식단 관리'),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/DietSchedule');
+                  },
+                ),
               ],
             )
           ],
