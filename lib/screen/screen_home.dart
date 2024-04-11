@@ -1,3 +1,4 @@
+import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
@@ -108,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Schedule schedule = snapshot.data![index];
                             int schedules = snapshot.data!.length;
                             return SizedBox(
-                              height: 45 + schedules*20,
+                              height: 45 + schedules * 20,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 7, horizontal: 10),
@@ -130,6 +131,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   )),
               SizedBox(height: 20),
               WidgetDiet(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => DietSchedule()));
+                },
                 userCalories: 2000,
                 breakfastCalories: 400,
                 lunchCalories: 500,

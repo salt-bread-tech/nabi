@@ -1,4 +1,5 @@
 import 'package:doctor_nyang/screen/screen_chat.dart';
+import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:doctor_nyang/screen/screen_dosage_schedule.dart';
 import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:doctor_nyang/screen/screen_intro.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/chat': (context) => ChatScreen(),
         '/DosageSchedule': (context) => DosageSchedule(),
         '/MedicineSearch': (context) => MedicineSearch(),
+        '/DietSchedule': (context) => DietSchedule(),
       },
     );
   }
