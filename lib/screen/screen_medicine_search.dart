@@ -13,7 +13,7 @@ class _MedicineSearchState extends State<MedicineSearch> {
   List<dynamic> searchResults = [];
 
   Future<void> searchMedicines(String query) async {
-    final response = await http.get(Uri.parse('$baseUrl/medicine/$query'));
+    final response = await http.get(Uri.parse('$baseUrl/medicines/$query'));
     final decodedResponse = utf8.decode(response.bodyBytes);
 
     if (response.statusCode == 200) {
@@ -54,10 +54,6 @@ class _MedicineSearchState extends State<MedicineSearch> {
           child: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios),
-              onPressed: () {},
-            ),
             actions: <Widget>[
               SizedBox(
                 width: 50,

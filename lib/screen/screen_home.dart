@@ -11,9 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  get user => nickName;
   int selectedTab = 0;
-  int userUid = 1;
   DateTime selectedDate = DateTime.now();
 
   void _updateSelectedDate(DateTime newDate) {
@@ -24,12 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Size screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        //title: Text('Doctor Nyang'),
         toolbarHeight: 10,
         backgroundColor: Colors.white,
         leading: Container(),
@@ -45,30 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: EdgeInsets.only(left: 5),
                     child: Text(
-                      '$user님 안녕하세요',
+                      '$nickName님 안녕하세요',
                       style: const TextStyle(
-                          fontSize: 22, fontWeight: FontWeight.w900),
+                          fontSize: 18, fontWeight: FontWeight.w600),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 21,
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/user');
-                    },
-                  )
                 ],
-              ),
-              SizedBox(height: 30),
-              Container(
-                child: InkWell(
-                  onTap: () {
-                    print('채팅방으로 이동');
-                  },
-                  child: Image.asset("이미지 나중에 가져와서 넣기"),
-                ),
               ),
               SizedBox(height: 30),
               Container(
@@ -117,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: FutureBuilder<List<Schedule>>(
                     future: fetchSchedules(
-                        userUid, DateTime.now().toString().substring(0, 10)),
+                        userId!, DateTime.now().toString().substring(0, 10)),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
