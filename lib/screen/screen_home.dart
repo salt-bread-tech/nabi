@@ -1,9 +1,15 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
 import 'package:intl/intl.dart';
 import '../services/globals.dart';
+import '../services/service_diet.dart';
 import '../services/service_schedule.dart';
+import '../services/urls.dart';
 import '../widgets/widget_diet.dart';
 import '../widgets/widget_weekly_routine.dart';
 
@@ -15,11 +21,38 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
   late DateTime selectedDate;
+  List<dynamic> ingestionSchedule = [];
 
   @override
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
+    fetchIngestion();
+  }
+
+  FutureOr<Ingestion?> fetchIngestion() async {
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final String url = '$baseUrl/ingestion/total/$userId/$formattedDate';
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        String responseBody = utf8.decode(response.bodyBytes);
+        Map<String, dynamic> ingestion = json.decode(responseBody);
+
+        setState(() {
+          ingestionSchedule = [ingestion];
+        });
+      } else {
+        throw Exception('Failed to load ingestion');
+      }
+    } catch (e) {
+      print('error: $e');
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -32,6 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
+        fetchIngestion();
       });
     }
   }
@@ -77,8 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 20),
               Container(
+                  width: MediaQuery.of(context).size.width - 50,
                   height: 45,
-                  width: 330,
                   margin: EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: Color(0xFFFFEBEB),
@@ -125,14 +159,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => DietSchedule()));
                 },
+                isWidget: true,
                 userCalories: 2000,
-                breakfastCalories: 400,
-                lunchCalories: 500,
-                dinnerCalories: 500,
-                snackCalories: 500,
-                totalCarb: 24,
-                totalFat: 50,
-                totalProtein: 20,
+                breakfastCalories: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['breakfastKcal']
+                    : 0,
+                lunchCalories: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['lunchKcal']
+                    : 0,
+                dinnerCalories: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['dinnerKcal']
+                    : 0,
+                snackCalories: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['snackKcal']
+                    : 0,
+                totalProtein: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['totalProtein']
+                    : 0,
+                totalCarb: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['totalCarbohydrate']
+                    : 0,
+                totalFat: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['totalFat']
+                    : 0,
               ),
               SizedBox(height: 20),
               RoutineStatusWidget(),

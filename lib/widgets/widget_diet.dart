@@ -14,6 +14,7 @@ class WidgetDiet extends StatelessWidget {
   final double totalFat;
 
   final VoidCallback onTap;
+  final bool isWidget;
 
   WidgetDiet({
     required this.breakfastCalories,
@@ -25,6 +26,7 @@ class WidgetDiet extends StatelessWidget {
     required this.totalProtein,
     required this.totalFat,
     required this.onTap,
+    required this.isWidget,
   });
 
   @override
@@ -73,133 +75,145 @@ class WidgetDiet extends StatelessWidget {
     ];
 
     return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-      children: [
-        Align(
-          child: Container(
-            width: 330,
-            height: 150,
-            decoration: BoxDecoration(
-              color: AppTheme.widgetbackgroundColor,
-              borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Align(
+              child: Container(
+                width: MediaQuery.of(context).size.width - 50,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: AppTheme.widgetbackgroundColor,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isWidget
+                          ? Colors.transparent
+                          : Colors.grey.withOpacity(0.5),
+                      spreadRadius: 1,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(width: 20),
+                    Expanded(
+                      flex: 1,
+                      child: Table(
+                        columnWidths: const {
+                          0: FlexColumnWidth(),
+                          1: FixedColumnWidth(70),
+                        },
+                        children: [
+                          TableRow(children: [
+                            Text('아침',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                            Text('$breakfastCaloriesToStr kcal',
+                                style: TextStyle(fontSize: 11)),
+                          ]),
+                          TableRow(children: [SizedBox(height: 5), SizedBox()]),
+                          TableRow(children: [
+                            Text('점심',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                            Text('$lunchCaloriesToStr kcal',
+                                style: TextStyle(fontSize: 11)),
+                          ]),
+                          TableRow(children: [SizedBox(height: 5), SizedBox()]),
+                          TableRow(children: [
+                            Text('저녁',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                            Text('$dinnerCaloriesToStr kcal',
+                                style: TextStyle(fontSize: 11)),
+                          ]),
+                          TableRow(children: [SizedBox(height: 5), SizedBox()]),
+                          TableRow(children: [
+                            Text('간식',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                            Text('$snackCaloriesToStr kcal',
+                                style: TextStyle(fontSize: 11)),
+                          ]),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: PieChart(
+                        PieChartData(
+                          startDegreeOffset: -90,
+                          sections: sections,
+                          centerSpaceRadius: 40,
+                          sectionsSpace: totalCalories == 0 ? 0 : 3,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      flex: 1,
+                      child: Table(
+                        columnWidths: const {
+                          0: FlexColumnWidth(),
+                          1: FixedColumnWidth(50),
+                        },
+                        children: [
+                          TableRow(children: [
+                            Text('탄수화물',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                            Text('$totalCarbToStr g',
+                                style: TextStyle(fontSize: 11)),
+                          ]),
+                          TableRow(
+                              children: [SizedBox(height: 10), SizedBox()]),
+                          TableRow(children: [
+                            Text('단백질',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                            Text('$totalProteinToStr g',
+                                style: TextStyle(fontSize: 11)),
+                          ]),
+                          TableRow(
+                              children: [SizedBox(height: 10), SizedBox()]),
+                          TableRow(children: [
+                            Text('지방',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                            Text('$totalFatToStr g',
+                                style: TextStyle(fontSize: 11)),
+                          ]),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Table(
-                      columnWidths: const {
-                        0: FlexColumnWidth(),
-                        1: FixedColumnWidth(65),
-                      },
-                      children: [
-                        TableRow(children: [
-                          Text('아침',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w600)),
-                          Text(' $breakfastCaloriesToStr kcal',
-                              style: TextStyle(fontSize: 11)),
-                        ]),
-                        TableRow(children: [SizedBox(height: 5), SizedBox()]),
-                        TableRow(children: [
-                          Text('점심',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w600)),
-                          Text(' $lunchCaloriesToStr kcal',
-                              style: TextStyle(fontSize: 11)),
-                        ]),
-                        TableRow(children: [SizedBox(height: 5), SizedBox()]),
-                        TableRow(children: [
-                          Text('저녁',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w600)),
-                          Text(' $dinnerCaloriesToStr kcal',
-                              style: TextStyle(fontSize: 11)),
-                        ]),
-                        TableRow(children: [SizedBox(height: 5), SizedBox()]),
-                        TableRow(children: [
-                          Text('간식',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w600)),
-                          Text(' $snackCaloriesToStr kcal',
-                              style: TextStyle(fontSize: 11)),
-                        ]),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: PieChart(
-                    PieChartData(
-                      startDegreeOffset: -90,
-                      sections: sections,
-                      centerSpaceRadius: 40,
-                      sectionsSpace: 3,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Table(
-                      columnWidths: const {
-                        0: FlexColumnWidth(),
-                        1: FixedColumnWidth(50),
-                      },
-                      children: [
-                        TableRow(children: [
-                          Text('탄수화물',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w600)),
-                          Text(' $totalCarbToStr g',
-                              style: TextStyle(fontSize: 11)),
-                        ]),
-                        TableRow(children: [SizedBox(height: 10), SizedBox()]),
-                        TableRow(children: [
-                          Text('단백질',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w600)),
-                          Text(' $totalProteinToStr g',
-                              style: TextStyle(fontSize: 11)),
-                        ]),
-                        TableRow(children: [SizedBox(height: 10), SizedBox()]),
-                        TableRow(children: [
-                          Text('지방',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w600)),
-                          Text(' $totalFatToStr g',
-                              style: TextStyle(fontSize: 11)),
-                        ]),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-            top: 48,
-          left: 148,
-          width: 60,
-
-            child: Table(children: [
+            Table(children: [
               TableRow(children: [
-                Text('총', style: TextStyle(fontSize: 12), textAlign: TextAlign.center,),
+                Text(
+                  '총',
+                  style: TextStyle(fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
               ]),
               TableRow(children: [
                 Text('$totalCaloriesToStr',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    textAlign: TextAlign.center),
               ]),
               TableRow(children: [
-                Text('kcal', style: TextStyle(fontSize: 12), textAlign: TextAlign.center),
+                Text('kcal',
+                    style: TextStyle(fontSize: 12),
+                    textAlign: TextAlign.center),
               ])
-            ]))
-      ],
-    )
-    );
+            ]),
+          ],
+        ));
   }
 }

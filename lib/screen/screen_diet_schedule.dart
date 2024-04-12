@@ -7,43 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../services/urls.dart';
+import '../services/service_diet.dart';
 import '../widgets/widget_diet.dart';
-
-
-class Ingestion {
-  final double? totalCalories;
-  final double? totalCarb;
-  final double? totalFat;
-  final double? totalProtein;
-  final double? breakfastCalories;
-  final double? lunchCalories;
-  final double? dinnerCalories;
-  final double? snackCalories;
-
-  Ingestion({
-    required this.totalCalories,
-    required this.totalCarb,
-    required this.totalFat,
-    required this.totalProtein,
-    required this.breakfastCalories,
-    required this.lunchCalories,
-    required this.dinnerCalories,
-    required this.snackCalories,
-  });
-
-  factory Ingestion.fromJson(Map<String, dynamic> json) {
-    return Ingestion(
-      totalCalories: json['totalKcal'],
-      totalCarb: json['totalCarbohydrate'],
-      totalFat: json['totalFat'],
-      totalProtein: json['totalProtein'],
-      breakfastCalories: json['breakfastKcal'],
-      lunchCalories: json['lunchKcal'],
-      dinnerCalories: json['dinnerKcal'],
-      snackCalories: json['snackKcal'],
-    );
-  }
-}
 
 class DietSchedule extends StatefulWidget {
   @override
@@ -53,6 +18,7 @@ class DietSchedule extends StatefulWidget {
 class _DietScheduleState extends State<DietSchedule> {
   late DateTime selectedDate;
   List<dynamic> dietSchedule = [];
+  List<dynamic> ingestionSchedule = [];
 
   @override
   void initState() {
@@ -64,7 +30,6 @@ class _DietScheduleState extends State<DietSchedule> {
   FutureOr<Ingestion?> fetchIngestion() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
     final String url = '$baseUrl/ingestion/total/$userId/$formattedDate';
-    List<Ingestion> ingestion = [];
 
     try {
       final response = await http.get(
@@ -74,13 +39,11 @@ class _DietScheduleState extends State<DietSchedule> {
 
       if (response.statusCode == 200) {
         String responseBody = utf8.decode(response.bodyBytes);
+        Map<String, dynamic> ingestion = json.decode(responseBody);
 
-        final data = json.decode(responseBody);
-        print(data);
-
-        Ingestion ingestion = Ingestion.fromJson(data);
-        return ingestion;
-
+        setState(() {
+          ingestionSchedule = [ingestion];
+        });
       } else {
         throw Exception('Failed to load ingestion');
       }
@@ -141,26 +104,30 @@ class _DietScheduleState extends State<DietSchedule> {
             SizedBox(height: 20),
             WidgetDiet(
               onTap: () {},
+              isWidget: false,
               userCalories: 2000,
-              breakfastCalories: 400,
-              lunchCalories: 500,
-              dinnerCalories: 500,
-              snackCalories: 500,
-              totalCarb: 24,
-              totalFat: 50,
-              totalProtein: 20,
+              breakfastCalories: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['breakfastKcal']
+                  : 0,
+              lunchCalories: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['lunchKcal']
+                  : 0,
+              dinnerCalories: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['dinnerKcal']
+                  : 0,
+              snackCalories: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['snackKcal']
+                  : 0,
+              totalProtein: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['totalProtein']
+                  : 0,
+              totalCarb: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['totalCarbohydrate']
+                  : 0,
+              totalFat: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['totalFat']
+                  : 0,
             ),
-            // WidgetDiet(
-            //   onTap: () {},
-            //   userCalories: 2000,
-            //   breakfastCalories: Ingestion.fromJson({})?.breakfastCalories ?? 0,
-            //   lunchCalories: Ingestion.fromJson({})?.lunchCalories ?? 0,
-            //   dinnerCalories: Ingestion.fromJson({})?.dinnerCalories ?? 0,
-            //   snackCalories: Ingestion.fromJson({})?.snackCalories ?? 0,
-            //   totalCarb: Ingestion.fromJson({})?.totalCarb ?? 0,
-            //   totalFat: Ingestion.fromJson({})?.totalFat ?? 0,
-            //   totalProtein: Ingestion.fromJson({})?.totalProtein ?? 0,
-            // ),
             Expanded(
               child: ListView.builder(
                 itemCount: dietSchedule.length,
