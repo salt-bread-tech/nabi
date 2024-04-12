@@ -55,15 +55,15 @@ class _LoginState extends State<Login> {
               children: <Widget>[
                 CustomTextFormField(
                   keyboardType: TextInputType.emailAddress,
-                  labelText: '이메일',
-                  hintText: 'example@gmail.com',
+                  labelText: '아이디',
+                  hintText: '아이디를 입력해주세요',
                   controller: emailController,
                   isPassword: false,
                 ),
                 SizedBox(height: 20),
                 CustomTextFormField(
                   labelText: '비밀번호',
-                  hintText: '비밀번호 입력',
+                  hintText: '비밀번호를 입력해주세요',
                   controller: passwordController,
                   keyboardType: TextInputType.visiblePassword,
                   isPassword: true,

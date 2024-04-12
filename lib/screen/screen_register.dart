@@ -102,7 +102,7 @@ class _RegisterState extends State<Register> {
                       borderSide: BorderSide(
                         color: Color(0xFF98CBFA),
                       )),
-                  labelText: '이메일',
+                  labelText: '아이디',
                   hintText: '아이디를 입력해주세요',
                   labelStyle: TextStyle(
                     color: Colors.grey,
