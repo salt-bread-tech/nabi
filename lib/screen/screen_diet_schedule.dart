@@ -25,6 +25,33 @@ class _DietScheduleState extends State<DietSchedule> {
     super.initState();
     selectedDate = DateTime.now();
     fetchIngestion();
+    fetchDietSchedule();
+  }
+
+  Future<void> fetchDietSchedule() async {
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final String url = '$baseUrl/diet/$userId/$formattedDate';
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        String responseBody = utf8.decode(response.bodyBytes);
+        List<dynamic> diet = json.decode(responseBody);
+
+        setState(() {
+          dietSchedule = diet;
+        });
+        print(dietSchedule);
+      } else {
+        print('복용 일정 조회 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
   }
 
   FutureOr<Ingestion?> fetchIngestion() async {
@@ -63,6 +90,7 @@ class _DietScheduleState extends State<DietSchedule> {
       setState(() {
         selectedDate = picked;
         fetchIngestion();
+        fetchDietSchedule();
       });
     }
   }
@@ -84,7 +112,7 @@ class _DietScheduleState extends State<DietSchedule> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.pushNamed(context, '/MedicineSearch');
+              Navigator.pushNamed(context, '/FoodSearch');
             },
           ),
         ],
@@ -128,31 +156,25 @@ class _DietScheduleState extends State<DietSchedule> {
                   ? ingestionSchedule[0]['totalFat']
                   : 0,
             ),
+            SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: dietSchedule.length,
                 itemBuilder: (context, index) {
-                  var dosage = dietSchedule[index];
+                  var diet = dietSchedule[index];
                   return Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: ListTile(
-                      title: Text('${dosage['medicineName']}'),
-                      subtitle:
-                          Text('복용 시간: ${dosage['times']},${dosage['date']}'),
-                      trailing: Icon(
-                        dosage['medicineTaken']
-                            ? Icons.check_circle
-                            : Icons.check_circle_outline,
-                        color: dosage['medicineTaken']
-                            ? Colors.green
-                            : Colors.grey,
-                      ),
-                      onTap: () {
-                        print(
-                            'userId: $userId, medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: ${dosage['times']}');
-                      },
+                      title: Row(
+                        children: [
+                          Text(diet['name'], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          SizedBox(width: 5),
+                          Text('${diet['servingSize'].toStringAsFixed(0)}g', style: TextStyle(fontSize: 12)),
+                        ]),
+                      subtitle: Text('탄수화물 ${diet['carbohydrate'].toStringAsFixed(0)}g 단백질 ${diet['protein'].toStringAsFixed(0)}g 지방 ${diet['fat'].toStringAsFixed(0)}g', style: TextStyle(fontSize: 12)),
+                      trailing: Text('${diet['calories'].toStringAsFixed(0)}kcal', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                     ),
                   );
                 },

@@ -90,10 +90,10 @@ class WidgetDiet extends StatelessWidget {
                     BoxShadow(
                       color: isWidget
                           ? Colors.transparent
-                          : Colors.grey.withOpacity(0.5),
+                          : Colors.grey.withOpacity(0.3),
                       spreadRadius: 1,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
+                      blurRadius: 1,
+                      offset: Offset(0, 1),
                     ),
                   ],
                 ),
