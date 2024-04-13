@@ -7,6 +7,7 @@ import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_medicine_search.dart';
 import 'package:doctor_nyang/screen/screen_register.dart';
 import 'package:doctor_nyang/screen/screen_user.dart';
+import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:flutter/material.dart';
 // flutter_tts 사용을 위한 라이브러리 임포트
 import 'package:flutter_tts/flutter_tts.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/DosageSchedule': (context) => DosageSchedule(),
         '/MedicineSearch': (context) => MedicineSearch(),
         '/DietSchedule': (context) => DietSchedule(),
+        '/FoodSearch' : (context) => FoodSearch(),
       },
     );
   }

@@ -169,11 +169,11 @@ class _DietScheduleState extends State<DietSchedule> {
                     child: ListTile(
                       title: Row(
                         children: [
-                          Text(diet['name'], style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text(diet['name'], style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                           SizedBox(width: 5),
-                          Text('${diet['servingSize'].toStringAsFixed(0)}g', style: TextStyle(fontSize: 12)),
+                          Text('${diet['servingSize'].toStringAsFixed(0)}g', style: TextStyle(fontSize: 10)),
                         ]),
-                      subtitle: Text('탄수화물 ${diet['carbohydrate'].toStringAsFixed(0)}g 단백질 ${diet['protein'].toStringAsFixed(0)}g 지방 ${diet['fat'].toStringAsFixed(0)}g', style: TextStyle(fontSize: 12)),
+                      subtitle: Text('탄수화물 ${diet['carbohydrate'].toStringAsFixed(0)}g 단백질 ${diet['protein'].toStringAsFixed(0)}g 지방 ${diet['fat'].toStringAsFixed(0)}g', style: TextStyle(fontSize: 11)),
                       trailing: Text('${diet['calories'].toStringAsFixed(0)}kcal', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                     ),
                   );
