@@ -129,16 +129,20 @@ class _FoodSearchState extends State<FoodSearch> {
 
   void _incrementQuantity() {
     setState(() {
-      _selectedQuantity += 0.5;
-      _controller.text = _selectedQuantity.toString();
+      _selectedQuantity += _selectedGram == '인분' ? 0.5 : 1.0;
+      _controller.text = _selectedGram == '인분'
+          ? _selectedQuantity.toString()
+          : _selectedQuantity.toStringAsFixed(0);
     });
   }
 
   void _decrementQuantity() {
     if (_selectedQuantity > 0.5) {
       setState(() {
-        _selectedQuantity -= 0.5;
-        _controller.text = _selectedQuantity.toString();
+        _selectedQuantity -= _selectedGram == '인분' ? 0.5 : 1.0;
+        _controller.text = _selectedGram == '인분'
+            ? _selectedQuantity.toString()
+            : _selectedQuantity.toStringAsFixed(0);
       });
     }
   }
@@ -146,7 +150,9 @@ class _FoodSearchState extends State<FoodSearch> {
   @override
   void initState() {
     super.initState();
-    _controller.text = _selectedQuantity.toString();
+    _controller.text = _selectedGram == '인분'
+        ? _selectedQuantity.toString()
+        : _selectedQuantity.toStringAsFixed(0);
     setState(() {
       _selectedMeal = _meals[0];
       _selectedGram = _grams[0];
@@ -296,6 +302,13 @@ class _FoodSearchState extends State<FoodSearch> {
                         onChanged: (newValue) {
                           setState(() {
                             _selectedGram = newValue!;
+                            if(_selectedGram == '인분') {
+                              _selectedQuantity = 1.0;
+                              _controller.text = _selectedQuantity.toString();
+                            } else {
+                              _selectedQuantity = food.servingSize;
+                              _controller.text = _selectedQuantity.toStringAsFixed(0);
+                            }
                           });
                         },
                         items: _grams
@@ -488,7 +501,9 @@ class _FoodSearchState extends State<FoodSearch> {
                     _selectedGram = '인분';
                     _selectedMeal = '아침';
                     setState(() {
-                      _controller.text = _selectedQuantity.toString();
+                      _controller.text = _selectedGram == '인분'
+                          ? _selectedQuantity.toString()
+                          : _selectedQuantity.toStringAsFixed(0);
                     });
                     showCustomModalBottomSheet(context, food);
                   },
