@@ -7,43 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../services/urls.dart';
+import '../services/service_diet.dart';
 import '../widgets/widget_diet.dart';
-
-
-class Ingestion {
-  final double? totalCalories;
-  final double? totalCarb;
-  final double? totalFat;
-  final double? totalProtein;
-  final double? breakfastCalories;
-  final double? lunchCalories;
-  final double? dinnerCalories;
-  final double? snackCalories;
-
-  Ingestion({
-    required this.totalCalories,
-    required this.totalCarb,
-    required this.totalFat,
-    required this.totalProtein,
-    required this.breakfastCalories,
-    required this.lunchCalories,
-    required this.dinnerCalories,
-    required this.snackCalories,
-  });
-
-  factory Ingestion.fromJson(Map<String, dynamic> json) {
-    return Ingestion(
-      totalCalories: json['totalKcal'],
-      totalCarb: json['totalCarbohydrate'],
-      totalFat: json['totalFat'],
-      totalProtein: json['totalProtein'],
-      breakfastCalories: json['breakfastKcal'],
-      lunchCalories: json['lunchKcal'],
-      dinnerCalories: json['dinnerKcal'],
-      snackCalories: json['snackKcal'],
-    );
-  }
-}
 
 class DietSchedule extends StatefulWidget {
   @override
@@ -53,18 +18,19 @@ class DietSchedule extends StatefulWidget {
 class _DietScheduleState extends State<DietSchedule> {
   late DateTime selectedDate;
   List<dynamic> dietSchedule = [];
+  List<dynamic> ingestionSchedule = [];
 
   @override
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
     fetchIngestion();
+    fetchDietSchedule();
   }
 
-  FutureOr<Ingestion?> fetchIngestion() async {
+  Future<void> fetchDietSchedule() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String url = '$baseUrl/ingestion/total/$userId/$formattedDate';
-    List<Ingestion> ingestion = [];
+    final String url = '$baseUrl/diet/$userId/$formattedDate';
 
     try {
       final response = await http.get(
@@ -74,13 +40,37 @@ class _DietScheduleState extends State<DietSchedule> {
 
       if (response.statusCode == 200) {
         String responseBody = utf8.decode(response.bodyBytes);
+        List<dynamic> diet = json.decode(responseBody);
 
-        final data = json.decode(responseBody);
-        print(data);
+        setState(() {
+          dietSchedule = diet;
+        });
+        print(dietSchedule);
+      } else {
+        print('복용 일정 조회 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
+  }
 
-        Ingestion ingestion = Ingestion.fromJson(data);
-        return ingestion;
+  FutureOr<Ingestion?> fetchIngestion() async {
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final String url = '$baseUrl/ingestion/total/$userId/$formattedDate';
 
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        String responseBody = utf8.decode(response.bodyBytes);
+        Map<String, dynamic> ingestion = json.decode(responseBody);
+
+        setState(() {
+          ingestionSchedule = [ingestion];
+        });
       } else {
         throw Exception('Failed to load ingestion');
       }
@@ -100,6 +90,7 @@ class _DietScheduleState extends State<DietSchedule> {
       setState(() {
         selectedDate = picked;
         fetchIngestion();
+        fetchDietSchedule();
       });
     }
   }
@@ -121,7 +112,7 @@ class _DietScheduleState extends State<DietSchedule> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.pushNamed(context, '/MedicineSearch');
+              Navigator.pushNamed(context, '/FoodSearch');
             },
           ),
         ],
@@ -141,51 +132,56 @@ class _DietScheduleState extends State<DietSchedule> {
             SizedBox(height: 20),
             WidgetDiet(
               onTap: () {},
+              isWidget: false,
               userCalories: 2000,
-              breakfastCalories: 400,
-              lunchCalories: 500,
-              dinnerCalories: 500,
-              snackCalories: 500,
-              totalCarb: 24,
-              totalFat: 50,
-              totalProtein: 20,
+              breakfastCalories: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['breakfastKcal']
+                  : 0,
+              lunchCalories: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['lunchKcal']
+                  : 0,
+              dinnerCalories: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['dinnerKcal']
+                  : 0,
+              snackCalories: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['snackKcal']
+                  : 0,
+              totalProtein: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['totalProtein']
+                  : 0,
+              totalCarb: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['totalCarbohydrate']
+                  : 0,
+              totalFat: ingestionSchedule.isNotEmpty
+                  ? ingestionSchedule[0]['totalFat']
+                  : 0,
             ),
-            // WidgetDiet(
-            //   onTap: () {},
-            //   userCalories: 2000,
-            //   breakfastCalories: Ingestion.fromJson({})?.breakfastCalories ?? 0,
-            //   lunchCalories: Ingestion.fromJson({})?.lunchCalories ?? 0,
-            //   dinnerCalories: Ingestion.fromJson({})?.dinnerCalories ?? 0,
-            //   snackCalories: Ingestion.fromJson({})?.snackCalories ?? 0,
-            //   totalCarb: Ingestion.fromJson({})?.totalCarb ?? 0,
-            //   totalFat: Ingestion.fromJson({})?.totalFat ?? 0,
-            //   totalProtein: Ingestion.fromJson({})?.totalProtein ?? 0,
-            // ),
+            SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: dietSchedule.length,
                 itemBuilder: (context, index) {
-                  var dosage = dietSchedule[index];
+                  var diet = dietSchedule[index];
                   return Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: ListTile(
-                      title: Text('${dosage['medicineName']}'),
-                      subtitle:
-                          Text('복용 시간: ${dosage['times']},${dosage['date']}'),
-                      trailing: Icon(
-                        dosage['medicineTaken']
-                            ? Icons.check_circle
-                            : Icons.check_circle_outline,
-                        color: dosage['medicineTaken']
-                            ? Colors.green
-                            : Colors.grey,
-                      ),
-                      onTap: () {
-                        print(
-                            'userId: $userId, medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: ${dosage['times']}');
-                      },
+                      title: Row(children: [
+                        Text(diet['name'],
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold)),
+                        SizedBox(width: 5),
+                        Text('${diet['servingSize'].toStringAsFixed(0)}g',
+                            style: TextStyle(fontSize: 10)),
+                      ]),
+                      subtitle: Text(
+                          '탄수화물 ${diet['carbohydrate'].toStringAsFixed(0)}g 단백질 ${diet['protein'].toStringAsFixed(0)}g 지방 ${diet['fat'].toStringAsFixed(0)}g',
+                          style: TextStyle(fontSize: 11)),
+                      trailing: Text(
+                          '${diet['calories'].toStringAsFixed(0)}kcal',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
                     ),
                   );
                 },
