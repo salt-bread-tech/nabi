@@ -574,9 +574,11 @@ class _FoodSearchState extends State<FoodSearch> {
               return SizedBox();
             } else {
               return Card(
+
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                elevation: 0,
                 color: AppTheme.pastelYellow,
                 child: ListTile(
                   onTap: () {
