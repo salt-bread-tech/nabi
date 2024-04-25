@@ -1,3 +1,4 @@
+import 'package:doctor_nyang/screen/screen_settings.dart';
 import 'package:flutter/material.dart';
 import '../services/globals.dart' as globals;
 import '../services/service_auth.dart';
@@ -30,12 +31,20 @@ class _UserScreenState extends State<UserScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                  builder: (context) => SettingsScreen(),
+              ),
+              );
             },
           ),
         ],

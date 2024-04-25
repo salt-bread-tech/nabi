@@ -62,10 +62,8 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
         maxPerform: maxPerform,
       );
 
-      // 성공 알림
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 성공")));
     } catch (e) {
-      // 실패 알림
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 실패: $e")));
     }
   }
