@@ -1,10 +1,58 @@
+import 'package:doctor_nyang/services/globals.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'dart:convert';
+import '../services/urls.dart';
+
+
+//약 등록 api
+Future<void> registMedicine(BuildContext context, int uid, String startDate,
+    String medicineName, int once, int total, int daily, String dosage) async {
+  final url = Uri.parse('$baseUrl/medicine/register');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'uid': uid,
+        'startDate': startDate,
+        'medicineName': medicineName,
+        'once': once,
+        'total': total,
+        'daily': daily,
+        'dosage': dosage,
+      }),
+    );
+
+    final responseData = json.decode(response.body);
+
+    if (responseData is int) {
+      switch (responseData) {
+        case 200:
+          print('약물 등록 성공');
+          Navigator.pushNamed(context, '/DosageSchedule');
+          break;
+        case 100:
+          print('등록 실패: 유저 정보를 찾을 수 없음');
+          break;
+        case 300:
+          print('등록 실패: 처방전 정보를 찾을 수 없음');
+          break;
+        default:
+          print('알 수 없는 오류');
+      }
+    }
+  } catch (error) {
+    print('네트워크 오류: $error');
+  }
+}
 
 
 class MedicineRegist extends StatefulWidget {
-  late final String name;
+  final String name;
 
   MedicineRegist({required this.name});
 
@@ -13,16 +61,102 @@ class MedicineRegist extends StatefulWidget {
 }
 
 class _MedicineRegistState extends State<MedicineRegist> {
+  DateTime selectedDate = DateTime.now();
+  TextEditingController DateController = TextEditingController();
+  TextEditingController onceController = TextEditingController();
+  TextEditingController totalController = TextEditingController();
+  TextEditingController dailyController = TextEditingController();
+  TextEditingController dosageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    DateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('yyyy-MM-dd').format(dateTime);
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        DateController.text = _formatDate(picked);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('복용 일정 추가하기', style: TextStyle(fontSize: 16),),
+        title: Text('복용 일정 추가하기', style: TextStyle(fontSize: 16)),
       ),
-      body: Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: Column(
+          children: [
+            Text('약물 이름: ${widget.name}'),
+            TextFormField(
+              controller: onceController,
+              decoration: InputDecoration(labelText: '1회 복용량'),
+              keyboardType: TextInputType.number,
+            ),
+            TextFormField(
+              controller: totalController,
+              decoration: InputDecoration(labelText: '총 복용량'),
+              keyboardType: TextInputType.number,
+            ),
+            TextFormField(
+              controller: dailyController,
+              decoration: InputDecoration(labelText: '하루 복용량'),
+              keyboardType: TextInputType.number,
+            ),
+            TextFormField(
+              controller: dosageController,
+              decoration: InputDecoration(labelText: '복용 방법'),
+            ),
+            TextFormField(
+              controller: DateController,
+              decoration: InputDecoration(labelText: '복용 시작 날짜'),
+              readOnly: true,
+              onTap: () => _selectDate(context),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                final uid = userId;
+                final String startDate = _formatDate(selectedDate);
+                final String medicineName = widget.name;
+                final int once = int.tryParse(onceController.text) ?? 0;
+                final int total = int.tryParse(totalController.text) ?? 0;
+                final int daily = int.tryParse(dailyController.text) ?? 0;
+                final String dosage = dosageController.text;
 
-          )
+                print({
+                  'uid': uid,
+                  'startDate': startDate,
+                  'medicineName': medicineName,
+                  'once': once,
+                  'total': total,
+                  'daily': daily,
+                  'dosage': dosage
+                });
+
+                await registMedicine(context, uid!, startDate, medicineName,
+                    once, total, daily, dosage);
+              },
+              child: Text('등록하기'),
+            ),
+          ],
+        ),
       ),
     );
   }
