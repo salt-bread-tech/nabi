@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'dart:async';
 
 class OCRModal {
@@ -9,7 +10,33 @@ class OCRModal {
     XFile? _image;
     final ImagePicker picker = ImagePicker();
 
-    void _showImageModal(XFile? image) {
+    void getRecognizedText(XFile image) async {
+      final InputImage inputImage = InputImage.fromFilePath(image.path);
+      text
+
+    }
+
+    void showOCRmodal(){
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            padding: const EdgeInsets.all(30.0),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
+            ),
+            child: Column(),
+          );
+        },
+      );
+    }
+
+    void showImageModal(XFile? image) {
       if (image != null) {
         showModalBottomSheet(
             context: context,
@@ -51,7 +78,7 @@ class OCRModal {
                           ),
                           onPressed: () {
                             Navigator.pop(context);
-                            // OCR API 호출
+                            showOCRmodal();
                           },
                           child: Text('처방전 스캔하기', style: TextStyle(color: Colors.black)),
                         ),
@@ -70,8 +97,7 @@ class OCRModal {
       if (pickedFile != null) {
         _image = XFile(pickedFile.path);
       }
-
-      _showImageModal(_image);
+      showImageModal(_image);
     }
 
     showModalBottomSheet(
