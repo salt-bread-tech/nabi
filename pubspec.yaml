@@ -40,6 +40,7 @@ dependencies:
   fl_chart: ^0.36.0
   flutter_chat_ui: ^1.6.12
   flutter_chat_types: ^3.6.2
+  image_picker: ^1.1.0
   flutter_tts:
 
 

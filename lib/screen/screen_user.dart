@@ -2,7 +2,7 @@ import 'package:doctor_nyang/screen/screen_settings.dart';
 import 'package:flutter/material.dart';
 import '../services/globals.dart' as globals;
 import '../services/service_auth.dart';
-import '../widgets/widget_ocr_modal.dart';
+import '../widgets/widget_imagePick_modal.dart';
 
 class UserScreen extends StatefulWidget {
   @override
@@ -112,7 +112,7 @@ class _UserScreenState extends State<UserScreen> {
                 ),ListTile(
                   title: Text('처방전 추가'),
                   onTap: () {
-                      OCRModal.show(context);
+                    OCRModal.show(context);
                   },
                 ),
               ],
