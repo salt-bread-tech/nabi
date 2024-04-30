@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../services/urls.dart';
 
 
+
 //약 등록 api
 Future<void> registMedicine(BuildContext context, int uid, String startDate,
     String medicineName, int once, int total, int daily, String dosage) async {
@@ -51,6 +52,7 @@ Future<void> registMedicine(BuildContext context, int uid, String startDate,
 }
 
 
+
 class MedicineRegist extends StatefulWidget {
   final String name;
 
@@ -61,12 +63,43 @@ class MedicineRegist extends StatefulWidget {
 }
 
 class _MedicineRegistState extends State<MedicineRegist> {
+
+
+  String _selectedDosage = 'none';
+  Widget DosageButton(String gender) {
+    bool isSelected = _selectedDosage == gender;
+
+    return Ink(
+      decoration: BoxDecoration(
+        color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB),
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10.0),
+        onTap: () {
+          setState(() {
+            _selectedDosage = gender;
+          });
+        },
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 65.0, vertical: 15.0),
+          alignment: Alignment.center,
+          child: Text(gender == '식후' ? '식전' : '식후'),
+        ),
+      ),
+    );
+  }
+
+
   DateTime selectedDate = DateTime.now();
   TextEditingController DateController = TextEditingController();
   TextEditingController onceController = TextEditingController();
   TextEditingController totalController = TextEditingController();
   TextEditingController dailyController = TextEditingController();
-  TextEditingController dosageController = TextEditingController();
+  //TextEditingController dosageController = TextEditingController();
 
   @override
   void initState() {
@@ -96,6 +129,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('복용 일정 추가하기', style: TextStyle(fontSize: 16)),
       ),
@@ -103,7 +137,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
           children: [
-            Text('약물 이름: ${widget.name}'),
+            Text('약 이름: ${widget.name}'),
             TextFormField(
               controller: onceController,
               decoration: InputDecoration(labelText: '1회 복용량'),
@@ -119,9 +153,16 @@ class _MedicineRegistState extends State<MedicineRegist> {
               decoration: InputDecoration(labelText: '하루 복용량'),
               keyboardType: TextInputType.number,
             ),
-            TextFormField(
-              controller: dosageController,
-              decoration: InputDecoration(labelText: '복용 방법'),
+            SizedBox(height: 20),
+            Container(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  DosageButton('식후'),
+                  SizedBox(width: 10),
+                  DosageButton('식전'),
+                ],
+              ),
             ),
             TextFormField(
               controller: DateController,
@@ -138,7 +179,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
                 final int once = int.tryParse(onceController.text) ?? 0;
                 final int total = int.tryParse(totalController.text) ?? 0;
                 final int daily = int.tryParse(dailyController.text) ?? 0;
-                final String dosage = dosageController.text;
+                final String dosage = _selectedDosage;
 
                 print({
                   'uid': uid,
