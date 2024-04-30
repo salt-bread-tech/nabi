@@ -10,8 +10,6 @@ import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:flutter/material.dart';
-// flutter_tts 사용을 위한 라이브러리 임포트
-import 'package:flutter_tts/flutter_tts.dart';
 
 void main() {
   runApp(MyApp());
@@ -54,7 +52,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final FlutterTts tts = FlutterTts();
   final TextEditingController con = TextEditingController();
   int _currentIndex = 1;
 
@@ -63,10 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    // setLanguage: 언어 설정 / setSpeechRate(): 읽기 속도 설정(0.0~1.0) & 0.0이 제일 느림 
-    tts.setLanguage("ko-KR");
-    tts.setSpeechRate(0);
-    // tts.speak(""); -> tts.speak()으로 말할 내용
   }
 
   final List<Widget> _children = [
