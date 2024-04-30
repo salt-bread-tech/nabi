@@ -2,21 +2,38 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'dart:async';
 
 class OCRModal {
   static void show(BuildContext context) {
     XFile? _image;
+    String scannedText = "";
     final ImagePicker picker = ImagePicker();
 
     void getRecognizedText(XFile image) async {
-      final InputImage inputImage = InputImage.fromFilePath(image.path);
-      text
+      final FirebaseVisionImage visionImage = FirebaseVisionImage.fromFile(File(image.path));
+      final TextRecognizer textRecognizer = FirebaseVision.instance.textRecognizer();
 
+      try {
+        final VisionText visionText = await textRecognizer.processImage(visionImage);
+        String scannedText = '';
+        for (TextBlock block in visionText.blocks) {
+          for (TextLine line in block.lines) {
+            scannedText += '${line.text}\n';
+          }
+        }
+
+        print(scannedText);
+      } catch (e) {
+        print('Error while recognizing text: $e');
+      } finally {
+        textRecognizer.close();
+      }
     }
 
-    void showOCRmodal(){
+    void showOCRmodal() {
+      getRecognizedText(_image!);
       showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
@@ -30,7 +47,36 @@ class OCRModal {
                 topRight: Radius.circular(30),
               ),
             ),
-            child: Column(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Text(
+                  scannedText,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  height: 55,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Color(0xFFEBEBEB),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('확인', style: TextStyle(color: Colors.black)),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       );
@@ -80,15 +126,15 @@ class OCRModal {
                             Navigator.pop(context);
                             showOCRmodal();
                           },
-                          child: Text('처방전 스캔하기', style: TextStyle(color: Colors.black)),
+                          child: Text('처방전 스캔하기',
+                              style: TextStyle(color: Colors.black)),
                         ),
                       ),
                     ],
                   ),
                 ),
               );
-            }
-        );
+            });
       }
     }
 
