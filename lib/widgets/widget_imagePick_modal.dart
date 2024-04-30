@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'dart:async';
 
 class OCRModal {
@@ -11,29 +10,7 @@ class OCRModal {
     String scannedText = "";
     final ImagePicker picker = ImagePicker();
 
-    void getRecognizedText(XFile image) async {
-      final FirebaseVisionImage visionImage = FirebaseVisionImage.fromFile(File(image.path));
-      final TextRecognizer textRecognizer = FirebaseVision.instance.textRecognizer();
-
-      try {
-        final VisionText visionText = await textRecognizer.processImage(visionImage);
-        String scannedText = '';
-        for (TextBlock block in visionText.blocks) {
-          for (TextLine line in block.lines) {
-            scannedText += '${line.text}\n';
-          }
-        }
-
-        print(scannedText);
-      } catch (e) {
-        print('Error while recognizing text: $e');
-      } finally {
-        textRecognizer.close();
-      }
-    }
-
     void showOCRmodal() {
-      getRecognizedText(_image!);
       showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
