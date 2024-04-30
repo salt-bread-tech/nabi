@@ -6,6 +6,7 @@ import 'package:doctor_nyang/screen/screen_intro.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_medicine_search.dart';
 import 'package:doctor_nyang/screen/screen_register.dart';
+import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/MedicineSearch': (context) => MedicineSearch(),
         '/DietSchedule': (context) => DietSchedule(),
         '/FoodSearch' : (context) => FoodSearch(),
+        '/routine' : (context) => RoutineScreen(),
       },
     );
   }

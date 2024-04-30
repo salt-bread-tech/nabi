@@ -115,6 +115,12 @@ class _UserScreenState extends State<UserScreen> {
                     OCRModal.show(context);
                   },
                 ),
+                ListTile(
+                  title: Text('routin'),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/routine');
+                  },
+                ),
               ],
             )
           ],
