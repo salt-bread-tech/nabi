@@ -1,10 +1,41 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+import '../services/globals.dart' as globals;
+import '../services/urls.dart';
 
-import '../services/service_routine.dart';
+Future<void> registerDailyRoutine({
+  required int userUid,
+  required String routineName,
+  required int maxPerform,
+  required String startDate,
+  required String colorCode,
+}) async {
+  final url = Uri.parse('$baseUrl/routine/register');
+  final response = await http.post(
+    url,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, dynamic>{
+      'uid': userUid,
+      'name': routineName,
+      'maxPerform': maxPerform,
+      'date': startDate,
+      'colorCode': colorCode,
+    }),
+  );
 
-
+  if (response.statusCode == 200) {
+    print('루틴 등록 성공');
+  } else if (response.statusCode == 400) {
+    print('사용자 정보를 찾을 수 없음');
+  } else {
+    throw Exception('루틴 등록 실패');
+  }
+}
 
 class RoutineScreen extends StatefulWidget {
   @override
@@ -39,91 +70,32 @@ class AddRoutineWidget extends StatefulWidget {
 
 class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   final TextEditingController _routineController = TextEditingController();
-  DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now().add(Duration(days: 7));
-  final FocusNode _focusNode = FocusNode();
   int _selectedFrequencyValue = 1;
-  bool _showDatePicker = false;
-  bool _isStartDatePicker = false;
-  late DateTime _selectedDate;
+  Color _selectedColor = Color(0xFFFFDFEB);
+  String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
+  void _registerRoutine() async {
+    int? userId = globals.userId;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("사용자 ID가 없습니다.")));
+      return;
+    }
 
-  Future<void> _registerRoutine() async {
+    String colorCodeWithoutAlpha = _selectedColor.value.toRadixString(16).substring(2).toUpperCase();
+
     try {
-      int userUid = 1; //임시
-      int routineId = 1; //임시
-      int maxPerform = _selectedFrequencyValue;
-
       await registerDailyRoutine(
-        userUid: userUid,
-        routineId: routineId,
-        startDate: _startDate,
-        endDate: _endDate,
-        maxPerform: maxPerform,
+          userUid: userId,
+          routineName: _routineController.text,
+          maxPerform: _selectedFrequencyValue,
+          startDate: startDate,
+          colorCode: colorCodeWithoutAlpha
       );
-
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 성공")));
+      print('userId: ${userId}, Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 실패: $e")));
     }
-  }
-
-
-  void _toggleDatePicker(bool isStartDate) {
-    setState(() {
-      _showDatePicker = !_showDatePicker;
-      if (isStartDate) {
-        _selectedDate = _startDate;
-      } else {
-        _selectedDate = _endDate;
-      }
-      _isStartDatePicker = isStartDate;
-    });
-  }
-
-  void _onDateSelected(DateTime newDate) {
-    if (_isStartDatePicker) {
-      if (newDate.isAfter(_endDate)) {
-        return;
-      }
-      setState(() {
-        _startDate = newDate;
-      });
-    } else {
-      if (newDate.isBefore(_startDate)) {
-        return;
-      }
-      setState(() {
-        _endDate = newDate;
-      });
-    }
-  }
-
-
-
-  Widget _buildDateField(BuildContext context, String label, DateTime date, bool isStartDate) {
-    return GestureDetector(
-      onTap: () {
-        _focusNode.unfocus();
-        _toggleDatePicker(isStartDate);
-      },
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(fontSize: 16),
-            ),
-            Text(
-              DateFormat('yyyy-MM-dd').format(date),
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   void _showFrequencyPicker(BuildContext context) {
@@ -142,7 +114,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
             itemExtent: 32.0,
             children: List<Widget>.generate(10, (int index) {
               return Center(
-                child: Text('${index + 1}'), //10까지
+                child: Text('${index + 1}'),
               );
             }),
           ),
@@ -176,18 +148,17 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
     );
   }
 
-  Color _selectedColor = Color(0xFFFFDFEB);
-  final List<Color> _colorOptions = [
-    Color(0xFFFFDFEB),
-    Color(0xFFFFAAD3),
-    Color(0xFFFFF27F),
-    Color(0xFFD3EAFF),
-    Color(0xFF6696DE),
-    Color(0xFFE8DAFF),
-    Color(0xFF9D79D8),
-  ];
-
   Widget _buildColorPicker() {
+    final List<Color> _colorOptions = [
+      Color(0xFFFFDFEB),
+      Color(0xFFFFAAD3),
+      Color(0xFFFFF27F),
+      Color(0xFFD3EAFF),
+      Color(0xFF6696DE),
+      Color(0xFFE8DAFF),
+      Color(0xFF9D79D8),
+    ];
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: _colorOptions.map((color) {
@@ -203,13 +174,13 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: isSelected ? Colors.black : Colors.transparent,
-                width: 1,
+                color: isSelected ? Colors.grey : Colors.transparent,
+                width: 1.5,
               ),
             ),
             child: CircleAvatar(
               backgroundColor: color,
-              radius: 12,
+              radius: 13,
             ),
           ),
         );
@@ -218,26 +189,10 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus(); // Automatically focus the text field when the widget is built.
-    });
-  }
-
-  @override
-  void dispose() {
-    _routineController.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final double bottomInset = MediaQuery.of(context).viewInsets.bottom;
-    final double datePickerHeight = 300;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Expanded(
@@ -246,39 +201,26 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
               children: [
                 Text('습관명'),
                 TextField(
-                  focusNode: _focusNode,
-                  autocorrect: false, // 자동완성 기능 끄기
+                  autocorrect: false,
                   decoration: InputDecoration(
                     hintText: '습관명 입력하기',
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.only( bottom: 11, top: 11, right: 15),
+                    contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 15),
                   ),
                   controller: _routineController,
                 ),
                 Row(
                   children: [
                     _buildFrequencyDisplay(context),
-                    SizedBox(width: 10),
+                    SizedBox(width: 30),
                     _buildColorPicker(),
+                    Spacer(),
                     IconButton(onPressed: _registerRoutine, icon: Icon(Icons.send))
                   ],
                 )
               ],
             ),
           ),
-          if (_showDatePicker)
-            Container(
-              height: datePickerHeight,
-              color: Colors.white,
-              child: CupertinoDatePicker(
-                mode: CupertinoDatePickerMode.date,
-                initialDateTime: _isStartDatePicker ? _startDate : _endDate,
-                onDateTimeChanged: (DateTime newDate) {
-                  _onDateSelected(newDate);
-                },
-              ),
-            ),
-
         ],
       ),
     );
