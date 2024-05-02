@@ -23,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> getChats(int uid) async {
-    final url = Uri.parse('$baseUrl/chats/$userId');
+    final url = Uri.parse('$baseUrl/chats/$userId/0');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
     });
