@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class OCRModal {
   static void show(BuildContext context) {
@@ -10,12 +13,28 @@ class OCRModal {
     String scannedText = "";
     final ImagePicker picker = ImagePicker();
 
+    void getRecognizedText(XFile image) async {
+      final inputImage = InputImage.fromFilePath(image.path);
+      final textRecognizer = GoogleMlKit.vision.textRecognizer(script: TextRecognitionScript.korean);
+      RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      await textRecognizer.close();
+
+      for (TextBlock block in recognizedText.blocks) {
+        for (TextLine line in block.lines) {
+          scannedText += line.text + '\n';
+        }
+      }
+
+      print(scannedText);
+    }
+
     void showOCRmodal() {
       showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
           return Container(
             padding: const EdgeInsets.all(30.0),
+            height: 500,
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.white,
@@ -28,14 +47,10 @@ class OCRModal {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text(
-                  scannedText,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
+                ListTile(
+                  title: Text('스캔된 텍스트'),
+                  subtitle: Text(scannedText),
                 ),
-                SizedBox(height: 8),
                 Container(
                   width: double.infinity,
                   height: 55,
@@ -101,6 +116,7 @@ class OCRModal {
                           ),
                           onPressed: () {
                             Navigator.pop(context);
+                            getRecognizedText(_image!);
                             showOCRmodal();
                           },
                           child: Text('처방전 스캔하기',
