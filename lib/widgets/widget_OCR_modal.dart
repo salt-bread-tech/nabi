@@ -31,10 +31,10 @@ class OCRModal {
     void showOCRmodal() {
       showModalBottomSheet(
         context: context,
+        scrollControlDisabledMaxHeightRatio: 0.9,
         builder: (BuildContext bc) {
           return Container(
             padding: const EdgeInsets.all(30.0),
-            height: 500,
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.white,
