@@ -3,6 +3,7 @@ import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:http/http.dart' as http;
 
 import '../services/urls.dart';
@@ -15,21 +16,51 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   List<types.Message> _messages = [];
   final _user = const types.User(id: '1');
+  late int page = 0;
+
+  AutoScrollController _scrollController = AutoScrollController();
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_scrollListener);
     getChats(1);
   }
 
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      page++;
+      getChats(1);
+      _scrollController.scrollToIndex(0, preferPosition: AutoScrollPosition.begin);
+    } else if (_scrollController.position.pixels ==
+        _scrollController.position.minScrollExtent) {
+      if(page > 0) {
+        page--;
+        getChats(1);
+        _scrollController.scrollToIndex(0, preferPosition: AutoScrollPosition.end);
+      } else {
+        print('Reached the top');
+      }
+    }
+  }
+
   Future<void> getChats(int uid) async {
-    final url = Uri.parse('$baseUrl/chats/$userId/0');
+    final url = Uri.parse('$baseUrl/chats/$userId/$page');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
     });
 
     if (response.statusCode == 200) {
-      final List<dynamic> chatData = json.decode(utf8.decode(response.bodyBytes));
+      final List<dynamic> chatData =
+          json.decode(utf8.decode(response.bodyBytes));
       setState(() {
         _messages = chatData.map((data) {
           final bool isUser = data['user'];
@@ -75,6 +106,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
+        page = 0;
         getChats(uid);
         return true;
       } else {
@@ -113,6 +145,7 @@ class _ChatScreenState extends State<ChatScreen> {
         messages: _messages,
         onSendPressed: _handleSendPressed,
         user: _user,
+        scrollController: _scrollController,
       ),
     );
   }
