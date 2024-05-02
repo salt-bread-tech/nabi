@@ -55,3 +55,5 @@ post_install do |installer|
 
   end
 end
+
+pod 'GoogleMLKit/TextRecognitionKorean', '~> 6.0.0'
