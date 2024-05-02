@@ -184,12 +184,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     : 0,
               ),
               SizedBox(height: 20),
-              RoutineStatusWidget(),
+              //RoutineStatusWidget(),
             ],
           ),
         ),
       ),
     );
-    return Scaffold();
   }
 }

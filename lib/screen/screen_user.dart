@@ -2,6 +2,7 @@ import 'package:doctor_nyang/screen/screen_settings.dart';
 import 'package:flutter/material.dart';
 import '../services/globals.dart' as globals;
 import '../services/service_auth.dart';
+import '../widgets/widget_OCR_modal.dart';
 
 class UserScreen extends StatefulWidget {
   @override
@@ -107,6 +108,17 @@ class _UserScreenState extends State<UserScreen> {
                   title: Text('식단 관리'),
                   onTap: () {
                     Navigator.pushNamed(context, '/DietSchedule');
+                  },
+                ),ListTile(
+                  title: Text('처방전 추가'),
+                  onTap: () {
+                    OCRModal.show(context);
+                  },
+                ),
+                ListTile(
+                  title: Text('routin'),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/routine');
                   },
                 ),
               ],
