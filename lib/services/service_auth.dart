@@ -23,7 +23,10 @@ Future<void> fetchUserInfo() async {
         globals.birth = userInfo['birth'];
         globals.height = userInfo['height'];
         globals.weight = userInfo['weight'];
+        globals.sex = userInfo['sex'];
+        globals.age = userInfo['age'];
         print({globals.nickName});
+        print('${globals.sex},${globals.age},$age,$sex');
       };
     } else {
       throw Exception('유저 정보 불러오기 실패');
