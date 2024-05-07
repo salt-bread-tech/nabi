@@ -116,7 +116,7 @@ class _UserScreenState extends State<UserScreen> {
                   },
                 ),
                 ListTile(
-                  title: Text('routin'),
+                  title: Text('루틴 화면'),
                   onTap: () {
                     Navigator.pushNamed(context, '/routine');
                   },
