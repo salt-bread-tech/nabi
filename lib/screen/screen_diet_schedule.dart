@@ -6,8 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../models/model_diet.dart';
 import '../services/urls.dart';
-import '../services/service_diet.dart';
 import '../widgets/widget_diet.dart';
 
 class DietSchedule extends StatefulWidget {

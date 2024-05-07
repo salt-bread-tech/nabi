@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../services/globals.dart' as globals;
 import '../services/urls.dart';
+import '../widgets/widget_weekly_routine.dart';
+
 
 Future<void> registerDailyRoutine({
   required int userUid,
@@ -59,6 +61,16 @@ class _RoutineScreenState extends State<RoutineScreen> {
           IconButton(onPressed: _presentRoutineAddSheet, icon: Icon(Icons.add))
         ],
       ),
+      body: SingleChildScrollView(
+    child: Padding(
+    padding: EdgeInsets.all(16.0),
+    child: Column(
+    children: [
+          RoutineStatusWidget()
+        ],
+      ),
+    ),
+    )
     );
   }
 }
@@ -73,6 +85,8 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   int _selectedFrequencyValue = 1;
   Color _selectedColor = Color(0xFFFFDFEB);
   String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+
 
   void _registerRoutine() async {
     int? userId = globals.userId;
