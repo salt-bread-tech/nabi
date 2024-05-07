@@ -5,7 +5,9 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
+import '../assets/theme.dart';
 import '../services/urls.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -17,6 +19,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<types.Message> _messages = [];
   final _user = const types.User(id: '1');
   late int page = 0;
+  bool _isLoading = false;
 
   AutoScrollController _scrollController = AutoScrollController();
 
@@ -39,13 +42,15 @@ class _ChatScreenState extends State<ChatScreen> {
         _scrollController.position.maxScrollExtent) {
       page++;
       getChats(1);
-      _scrollController.scrollToIndex(0, preferPosition: AutoScrollPosition.begin);
+      _scrollController.scrollToIndex(0,
+          preferPosition: AutoScrollPosition.begin);
     } else if (_scrollController.position.pixels ==
         _scrollController.position.minScrollExtent) {
-      if(page > 0) {
+      if (page > 0) {
         page--;
         getChats(1);
-        _scrollController.scrollToIndex(0, preferPosition: AutoScrollPosition.end);
+        _scrollController.scrollToIndex(0,
+            preferPosition: AutoScrollPosition.end);
       } else {
         print('Reached the top');
       }
@@ -102,15 +107,25 @@ class _ChatScreenState extends State<ChatScreen> {
       'content': content,
     });
 
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         page = 0;
-        getChats(uid);
+        setState(() {
+          _isLoading = false;
+          getChats(1);
+        });
         return true;
       } else {
-        print('서버 에러: ${response.statusCode}');
+        print('전송 에러: ${response.statusCode}');
+        setState(() {
+          _isLoading = false;
+        });
         return false;
       }
     } catch (e) {
@@ -132,20 +147,29 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Chat(
-        theme: const DefaultChatTheme(
-          inputBackgroundColor: Color(0xFFF2F2F2),
-          inputTextColor: Colors.black,
-          primaryColor: Color(0xFFFFFACD),
-          sentMessageBodyTextStyle: TextStyle(color: Colors.black87),
-          receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
-          secondaryColor: Color(0xFFD3EAFF),
-          messageBorderRadius: 20.0,
+      body: Center(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Chat(
+              theme: const DefaultChatTheme(
+                inputBackgroundColor: Color(0xFFF2F2F2),
+                inputTextColor: Colors.black,
+                primaryColor: Color(0xFFFFFACD),
+                sentMessageBodyTextStyle: TextStyle(color: Colors.black87),
+                receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
+                secondaryColor: Color(0xFFD3EAFF),
+                messageBorderRadius: 20.0,
+              ),
+              messages: _messages,
+              onSendPressed: _handleSendPressed,
+              user: _user,
+              scrollController: _scrollController,
+            ),
+            Positioned(
+                child: _isLoading ? SpinKitPumpingHeart(color: AppTheme.pastelPink) : Container()),
+          ],
         ),
-        messages: _messages,
-        onSendPressed: _handleSendPressed,
-        user: _user,
-        scrollController: _scrollController,
       ),
     );
   }
