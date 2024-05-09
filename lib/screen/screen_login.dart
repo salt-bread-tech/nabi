@@ -52,17 +52,20 @@ class _LoginState extends State<Login> {
             ),
             SizedBox(height: 20),
             Column(
-              children: <Widget>[
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                //Text('아이디', style: TextStyle(fontSize: 12)),
+                SizedBox(height: 5),
                 CustomTextFormField(
                   keyboardType: TextInputType.emailAddress,
-                  labelText: '아이디',
                   hintText: '아이디를 입력해주세요',
                   controller: emailController,
                   isPassword: false,
                 ),
-                SizedBox(height: 20),
+                //Text('비밀번호', style: TextStyle(fontSize: 12)),
+                SizedBox(height: 7),
                 CustomTextFormField(
-                  labelText: '비밀번호',
                   hintText: '비밀번호를 입력해주세요',
                   controller: passwordController,
                   keyboardType: TextInputType.visiblePassword,
@@ -107,8 +110,8 @@ class _LoginState extends State<Login> {
               child: RichText(
                 text: TextSpan(
                   style: TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.black,
+                    fontSize: 14.0,
+                    color: Colors.grey[800],
                   ),
                   children: <TextSpan>[
                     TextSpan(text: '계정이 없으신가요? '),

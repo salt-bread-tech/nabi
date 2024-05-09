@@ -2,7 +2,7 @@ String? nickName;
 String? birth;
 double? height;
 double? weight;
-String? sex;
+String? gender;
 int? age;
 String? id;
 
