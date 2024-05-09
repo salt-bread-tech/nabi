@@ -21,8 +21,9 @@ class _ChatScreenState extends State<ChatScreen> {
   List<types.Message> _messages = [];
   final _user = const types.User(id: '1');
   late int page = 0;
-  bool _isLoading = false;
   late int day = 0;
+
+  bool _isLoading = false;
 
   AutoScrollController _scrollController = AutoScrollController();
   FocusNode myFocusNode = FocusNode();
@@ -60,6 +61,26 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> feed() async {
+    final url = Uri.parse('$baseUrl/feed/$userId');
+    final response = await http.get(url, headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+      'Authorization': 'Bearer $token',
+    });
+
+    if (response.statusCode == 200) {
+      final int feedData =
+          json.decode(utf8.decode(response.bodyBytes));
+      if(feedData == 200){
+        print('Feed success');
+      } else if(feedData == 300){
+        print('Already feeded');
+      }
+    } else {
+      print('Failed to load feed from server');
+    }
+  }
+
   Future<void> getDday() async {
     final url = Uri.parse('$baseUrl/user/d-day');
     final response = await http.get(url, headers: {
@@ -70,9 +91,9 @@ class _ChatScreenState extends State<ChatScreen> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> ddayData =
           json.decode(utf8.decode(response.bodyBytes));
-        setState(() {
-          day = ddayData['days'];
-        });
+      setState(() {
+        day = ddayData['days'];
+      });
     } else {
       print('Failed to load dday from server');
     }
@@ -216,19 +237,25 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Container(
                   color: Colors.white,
                   child: ButtonBar(
-                  alignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(Iconsax.heart5, size: 30, color: AppTheme.pastelPink),
-                      onPressed: () {},
-                    ),
-                    Text('나비와 함께한지 ${day}일', style: TextStyle(fontSize: 16)),
-                    IconButton(
-                      icon: Icon(Iconsax.milk5, size: 30, color: AppTheme.pastelBlue),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),),
+                    alignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(Iconsax.heart5,
+                            size: 30, color: AppTheme.pastelPink),
+                        onPressed: () {
+                        },
+                      ),
+                      Text('나비와 함께한지 ${day}일', style: TextStyle(fontSize: 16)),
+                      IconButton(
+                        icon: Icon(Iconsax.milk5,
+                            size: 30, color: AppTheme.pastelBlue),
+                        onPressed: () {
+                          feed();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               )
             ],
           ),
