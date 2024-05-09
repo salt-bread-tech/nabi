@@ -23,10 +23,10 @@ Future<void> fetchUserInfo() async {
         globals.birth = userInfo['birth'];
         globals.height = userInfo['height'];
         globals.weight = userInfo['weight'];
-        globals.sex = userInfo['sex'];
+        globals.gender = userInfo['sex'];
         globals.age = userInfo['age'];
         print({globals.nickName});
-        print('${globals.sex},${globals.age},$age,$sex');
+        print('${globals.gender},${globals.age},$age,$gender');
       };
     } else {
       throw Exception('유저 정보 불러오기 실패');
@@ -69,52 +69,6 @@ Future<bool> login(String id, String password, BuildContext context) async {
   } catch (error) {
     print('네트워크 오류: $error');
     return false;
-  }
-}
-
-Future<void> register(String nickname,String id, String password,
-    String birthDate, String sex, double height, double weight, int age, BuildContext context) async {
-  final url = Uri.parse('$baseUrl/user/register');
-
-  try {
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'nickname': nickname,
-        'id': id,
-        'password': password,
-        'birthDate': birthDate,
-        'sex': sex,
-        'height': height,
-        'weight' : weight,
-        'age' : age,
-      }),
-    );
-
-    dynamic responseData = json.decode(response.body);
-
-    if (responseData is int) {
-      switch (responseData) {
-        case 200:
-          print('$id,$nickname,$birthDate, 회원가입 성공');
-          Navigator.pushNamed(context, '/login');
-          break;
-        case 100:
-          print('$id,$nickname,$birthDate,회원가입 실패: 아이디 중복');
-          break;
-        case 400:
-          print('$id,$nickname,$birthDate,유효하지 않은 BMR 값');
-          break;
-        case 500:
-          print('$id,$nickname,$birthDate,유효하지 않은 BMI 값');
-          break;
-        default:
-          print('$id,$nickname,$birthDate,알 수 없는 오류');
-      }
-    }
-  } catch (error) {
-    print('$id,$nickname,$birthDate,네트워크 오류: $error');
   }
 }
 

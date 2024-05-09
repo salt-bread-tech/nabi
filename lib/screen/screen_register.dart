@@ -1,9 +1,11 @@
-import 'package:doctor_nyang/screen/screen_register2.dart';
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../services/service_auth.dart'; //DateFormat
+import '../services/urls.dart';
+import '../widgets/widget_custom_textFormField.dart';
+import 'package:http/http.dart' as http;
 
 enum Gender { male, female }
 
@@ -11,11 +13,312 @@ class Register extends StatefulWidget {
   @override
   _RegisterState createState() => _RegisterState();
 }
+
 class _RegisterState extends State<Register> {
+  bool isIdDuplicated = false;
+  bool isPasswordConfirmed = true;
+  bool isInvalidBMR = false; // BMR
+  bool isInvalidBMI = false; // BMI
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
   final TextEditingController confirmPWController = TextEditingController();
+  final TextEditingController birthDateController = TextEditingController();
+  final TextEditingController genderController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
+
+  DateTime selectedDate = DateTime.now();
+
+  String nicknameError = '';
+  String idError = '';
+  String passwordError = '';
+  String confirmPasswordError = '';
+  String birthDateError = '';
+  String genderError = '';
+  String heightError = '';
+  String weightError = '';
+
+
+
+  void validateFields() {
+    setState(() {
+      nicknameError = nicknameController.text.isEmpty ? '닉네임을 입력해주세요.' : '';
+      idError = emailController.text.isEmpty ? '아이디를 입력해주세요.' : '';
+      passwordError = passwordController.text.isEmpty ? '비밀번호를 입력해주세요.' : '';
+      confirmPasswordError = confirmPWController.text.isEmpty ? '비밀번호 확인을 입력해주세요.' : '';
+      birthDateError = birthDateController.text.isEmpty ? '생년월일을 입력해주세요.' : '';
+      genderError = genderController.text.isEmpty? '성별을 선택해주세요.':'';
+      heightError = heightController.text.isEmpty ? '키를 입력해주세요.' : '';
+      weightError = weightController.text.isEmpty ? '몸무게를 입력해주세요.' : '';
+    });
+  }
+  void validateGender() {
+    if (_selectedGender == 'none') {
+      setState(() {
+        genderError = '성별을 선택해주세요.';
+      });
+    } else {
+      setState(() {
+        genderError = '';
+      });
+    }
+  }
+
+
+  Future<void> register(String nickname,String id, String password,
+      String birthDate, String gender, double height, double weight, int age, BuildContext context) async {
+    final url = Uri.parse('$baseUrl/user/register');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'nickname': nickname,
+          'id': id,
+          'password': password,
+          'birthDate': birthDate,
+          'sex': gender,
+          'height': height,
+          'weight' : weight,
+          'age' : age,
+        }),
+      );
+
+      dynamic responseData = json.decode(response.body);
+
+      if (responseData is int) {
+        switch (responseData) {
+          case 200:
+            print('$id,$nickname,$birthDate, 회원가입 성공');
+            Navigator.pushNamed(context, '/login');
+            break;
+          case 100:
+            print('$id,$nickname,$birthDate,회원가입 실패: 아이디 중복');
+            setState(() {
+              isIdDuplicated = true;
+            });
+            break;
+          case 300:
+            print('$id,$nickname,$birthDate,회원가입 실패: 유효하지 않은 키, 몸무게 값');
+            setState(() {
+              isInvalidBMR = true;
+              isInvalidBMI = true;
+            });
+            break;
+          case 400:
+            print('$id,$nickname,$birthDate,유효하지 않은 BMR 값');
+            setState(() {
+              isInvalidBMR = true;
+            });
+            break;
+          case 500:
+            print('$id,$nickname,$birthDate,유효하지 않은 BMI 값');
+            setState(() {
+              isInvalidBMI = true;
+            });
+            break;
+          default:
+            print('$id,$nickname,$birthDate,알 수 없는 오류,$responseData');
+        }
+      }
+    } catch (error) {
+      print('$id,$nickname,$birthDate,네트워크 오류: $error');
+    }
+  }
+
+  Future<void> attemptRegister() async {
+    validateFields();
+    validateGender();
+
+    if (nicknameError == '' && idError == '' && passwordError == '' && confirmPasswordError == '' &&
+        birthDateError == '' && heightError == '' && weightError == '') {
+      final nickname = nicknameController.text;
+      final id = emailController.text;
+      final password = passwordController.text;
+      final birthDate = birthDateController.text;
+      final sex = _selectedGender;
+      final height = double.tryParse(heightController.text);
+      final weight = double.tryParse(weightController.text);
+      final age = calculateAge(selectedDate);
+
+      await register(nickname, id, password, birthDate, sex, height!, weight!, age, context);
+    }
+  }
+
+//닉네임
+  Widget _buildNicknameField() {
+    return CustomErrorTextFormField(
+      controller: nicknameController,
+      keyboardType: TextInputType.name,
+      hintText: '닉네임을 입력해주세요',
+      errorText: nicknameError.isEmpty ? null : nicknameError,
+    );
+  }
+
+  //아이디
+  Widget _buildIdField() {
+    return CustomErrorTextFormField(
+      controller: emailController,
+      keyboardType: TextInputType.emailAddress,
+      hintText: '아이디를 입력해주세요',
+      errorText: isIdDuplicated ? '중복된 아이디입니다.' : (idError.isNotEmpty ? idError : null),
+    );
+  }
+
+
+  //비번
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('비밀번호', style: TextStyle(fontSize: 12)),
+        SizedBox(height: 5),
+        CustomErrorTextFormField(
+          controller: passwordController,
+          keyboardType: TextInputType.visiblePassword,
+          hintText: '비밀번호를 입력해주세요',
+          isPassword: true,
+          errorText: passwordError.isEmpty ? null : passwordError,
+
+        ),
+        SizedBox(height: 10),
+        Text('비밀번호 확인', style: TextStyle(fontSize: 12)),
+        SizedBox(height: 5),
+        CustomErrorTextFormField(
+          controller: confirmPWController,
+          keyboardType: TextInputType.visiblePassword,
+          hintText: '비밀번호 확인',
+          isPassword: true,
+          errorText: isPasswordConfirmed ? null : '비밀번호가 일치하지 않습니다.',
+        ),
+      ],
+    );
+  }
+  //키, 몸무게
+  Widget _buildBMIField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('키', style: TextStyle(fontSize: 12)),
+        SizedBox(height: 5),
+        CustomErrorTextFormField(
+          controller: heightController,
+          keyboardType: TextInputType.number,
+          hintText: '키를 입력해주세요 (cm)',
+          suffixText: 'cm',
+          errorText: isInvalidBMR ? '키를 확인해주세요' : (heightError.isNotEmpty ? heightError : null),
+        ),
+        SizedBox(height: 10),
+        Text('몸무게', style: TextStyle(fontSize: 12)),
+        SizedBox(height: 5),
+        CustomErrorTextFormField(
+          controller: weightController,
+          keyboardType: TextInputType.number,
+          hintText: '몸무게를 입력해주세요 (kg)',
+          suffixText: 'kg',
+          errorText: isInvalidBMI ? '몸무게를 확인해주세요' : (weightError.isNotEmpty ? weightError : null),
+        ),
+      ],
+    );
+  }
+
+  //생년월일
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('yyyy-MM-dd').format(dateTime);
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext builder) {
+        final initDate=
+        DateFormat('yyyy-MM-dd').parse('2000-01-01');
+
+        return Container(
+          height: MediaQuery.of(context).copyWith().size.height / 3,
+          color: Colors.white,
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            dateOrder: DatePickerDateOrder.ymd,
+            onDateTimeChanged: (picked) {
+              if (picked != null && picked != selectedDate)
+                setState(() {
+                  selectedDate = picked;
+                  birthDateController.text = _formatDate(picked);
+                });
+            },
+            initialDateTime: initDate,
+            minimumYear: 1900,
+            maximumYear: DateTime.now().year,
+            maximumDate: DateTime.now(),
+          ),
+        );
+      },
+    );
+  }
+
+  //나이
+  int calculateAge(DateTime birthDate) {
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    if (birthDate.month > currentDate.month ||
+        (birthDate.month == currentDate.month && birthDate.day > currentDate.day)) {
+      age--;
+    }
+    return age;
+  }
+
+  //성별
+  String _selectedGender = 'none';
+  Widget genderButton(String gender) {
+    bool isSelected = _selectedGender == gender;
+
+    return Ink(
+      decoration: BoxDecoration(
+        color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB),
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10.0),
+        onTap: () {
+          setState(() {
+            _selectedGender = gender;
+          });
+        },
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 65.0, vertical: 15.0),
+          alignment: Alignment.center,
+          child: Text(gender == '남성' ? '남성' : '여성'),
+        ),
+      ),
+    );
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.addListener(_validatePassword);
+    confirmPWController.addListener(_validatePassword);
+  }
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    confirmPWController.dispose();
+    super.dispose();
+  }
+  void _validatePassword() {
+    setState(() {
+      isPasswordConfirmed = passwordController.text == confirmPWController.text;
+    });
+  }
 
 
   @override
@@ -40,144 +343,65 @@ class _RegisterState extends State<Register> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('닉네임', style: TextStyle(fontSize: 12)),
+                SizedBox(height: 5),
+                _buildNicknameField(),
+                SizedBox(height: 15),
+                Text('아이디', style: TextStyle(fontSize: 12)),
+                SizedBox(height: 5),
+                _buildIdField(),
+                SizedBox(height: 15),
+                _buildPasswordField(),
+                SizedBox(height: 15),
+                Text('생년월일', style: TextStyle(fontSize: 12)),
+                SizedBox(height: 5),
+                GestureDetector(
+                  onTap: () => _selectDate(context),
+                  child: AbsorbPointer(
+                    child: CustomErrorTextFormField(
+                      controller: birthDateController,
+                        hintText: '생년월일',
+                      keyboardType: TextInputType.number,
+                        errorText: birthDateError.isEmpty ? null : birthDateError,
+                      ),
+                    ),
+                  ),
+                SizedBox(height: 15),
+                Text('성별', style: TextStyle(fontSize: 12)),
+                SizedBox(height: 5),
+              ],
+            ),
             Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 3,
-                    blurRadius: 2,
-                    offset: Offset(0, 3),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      genderButton('남성'),
+                      SizedBox(width: 10),
+                      genderButton('여성'),
+                    ],
+                  ),
+                  if (genderError.isNotEmpty) Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      '성별을 선택해주세요',
+                      style: TextStyle(fontSize: 12,color: Colors.red),
+                    ),
                   ),
                 ],
-              ),
-              child: TextFormField(
-                controller: nicknameController,
-                keyboardType: TextInputType.name,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Color(0xFF98CBFA),
-                      )),
-                  labelText: '닉네임',
-                  hintText: '냥냥이',
-                  labelStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
+              )
+
+
             ),
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 3,
-                    blurRadius: 2,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.white),),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Color(0xFF98CBFA),
-                      )),
-                  labelText: '아이디',
-                  hintText: '아이디를 입력해주세요',
-                  labelStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 3,
-                    blurRadius: 2,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Color(0xFF98CBFA),
-                      )),
-                  labelText: '비밀번호',
-                  labelStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 3,
-                    blurRadius: 2,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: TextFormField(
-                controller: confirmPWController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Color(0xFF98CBFA),
-                      )),
-                  labelText: '비밀번호 확인',
-                  labelStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
+            SizedBox(height: 15),
+            _buildBMIField(),
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -190,24 +414,9 @@ class _RegisterState extends State<Register> {
                         backgroundColor: Color(0xFFE0F0FF),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
-                    onPressed: ()async {
-                      final nickname = nicknameController.text;
-                      final id = emailController.text;
-                      final password = passwordController.text;
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Register2(
-                            nickname: nickname,
-                            email : id,
-                            password: password,
-                          ),
-                        ),
-                      );
-                    },
+                    onPressed: attemptRegister,
                     child: Text(
-                      '계속하기',
+                      '회원가입',
                       style: TextStyle(color: Colors.black),
                     ),
                   ),
@@ -216,7 +425,7 @@ class _RegisterState extends State<Register> {
             ),
           ],
         ),
-      ),
+    ),
     );
   }
 }
