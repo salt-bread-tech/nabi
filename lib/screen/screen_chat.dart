@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:doctor_nyang/services/globals.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:iconsax/iconsax.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -19,21 +21,23 @@ class _ChatScreenState extends State<ChatScreen> {
   List<types.Message> _messages = [];
   final _user = const types.User(id: '1');
   late int page = 0;
+  late int day = 0;
+
   bool _isLoading = false;
 
   AutoScrollController _scrollController = AutoScrollController();
+  FocusNode myFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
     getChats(1);
+    getDday();
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_scrollListener);
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -54,6 +58,44 @@ class _ChatScreenState extends State<ChatScreen> {
       } else {
         print('Reached the top');
       }
+    }
+  }
+
+  Future<void> feed() async {
+    final url = Uri.parse('$baseUrl/feed/$userId');
+    final response = await http.get(url, headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+      'Authorization': 'Bearer $token',
+    });
+
+    if (response.statusCode == 200) {
+      final int feedData =
+          json.decode(utf8.decode(response.bodyBytes));
+      if(feedData == 200){
+        print('Feed success');
+      } else if(feedData == 300){
+        print('Already feeded');
+      }
+    } else {
+      print('Failed to load feed from server');
+    }
+  }
+
+  Future<void> getDday() async {
+    final url = Uri.parse('$baseUrl/user/d-day');
+    final response = await http.get(url, headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+      'Authorization': 'Bearer $token',
+    });
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> ddayData =
+          json.decode(utf8.decode(response.bodyBytes));
+      setState(() {
+        day = ddayData['days'];
+      });
+    } else {
+      print('Failed to load dday from server');
     }
   }
 
@@ -102,7 +144,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<bool> sendChat(int uid, String content) async {
     final url = Uri.parse('$baseUrl/chat');
-    final headers = {"Content-Type": "application/json",'Authorization': 'Bearer $token',};
+    final headers = {
+      "Content-Type": "application/json",
+      'Authorization': 'Bearer $token',
+    };
     final body = json.encode({
       'uid': uid,
       'content': content,
@@ -147,29 +192,73 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Chat(
-              theme: const DefaultChatTheme(
-                inputBackgroundColor: Color(0xFFF2F2F2),
-                inputTextColor: Colors.black,
-                primaryColor: Color(0xFFFFFACD),
-                sentMessageBodyTextStyle: TextStyle(color: Colors.black87),
-                receivedMessageBodyTextStyle: TextStyle(color: Colors.black87),
-                secondaryColor: Color(0xFFD3EAFF),
-                messageBorderRadius: 20.0,
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.cover,
+          image: AssetImage('images/chat_default.png'),
+          colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.5), BlendMode.dstATop),
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: false,
+        body: Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Chat(
+                theme: const DefaultChatTheme(
+                  inputBackgroundColor: Colors.white,
+                  inputTextColor: Colors.black,
+                  primaryColor: Color(0xFFFFFACD),
+                  sentMessageBodyTextStyle: TextStyle(color: Colors.black87),
+                  receivedMessageBodyTextStyle:
+                      TextStyle(color: Colors.black87),
+                  secondaryColor: Color(0xFFD3EAFF),
+                  messageBorderRadius: 20.0,
+                  backgroundColor: Colors.transparent,
+                  sendButtonIcon: Icon(Iconsax.send_1),
+                ),
+                messages: _messages,
+                onSendPressed: _handleSendPressed,
+                user: _user,
+                scrollController: _scrollController,
               ),
-              messages: _messages,
-              onSendPressed: _handleSendPressed,
-              user: _user,
-              scrollController: _scrollController,
-            ),
-            Positioned(
-                child: _isLoading ? SpinKitPumpingHeart(color: AppTheme.pastelPink) : Container()),
-          ],
+              Positioned(
+                  child: _isLoading
+                      ? SpinKitPumpingHeart(color: AppTheme.pastelPink)
+                      : Container()),
+              Positioned(
+                top: 0,
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                child: Container(
+                  color: Colors.white,
+                  child: ButtonBar(
+                    alignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(Iconsax.heart5,
+                            size: 30, color: AppTheme.pastelPink),
+                        onPressed: () {
+                        },
+                      ),
+                      Text('나비와 함께한지 ${day}일', style: TextStyle(fontSize: 16)),
+                      IconButton(
+                        icon: Icon(Iconsax.milk5,
+                            size: 30, color: AppTheme.pastelBlue),
+                        onPressed: () {
+                          feed();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
