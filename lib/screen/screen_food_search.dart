@@ -66,7 +66,10 @@ class _FoodSearchState extends State<FoodSearch> {
   Map<String, Food> foodInfo = {};
 
   Future<void> searchFood(String food) async {
-    final response = await http.get(Uri.parse('$baseUrl/foods/$food'));
+    final response = await http.get(Uri.parse('$baseUrl/foods/$food'),headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },);
     final decodedResponse = utf8.decode(response.bodyBytes);
 
     if (response.statusCode == 200) {
@@ -112,6 +115,7 @@ class _FoodSearchState extends State<FoodSearch> {
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode(<String, dynamic>{
         'uid': uid,

@@ -16,7 +16,7 @@ Future<void> registMedicine(BuildContext context, int uid, String startDate,
   try {
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json','Authorization': 'Bearer $token',},
       body: json.encode({
         'uid': uid,
         'startDate': startDate,

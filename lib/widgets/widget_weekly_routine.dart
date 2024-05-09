@@ -1,13 +1,51 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../screen/screen_routine.dart';
+import 'package:http/http.dart' as http;
+import '../services/globals.dart' as global;
+import '../services/urls.dart';
 
 class RoutineStatusWidget extends StatefulWidget {
   @override
-  _TaskStatusWidgetState createState() => _TaskStatusWidgetState();
+  _RoutineStatusWidgetState createState() => _RoutineStatusWidgetState();
 }
 
-class _TaskStatusWidgetState extends State<RoutineStatusWidget> {
+class _RoutineStatusWidgetState extends State<RoutineStatusWidget> {
+  List<dynamic> _routines = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
+
+ /* Future<List<dynamic>> fetchRoutines() async {
+    final url = Uri.parse('$baseUrl/routine/list');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'uid': global.id,}),
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData == 200) {
+        print('루틴 불러오기 완료');
+
+      } else {
+        print('오류');
+      }
+    } catch (error) {
+      print('네트워크 오류: $error');
+    }
+  }
+
+  */
+
   int _currentCount = 0;
   final int _maxCount = 7; //최대 나중에 수정하기 (임시) 8개까지 들어감 한줄에 8개
 

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../services/globals.dart';
 import '../services/urls.dart';
 import '../widgets/widget_custom_textFormField.dart';
 import 'package:http/http.dart' as http;
@@ -74,7 +75,8 @@ class _RegisterState extends State<Register> {
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',},
         body: json.encode({
           'nickname': nickname,
           'id': id,

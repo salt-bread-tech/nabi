@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../services/globals.dart' as globals;
+import '../services/globals.dart';
 import '../services/urls.dart';
 import '../widgets/widget_weekly_routine.dart';
 
@@ -20,6 +22,7 @@ Future<void> registerDailyRoutine({
     url,
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token',
     },
     body: jsonEncode(<String, dynamic>{
       'uid': userUid,
@@ -141,10 +144,8 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
     return GestureDetector(
       onTap: () => _showFrequencyPicker(context),
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.grey)),
-        ),
+        padding: EdgeInsets.symmetric(vertical: 3.0,horizontal: 8),
+
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -225,11 +226,25 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
                 ),
                 Row(
                   children: [
-                    _buildFrequencyDisplay(context),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('횟수'),
+                        SizedBox(height: 5),
+                        _buildFrequencyDisplay(context),
+                      ],
+                    ),
                     SizedBox(width: 30),
-                    _buildColorPicker(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('색'),
+                        SizedBox(height: 5),
+                        _buildColorPicker(),
+                      ],
+                    ),
                     Spacer(),
-                    IconButton(onPressed: _registerRoutine, icon: Icon(Icons.send))
+                    IconButton(onPressed: _registerRoutine, icon: Icon(Iconsax.send_15))
                   ],
                 )
               ],

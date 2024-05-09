@@ -27,7 +27,10 @@ class _MedicineInfoState extends State<MedicineInfo> {
 
   Future<void> fetchMedicineInfo() async {
     final type = '0';
-    final response = await http.get(Uri.parse('$baseUrl/medicine/${widget.name}/$type'));
+    final response = await http.get(Uri.parse('$baseUrl/medicine/${widget.name}/$type'),headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },);
 
     if (response.statusCode == 200) {
       final data = json.decode(utf8.decode(response.bodyBytes));

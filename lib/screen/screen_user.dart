@@ -1,5 +1,6 @@
 import 'package:doctor_nyang/screen/screen_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import '../services/globals.dart' as globals;
 import '../services/service_auth.dart';
 import '../widgets/widget_OCR_modal.dart';
@@ -38,7 +39,7 @@ class _UserScreenState extends State<UserScreen> {
         automaticallyImplyLeading: false,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(Iconsax.setting_2),
             onPressed: () {
               Navigator.push(
                   context,
@@ -119,6 +120,12 @@ class _UserScreenState extends State<UserScreen> {
                   title: Text('루틴 화면'),
                   onTap: () {
                     Navigator.pushNamed(context, '/routine');
+                  },
+                ),
+                ListTile(
+                  title: Text('웹툰 화면'),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/webtoon');
                   },
                 ),
               ],

@@ -9,7 +9,9 @@ import 'package:doctor_nyang/screen/screen_register.dart';
 import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:doctor_nyang/screen/screen_food_search.dart';
+import 'package:doctor_nyang/screen/screen_webtoon.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 void main() {
   runApp(MyApp());
@@ -40,6 +42,7 @@ class MyApp extends StatelessWidget {
         '/DietSchedule': (context) => DietSchedule(),
         '/FoodSearch' : (context) => FoodSearch(),
         '/routine' : (context) => RoutineScreen(),
+        '/webtoon' : (context) => WebtoonPage(),
       },
     );
   }
@@ -59,7 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
   }
 
   final List<Widget> _children = [
@@ -76,27 +78,43 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: _children[_currentIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          onTap: onTabTapped,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          currentIndex: _currentIndex,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_rounded),
-              label: 'chat',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home), label: 'home',),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'mypage',
-            ),
+    Color activeColor = Color(0xFF6696DE); // 활성화된 탭의 색상
+    Color inactiveColor = Colors.grey; // 비활성화된 탭의 색상
 
-          ],
-        ),
+    return Scaffold(
+      body: Container(
+        color: Colors.white,
+      child: SafeArea(
+        child: _children[_currentIndex],
+      ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        onTap: onTabTapped,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        currentIndex: _currentIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Iconsax.message_favorite,
+                color: _currentIndex == 0 ? activeColor : inactiveColor),
+            activeIcon: Icon(Iconsax.message_favorite, color: activeColor),
+            label: 'chat',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Iconsax.home_2,
+                color: _currentIndex == 1 ? activeColor : inactiveColor),
+            activeIcon: Icon(Iconsax.home_2, color: activeColor),
+            label: 'home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Iconsax.user,
+                color: _currentIndex == 2 ? activeColor : inactiveColor),
+            activeIcon: Icon(Iconsax.user, color: activeColor),
+            label: 'mypage',
+          ),
+        ],
+      ),
     );
   }
 }

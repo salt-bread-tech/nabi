@@ -61,6 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final url = Uri.parse('$baseUrl/chats/$userId/$page');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
+      'Authorization': 'Bearer $token',
     });
 
     if (response.statusCode == 200) {
@@ -101,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<bool> sendChat(int uid, String content) async {
     final url = Uri.parse('$baseUrl/chat');
-    final headers = {"Content-Type": "application/json"};
+    final headers = {"Content-Type": "application/json",'Authorization': 'Bearer $token',};
     final body = json.encode({
       'uid': uid,
       'content': content,

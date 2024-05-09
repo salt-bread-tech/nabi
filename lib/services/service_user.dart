@@ -2,6 +2,8 @@ import 'package:doctor_nyang/services/urls.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'globals.dart';
+
 
 Future<void> updateBodyInfo({
   required int userUid,
@@ -16,6 +18,7 @@ Future<void> updateBodyInfo({
     url,
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token',
     },
     body: jsonEncode(<String, dynamic>{
       'id': userUid,

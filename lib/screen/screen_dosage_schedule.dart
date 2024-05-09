@@ -1,5 +1,6 @@
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -31,7 +32,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
     try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json','Authorization': 'Bearer $token',},
       );
 
       if (response.statusCode == 200) {
@@ -120,6 +121,9 @@ class _DosageScheduleState extends State<DosageSchedule> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(Iconsax.backward), onPressed: () { Navigator.pushNamed(context, '/MyHomePage');},
+        ),
         title: Text(
           '$nickName님의 복용 일정',
           style: TextStyle(color: Colors.black,fontSize: 17),
@@ -128,7 +132,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
         iconTheme: IconThemeData(color: Colors.black),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Iconsax.add),
             onPressed: () {
               Navigator.pushNamed(context, '/MedicineSearch');
             },

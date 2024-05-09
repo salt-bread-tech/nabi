@@ -52,6 +52,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   easy_date_timeline: ^1.0.3
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +79,10 @@ flutter:
     - images/image1.png
     - images/image2.png
     - images/image3.png
+    - images/webtoon1.jpeg
+    - images/webtoon2.jpeg
+    - images/webtoon3.jpeg
+    - images/webtoon4.jpeg
 
 
   # To add assets to your application, add an assets section, like this:

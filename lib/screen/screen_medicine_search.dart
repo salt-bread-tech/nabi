@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../services/globals.dart';
 import '../services/urls.dart';
 
 class MedicineSearch extends StatefulWidget {
@@ -14,7 +15,10 @@ class _MedicineSearchState extends State<MedicineSearch> {
   List<dynamic> searchResults = [];
 
   Future<void> searchMedicines(String query) async {
-    final response = await http.get(Uri.parse('$baseUrl/medicines/$query'));
+    final response = await http.get(Uri.parse('$baseUrl/medicines/$query'),headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },);
     final decodedResponse = utf8.decode(response.bodyBytes);
 
     if (response.statusCode == 200) {

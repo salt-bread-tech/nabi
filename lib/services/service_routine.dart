@@ -13,6 +13,7 @@ Future<void> registerRoutinePrototype(String routineName) async {
     },
     body: jsonEncode(<String, String>{
       'routineName': routineName,
+      'Authorization': 'Bearer $token',
     }),
   );
 
@@ -35,6 +36,7 @@ Future<void> registerDailyRoutine({
     url,
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token',
     },
     body: jsonEncode(<String, dynamic>{
       'userUid': userUid,
@@ -57,6 +59,7 @@ Future<List<dynamic>> fetchRegisteredRoutines(int userUid) async {
     Uri.parse('$baseUrl/get-routine/$userUid'),
     headers: <String, String>{
       'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
     },
   );
 
