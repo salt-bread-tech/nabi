@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       MaterialPageRoute(builder: (context) => DietSchedule()));
                 },
                 isWidget: true,
-                userCalories: 2000,
+                userCalories: bmr ?? 2000,
                 breakfastCalories: ingestionSchedule.isNotEmpty
                     ? ingestionSchedule[0]['breakfastKcal']
                     : 0,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:doctor_nyang/assets/theme.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +9,7 @@ import 'dart:convert';
 
 import '../models/model_diet.dart';
 import '../services/urls.dart';
+import '../services/globals.dart';
 import '../widgets/widget_diet.dart';
 
 class DietSchedule extends StatefulWidget {
@@ -19,6 +21,7 @@ class _DietScheduleState extends State<DietSchedule> {
   late DateTime selectedDate;
   List<dynamic> dietSchedule = [];
   List<dynamic> ingestionSchedule = [];
+  List<String> times = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
   @override
   void initState() {
@@ -35,7 +38,10 @@ class _DietScheduleState extends State<DietSchedule> {
     try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json','Authorization': 'Bearer $token',},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode == 200) {
@@ -45,9 +51,11 @@ class _DietScheduleState extends State<DietSchedule> {
         setState(() {
           dietSchedule = diet;
         });
-        print(dietSchedule);
+
+        dietSchedule.sort((a, b) => times.indexOf(a['times']).compareTo(times.indexOf(b['times'])));
+
       } else {
-        print('복용 일정 조회 실패');
+        print('일정 조회 실패');
       }
     } catch (e) {
       print('네트워크 오류 $e');
@@ -61,7 +69,10 @@ class _DietScheduleState extends State<DietSchedule> {
     try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode == 200) {
@@ -92,6 +103,18 @@ class _DietScheduleState extends State<DietSchedule> {
         fetchIngestion();
         fetchDietSchedule();
       });
+    }
+  }
+
+  Color cardColor(String times) {
+    if (times == 'BREAKFAST') {
+      return AppTheme.pastelPink;
+    } else if (times == 'LUNCH') {
+      return AppTheme.pastelBlue;
+    } else if (times == 'DINNER') {
+      return AppTheme.pastelGreen;
+    } else {
+      return AppTheme.pastelYellow;
     }
   }
 
@@ -133,7 +156,7 @@ class _DietScheduleState extends State<DietSchedule> {
             WidgetDiet(
               onTap: () {},
               isWidget: false,
-              userCalories: 2000,
+              userCalories: bmr ?? 2000,
               breakfastCalories: ingestionSchedule.isNotEmpty
                   ? ingestionSchedule[0]['breakfastKcal']
                   : 0,
@@ -166,6 +189,8 @@ class _DietScheduleState extends State<DietSchedule> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    color:cardColor(diet['times']).withOpacity(0.4),
+                    elevation: 0,
                     child: ListTile(
                       title: Row(children: [
                         Text(diet['name'],
@@ -175,8 +200,7 @@ class _DietScheduleState extends State<DietSchedule> {
                         Text('${diet['servingSize'].toStringAsFixed(0)}g',
                             style: TextStyle(fontSize: 10)),
                       ]),
-                      subtitle:
-                      Text(
+                      subtitle: Text(
                           '탄수화물 ${diet['carbohydrate'] >= 9999999.0 ? "-g" : "${diet['carbohydrate'].toStringAsFixed(0)}g"} 단백질 ${diet['protein'] >= 9999999.0 ? "-g" : "${diet['protein'].toStringAsFixed(0)}g"} 지방 ${diet['fat'] >= 9999999.0 ? "-g" : "${diet['fat'].toStringAsFixed(0)}g"}',
                           style: TextStyle(fontSize: 11)),
                       trailing: Text(

@@ -620,7 +620,7 @@ class _FoodSearchState extends State<FoodSearch> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 elevation: 0,
-                color: AppTheme.pastelYellow,
+                color: AppTheme.pastelBlue.withOpacity(0.5),
                 child: ListTile(
                   onTap: () {
                     _selectedQuantity = 1.0;
