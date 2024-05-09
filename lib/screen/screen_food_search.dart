@@ -86,7 +86,6 @@ class _FoodSearchState extends State<FoodSearch> {
         Food food = Food.fromJson(foodMap);
         foodsInfo[i] = food;
       }
-
     } else {
       throw Exception('Failed to load foods');
     }
@@ -358,7 +357,10 @@ class _FoodSearchState extends State<FoodSearch> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('탄수화물', style: TextStyle(fontSize: 16)),
-                        Text('${food.carbohydrate.toStringAsFixed(0)}g',
+                        Text(
+                            food.carbohydrate == 9999999
+                                ? '정보없음'
+                                : '${food.carbohydrate.toStringAsFixed(0)}g',
                             style: TextStyle(fontSize: 16)),
                       ],
                     ),
@@ -374,7 +376,10 @@ class _FoodSearchState extends State<FoodSearch> {
                                 fontSize: 16,
                                 color: AppTheme.subTitleTextColor)),
                         Expanded(
-                          child: Text('${food.sugars.toStringAsFixed(0)}g',
+                          child: Text(
+                              food.sugars == 9999999
+                                  ? '정보없음'
+                                  : '${food.sugars.toStringAsFixed(0)}g',
                               style: TextStyle(
                                   fontSize: 16,
                                   color: AppTheme.subTitleTextColor),
@@ -387,7 +392,10 @@ class _FoodSearchState extends State<FoodSearch> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('단백질', style: TextStyle(fontSize: 16)),
-                        Text('${food.protein.toStringAsFixed(0)}g',
+                        Text(
+                            food.protein == 9999999
+                                ? '정보없음'
+                                : '${food.protein.toStringAsFixed(0)}g',
                             style: TextStyle(fontSize: 16)),
                       ],
                     ),
@@ -396,7 +404,10 @@ class _FoodSearchState extends State<FoodSearch> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('지방', style: TextStyle(fontSize: 16)),
-                        Text('${food.fat.toStringAsFixed(0)}g',
+                        Text(
+                            food.fat == 9999999
+                                ? '정보없음'
+                                : '${food.fat.toStringAsFixed(0)}g',
                             style: TextStyle(fontSize: 16)),
                       ],
                     ),
@@ -413,7 +424,9 @@ class _FoodSearchState extends State<FoodSearch> {
                                 color: AppTheme.subTitleTextColor)),
                         Expanded(
                           child: Text(
-                              '${food.saturatedFattyAcid.toStringAsFixed(0)}g',
+                              food.saturatedFattyAcid == 9999999
+                                  ? '정보없음'
+                                  : '${food.saturatedFattyAcid.toStringAsFixed(0)}g',
                               style: TextStyle(
                                   fontSize: 16,
                                   color: AppTheme.subTitleTextColor),
@@ -434,7 +447,9 @@ class _FoodSearchState extends State<FoodSearch> {
                                 color: AppTheme.subTitleTextColor)),
                         Expanded(
                           child: Text(
-                              '${food.transFattyAcid.toStringAsFixed(0)}g',
+                              food.transFattyAcid == 9999999
+                                  ? '정보없음'
+                                  : '${food.transFattyAcid.toStringAsFixed(0)}g',
                               style: TextStyle(
                                   fontSize: 16,
                                   color: AppTheme.subTitleTextColor),
@@ -447,7 +462,10 @@ class _FoodSearchState extends State<FoodSearch> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('나트륨', style: TextStyle(fontSize: 16)),
-                        Text('${food.salt.toStringAsFixed(0)}mg',
+                        Text(
+                            food.salt == 9999999
+                                ? '정보없음'
+                                : '${food.salt.toStringAsFixed(0)}mg',
                             style: TextStyle(fontSize: 16)),
                       ],
                     ),
@@ -467,7 +485,8 @@ class _FoodSearchState extends State<FoodSearch> {
                             uid: userId!,
                             times: _meals.indexOf(_selectedMeal),
                             foodName: food.name,
-                            quantity: _selectedGram == '인분'
+                            quantity:
+                            _selectedGram == '인분'
                                 ? food.servingSize * _selectedQuantity
                                 : _selectedQuantity,
                             calories: _selectedGram == '인분'
@@ -475,42 +494,50 @@ class _FoodSearchState extends State<FoodSearch> {
                                 : food.calories *
                                     _selectedQuantity /
                                     food.servingSize,
-                            carbohydrate: _selectedGram == '인분'
+                            carbohydrate: food.carbohydrate >= 9999999 ? 9999999 :
+                            _selectedGram == '인분'
                                 ? food.carbohydrate * _selectedQuantity
                                 : food.carbohydrate *
                                     _selectedQuantity /
                                     food.servingSize,
-                            protein: _selectedGram == '인분'
+                            protein: food.protein >= 9999999 ? 9999999 :
+                            _selectedGram == '인분'
                                 ? food.protein * _selectedQuantity
                                 : food.protein *
                                     _selectedQuantity /
                                     food.servingSize,
-                            fat: _selectedGram == '인분'
+                            fat: food.fat >= 9999999 ? 9999999 :
+                            _selectedGram == '인분'
                                 ? food.fat * _selectedQuantity
                                 : food.fat *
                                     _selectedQuantity /
                                     food.servingSize,
-                            sugars: _selectedGram == '인분'
+                            sugars: food.sugars >= 9999999 ? 9999999 :
+                            _selectedGram == '인분'
                                 ? food.sugars * _selectedQuantity
                                 : food.sugars *
                                     _selectedQuantity /
                                     food.servingSize,
-                            salt: _selectedGram == '인분'
+                            salt:   food.salt >= 9999999 ? 9999999 :
+                            _selectedGram == '인분'
                                 ? food.salt * _selectedQuantity
                                 : food.salt *
                                     _selectedQuantity /
                                     food.servingSize,
-                            cholesterol: _selectedGram == '인분'
+                            cholesterol: food.cholesterol >= 9999999 ? 9999999 :
+                            _selectedGram == '인분'
                                 ? food.cholesterol * _selectedQuantity
                                 : food.cholesterol *
                                     _selectedQuantity /
                                     food.servingSize,
-                            saturatedFattyAcid: _selectedGram == '인분'
+                            saturatedFattyAcid: food.saturatedFattyAcid >= 9999999 ? 9999999 :
+                            _selectedGram == '인분'
                                 ? food.saturatedFattyAcid * _selectedQuantity
                                 : food.saturatedFattyAcid *
                                     _selectedQuantity /
                                     food.servingSize,
-                            transFattyAcid: _selectedGram == '인분'
+                            transFattyAcid: food.transFattyAcid >= 9999999 ? 9999999 :
+                            _selectedGram == '인분'
                                 ? food.transFattyAcid * _selectedQuantity
                                 : food.transFattyAcid *
                                     _selectedQuantity /
@@ -615,7 +642,7 @@ class _FoodSearchState extends State<FoodSearch> {
                         style: TextStyle(fontSize: 10)),
                   ]),
                   subtitle: Text(
-                      '탄수화물 ${food?.carbohydrate.toStringAsFixed(0)}g 단백질 ${food?.protein.toStringAsFixed(0)}g 지방 ${food?.fat.toStringAsFixed(0)}g',
+                      '탄수화물 ${food?.carbohydrate == 9999999.0 ? "정보없음" : "${food?.carbohydrate.toStringAsFixed(0)}g"} 단백질 ${food?.protein == 9999999.0 ? "정보없음" : "${food?.protein.toStringAsFixed(0)}g"} 지방 ${food?.fat == 9999999.0 ? "정보없음" : "${food?.fat.toStringAsFixed(0)}g"}',
                       style: TextStyle(fontSize: 11)),
                   trailing: Text('${food?.calories.toStringAsFixed(0)}kcal',
                       style:
