@@ -63,6 +63,7 @@ class FoodSearch extends StatefulWidget {
 class _FoodSearchState extends State<FoodSearch> {
   List<dynamic> searchResults = [];
   Map<int, Food> foodsInfo = {};
+  Map<String, Food> foodInfo = {};
 
   Future<void> searchFood(String food) async {
     final response = await http.get(Uri.parse('$baseUrl/foods/$food'));
@@ -71,44 +72,23 @@ class _FoodSearchState extends State<FoodSearch> {
     if (response.statusCode == 200) {
       final data = json.decode(decodedResponse) as List;
 
-      List<String> processedData = data.map<String>((item) {
-        String itemStr = item as String;
-        List<String> parts = itemStr.split(',');
-
-        return parts.first.trim();
+      List processedData = data.map((item) {
+        return item['name'];
       }).toList();
 
       setState(() {
         searchResults = processedData;
-        foodsInfo = {};
       });
 
-      loadFoodData();
+      for (int i = 0; i < data.length; i++) {
+        String jsonData = json.encode(data[i]);
+        Map<String, dynamic> foodMap = jsonDecode(jsonData);
+        Food food = Food.fromJson(foodMap);
+        foodsInfo[i] = food;
+      }
+
     } else {
       throw Exception('Failed to load foods');
-    }
-  }
-
-  FutureOr<Food?> fetchFood(String name, int index) async {
-    final String url = '$baseUrl/food/$name/$index';
-
-    try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        String responseBody = utf8.decode(response.bodyBytes);
-        Map<String, dynamic> food = json.decode(responseBody);
-        setState(() {
-          foodsInfo[index] = Food.fromJson(food);
-        });
-      } else {
-        throw Exception('Failed to load food');
-      }
-    } catch (e) {
-      print('error: $e');
     }
   }
 
@@ -170,12 +150,6 @@ class _FoodSearchState extends State<FoodSearch> {
       }));
     } else {
       throw Exception('식사 기록 실패');
-    }
-  }
-
-  Future<void> loadFoodData() async {
-    for (int i = 0; i < searchResults.length; i++) {
-      await fetchFood(searchResults[i], i);
     }
   }
 
@@ -249,8 +223,7 @@ class _FoodSearchState extends State<FoodSearch> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          '${food.name}',
-                          overflow: TextOverflow.ellipsis,
+                          '${food.name.length > 12 ? food.name.substring(0, 12) + '···' : food.name}',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -494,16 +467,54 @@ class _FoodSearchState extends State<FoodSearch> {
                             uid: userId!,
                             times: _meals.indexOf(_selectedMeal),
                             foodName: food.name,
-                            quantity: _selectedGram == '인분' ? food.servingSize*_selectedQuantity : _selectedQuantity,
-                            calories: _selectedGram == '인분' ? food.calories * _selectedQuantity : food.calories * _selectedQuantity / food.servingSize,
-                            carbohydrate: _selectedGram == '인분' ? food.carbohydrate * _selectedQuantity : food.carbohydrate * _selectedQuantity / food.servingSize,
-                            protein: _selectedGram == '인분' ? food.protein * _selectedQuantity : food.protein * _selectedQuantity / food.servingSize,
-                            fat: _selectedGram == '인분' ? food.fat * _selectedQuantity : food.fat * _selectedQuantity / food.servingSize,
-                            sugars: _selectedGram == '인분' ? food.sugars * _selectedQuantity : food.sugars * _selectedQuantity / food.servingSize,
-                            salt: _selectedGram == '인분' ? food.salt * _selectedQuantity : food.salt * _selectedQuantity / food.servingSize,
-                            cholesterol: _selectedGram == '인분' ? food.cholesterol * _selectedQuantity : food.cholesterol * _selectedQuantity / food.servingSize,
-                            saturatedFattyAcid: _selectedGram == '인분' ? food.saturatedFattyAcid * _selectedQuantity : food.saturatedFattyAcid * _selectedQuantity / food.servingSize,
-                            transFattyAcid: _selectedGram == '인분' ? food.transFattyAcid * _selectedQuantity : food.transFattyAcid * _selectedQuantity / food.servingSize,
+                            quantity: _selectedGram == '인분'
+                                ? food.servingSize * _selectedQuantity
+                                : _selectedQuantity,
+                            calories: _selectedGram == '인분'
+                                ? food.calories * _selectedQuantity
+                                : food.calories *
+                                    _selectedQuantity /
+                                    food.servingSize,
+                            carbohydrate: _selectedGram == '인분'
+                                ? food.carbohydrate * _selectedQuantity
+                                : food.carbohydrate *
+                                    _selectedQuantity /
+                                    food.servingSize,
+                            protein: _selectedGram == '인분'
+                                ? food.protein * _selectedQuantity
+                                : food.protein *
+                                    _selectedQuantity /
+                                    food.servingSize,
+                            fat: _selectedGram == '인분'
+                                ? food.fat * _selectedQuantity
+                                : food.fat *
+                                    _selectedQuantity /
+                                    food.servingSize,
+                            sugars: _selectedGram == '인분'
+                                ? food.sugars * _selectedQuantity
+                                : food.sugars *
+                                    _selectedQuantity /
+                                    food.servingSize,
+                            salt: _selectedGram == '인분'
+                                ? food.salt * _selectedQuantity
+                                : food.salt *
+                                    _selectedQuantity /
+                                    food.servingSize,
+                            cholesterol: _selectedGram == '인분'
+                                ? food.cholesterol * _selectedQuantity
+                                : food.cholesterol *
+                                    _selectedQuantity /
+                                    food.servingSize,
+                            saturatedFattyAcid: _selectedGram == '인분'
+                                ? food.saturatedFattyAcid * _selectedQuantity
+                                : food.saturatedFattyAcid *
+                                    _selectedQuantity /
+                                    food.servingSize,
+                            transFattyAcid: _selectedGram == '인분'
+                                ? food.transFattyAcid * _selectedQuantity
+                                : food.transFattyAcid *
+                                    _selectedQuantity /
+                                    food.servingSize,
                             date: DateTime.now(),
                           );
                           Navigator.pop(context);
@@ -574,7 +585,6 @@ class _FoodSearchState extends State<FoodSearch> {
               return SizedBox();
             } else {
               return Card(
-
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -593,7 +603,10 @@ class _FoodSearchState extends State<FoodSearch> {
                     showCustomModalBottomSheet(context, food);
                   },
                   title: Row(children: [
-                    Text(food.name,
+                    Text(
+                        food.name.length > 17
+                            ? food.name.substring(0, 17) + '···'
+                            : food.name,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.bold)),
