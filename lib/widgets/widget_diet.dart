@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../assets/theme.dart';
 
-class WidgetDiet extends StatelessWidget {
+class WidgetDiet extends StatefulWidget {
   final double breakfastCalories;
   final double lunchCalories;
   final double dinnerCalories;
@@ -30,20 +30,26 @@ class WidgetDiet extends StatelessWidget {
   });
 
   @override
+  _WidgetDietState createState() => _WidgetDietState();
+}
+
+class _WidgetDietState extends State<WidgetDiet> {
+  @override
   Widget build(BuildContext context) {
+
     Color remainColor = Colors.white;
     double totalCalories =
-        breakfastCalories + lunchCalories + dinnerCalories + snackCalories;
-    double remainCalories = userCalories - totalCalories;
+        widget.breakfastCalories + widget.lunchCalories + widget.dinnerCalories + widget.snackCalories;
+    double remainCalories = widget.userCalories - totalCalories;
 
-    String breakfastCaloriesToStr = breakfastCalories.toStringAsFixed(0);
-    String lunchCaloriesToStr = lunchCalories.toStringAsFixed(0);
-    String dinnerCaloriesToStr = dinnerCalories.toStringAsFixed(0);
-    String snackCaloriesToStr = snackCalories.toStringAsFixed(0);
+    String breakfastCaloriesToStr = widget.breakfastCalories.toStringAsFixed(0);
+    String lunchCaloriesToStr = widget.lunchCalories.toStringAsFixed(0);
+    String dinnerCaloriesToStr = widget.dinnerCalories.toStringAsFixed(0);
+    String snackCaloriesToStr = widget.snackCalories.toStringAsFixed(0);
     String totalCaloriesToStr = totalCalories.toStringAsFixed(0);
-    String totalCarbToStr = totalCarb.toStringAsFixed(0);
-    String totalProteinToStr = totalProtein.toStringAsFixed(0);
-    String totalFatToStr = totalFat.toStringAsFixed(0);
+    String totalCarbToStr = widget.totalCarb.toStringAsFixed(0);
+    String totalProteinToStr = widget.totalProtein.toStringAsFixed(0);
+    String totalFatToStr = widget.totalFat.toStringAsFixed(0);
 
     if (remainCalories < 0) {
       remainColor = Colors.red;
@@ -51,22 +57,22 @@ class WidgetDiet extends StatelessWidget {
 
     List<PieChartSectionData> sections = [
       PieChartSectionData(
-          value: breakfastCalories,
+          value: widget.breakfastCalories,
           color: AppTheme.pastelPink,
           title: '',
           radius: 10),
       PieChartSectionData(
-          value: lunchCalories,
+          value: widget.lunchCalories,
           color: AppTheme.pastelBlue,
           title: '',
           radius: 10),
       PieChartSectionData(
-          value: dinnerCalories,
+          value: widget.dinnerCalories,
           color: AppTheme.pastelGreen,
           title: '',
           radius: 10),
       PieChartSectionData(
-          value: snackCalories,
+          value: widget.snackCalories,
           color: AppTheme.pastelYellow,
           title: '',
           radius: 10),
@@ -75,7 +81,7 @@ class WidgetDiet extends StatelessWidget {
     ];
 
     return GestureDetector(
-        onTap: onTap,
+        onTap: widget.onTap,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -88,7 +94,7 @@ class WidgetDiet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: isWidget
+                      color: widget.isWidget
                           ? Colors.transparent
                           : Colors.grey.withOpacity(0.3),
                       spreadRadius: 1,

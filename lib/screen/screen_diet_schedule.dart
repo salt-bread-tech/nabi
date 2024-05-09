@@ -175,8 +175,9 @@ class _DietScheduleState extends State<DietSchedule> {
                         Text('${diet['servingSize'].toStringAsFixed(0)}g',
                             style: TextStyle(fontSize: 10)),
                       ]),
-                      subtitle: Text(
-                          '탄수화물 ${diet['carbohydrate'].toStringAsFixed(0)}g 단백질 ${diet['protein'].toStringAsFixed(0)}g 지방 ${diet['fat'].toStringAsFixed(0)}g',
+                      subtitle:
+                      Text(
+                          '탄수화물 ${diet['carbohydrate'] >= 9999999.0 ? "-g" : "${diet['carbohydrate'].toStringAsFixed(0)}g"} 단백질 ${diet['protein'] >= 9999999.0 ? "-g" : "${diet['protein'].toStringAsFixed(0)}g"} 지방 ${diet['fat'] >= 9999999.0 ? "-g" : "${diet['fat'].toStringAsFixed(0)}g"}',
                           style: TextStyle(fontSize: 11)),
                       trailing: Text(
                           '${diet['calories'].toStringAsFixed(0)}kcal',
