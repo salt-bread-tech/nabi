@@ -13,10 +13,10 @@ Map<String, dynamic> loginInfo = {};
 Future<void> fetchUserInfo() async {
   try {
     final response = await http.get(
-      Uri.parse('$baseUrl/user/show-info/${globals.userId}'),
+      Uri.parse('$baseUrl/user/show-info'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer ${globals.token}',
       },
     );
     if (response.statusCode == 200) {
@@ -34,12 +34,13 @@ Future<void> fetchUserInfo() async {
         print('${globals.gender},${globals.age},$age,$gender');
       };
     } else {
-      throw Exception('유저 정보 불러오기 실패');
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
     }
   } catch (error) {
     print('네트워크 오류: $error');
   }
 }
+
 
 Future<bool> login(String id, String password, BuildContext context) async {
   //final String baseUrl = GlobalConfiguration().getString('baseUrl');
@@ -52,13 +53,11 @@ Future<bool> login(String id, String password, BuildContext context) async {
       body: json.encode({'id': id, 'password': password}),
     );
 
-    if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
 
       switch (responseData['code']) {
         case 'SU': // 로그인 성공
           print('로그인 성공: 토큰 = ${responseData['token']}');
-          // 전역 변수나 저장소에 토큰 저장
             globals.token = responseData['token'];
 
           //await saveToken(responseData['token']);
@@ -76,15 +75,20 @@ Future<bool> login(String id, String password, BuildContext context) async {
         case 'VF': // 올바르지 않은 요청
           print('올바르지 않은 요청: ${responseData['message']}');
           break;
-
         default:
           print('알 수 없는 응답 코드: ${responseData['code']}');
+          break;
       }
-    } else {
-      print('서버 에러: HTTP 상태 코드 ${response.statusCode}');
+
+//네트워크 요청 실패 시
+    if (responseData['code'] != 'SU') {
+      print('로그인 실패: ${responseData['message']}');
+      return false;
     }
-  } catch (error) {
-    print('네트워크 오류: $error');
+  } catch (e) {
+    print('오류: $e');
+    return false;
   }
   return false;
 }
+

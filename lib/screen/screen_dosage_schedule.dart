@@ -122,7 +122,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Iconsax.backward), onPressed: () { Navigator.pushNamed(context, '/MyHomePage');},
+          icon: Icon(Icons.arrow_back_ios), onPressed: () { Navigator.pushNamed(context, '/MyHomePage');},
         ),
         title: Text(
           '$nickName님의 복용 일정',
