@@ -123,10 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => ScheduleCalendar()));
                 },
                 child: WidgetSchedule(
-                  time: 0,
-                  minute: 0,
-                  content: '',
-                  isDone: false
+                  datetime: selectedDate.toString(),
                 ),
               ),
               SizedBox(height: 20),
