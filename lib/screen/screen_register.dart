@@ -42,19 +42,20 @@ class _RegisterState extends State<Register> {
   String weightError = '';
 
 
-
   void validateFields() {
     setState(() {
       nicknameError = nicknameController.text.isEmpty ? '닉네임을 입력해주세요.' : '';
       idError = emailController.text.isEmpty ? '아이디를 입력해주세요.' : '';
       passwordError = passwordController.text.isEmpty ? '비밀번호를 입력해주세요.' : '';
-      confirmPasswordError = confirmPWController.text.isEmpty ? '비밀번호 확인을 입력해주세요.' : '';
+      confirmPasswordError =
+      confirmPWController.text.isEmpty ? '비밀번호 확인을 입력해주세요.' : '';
       birthDateError = birthDateController.text.isEmpty ? '생년월일을 입력해주세요.' : '';
-      genderError = genderController.text.isEmpty? '성별을 선택해주세요.':'';
+      genderError = genderController.text.isEmpty ? '성별을 선택해주세요.' : '';
       heightError = heightController.text.isEmpty ? '키를 입력해주세요.' : '';
       weightError = weightController.text.isEmpty ? '몸무게를 입력해주세요.' : '';
     });
   }
+
   void validateGender() {
     if (_selectedGender == 'none') {
       setState(() {
@@ -68,15 +69,16 @@ class _RegisterState extends State<Register> {
   }
 
 
-  Future<void> register(String nickname,String id, String password,
-      String birthDate, String gender, double height, double weight, int age, BuildContext context) async {
+  Future<bool> register(String nickname, String id, String password,
+      String birthDate, String gender, double height, double weight, int age,
+      BuildContext context) async {
     final url = Uri.parse('$baseUrl/user/register');
 
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',},
+        },
         body: json.encode({
           'nickname': nickname,
           'id': id,
@@ -84,51 +86,56 @@ class _RegisterState extends State<Register> {
           'birthDate': birthDate,
           'sex': gender,
           'height': height,
-          'weight' : weight,
-          'age' : age,
+          'weight': weight,
+          'age': age,
         }),
       );
 
-      dynamic responseData = json.decode(response.body);
+      final responseData = json.decode(response.body);
+      switch (responseData['code']) {
+        case 'SU': //회원가입 성공
+          print('회원가입 성공: ${responseData['message']}');
+          Navigator.pushNamed(context, '/login');
+          return true;
 
-      if (responseData is int) {
-        switch (responseData) {
-          case 200:
-            print('$id,$nickname,$birthDate, 회원가입 성공');
-            Navigator.pushNamed(context, '/login');
-            break;
-          case 100:
-            print('$id,$nickname,$birthDate,회원가입 실패: 아이디 중복');
-            setState(() {
-              isIdDuplicated = true;
-            });
-            break;
-          case 300:
-            print('$id,$nickname,$birthDate,회원가입 실패: 유효하지 않은 키, 몸무게 값');
-            setState(() {
-              isInvalidBMR = true;
-              isInvalidBMI = true;
-            });
-            break;
-          case 400:
-            print('$id,$nickname,$birthDate,유효하지 않은 BMR 값');
-            setState(() {
-              isInvalidBMR = true;
-            });
-            break;
-          case 500:
-            print('$id,$nickname,$birthDate,유효하지 않은 BMI 값');
-            setState(() {
-              isInvalidBMI = true;
-            });
-            break;
-          default:
-            print('$id,$nickname,$birthDate,알 수 없는 오류,$responseData');
-        }
+        case 'DI': // 아이디 중복
+          print('아이디 중복: ${responseData['message']}');
+          setState(() {
+            isIdDuplicated = true;
+          });
+          break;
+
+        case 'CF': // 올바른 형식이 아님
+          print('올바른 형식이 아님: ${responseData['message']}');
+          setState(() {
+            isInvalidBMR = true;
+            isInvalidBMI = true;
+          });
+          break;
+
+        case 'DBE': // 데이터베이스 에러
+          print('데이터베이스 에러: ${responseData['message']}');
+          break;
+
+        case 'VF': // 올바르지 않은 요청
+          print('올바르지 않은 요청: ${responseData['message']}');
+          break;
+
+        default:
+          print('알 수 없는 응답 코드: ${responseData['code']}');
+          break;
       }
-    } catch (error) {
-      print('$id,$nickname,$birthDate,네트워크 오류: $error');
+
+//네트워크 요청 실패 시
+      if (responseData['code'] != 'SU') {
+        print('회원가입 실패: ${responseData['message']}');
+        return false;
+      }
+    } catch (e) {
+      print('오류: $e');
+      return false;
     }
+    return false;
   }
 
   Future<void> attemptRegister() async {
@@ -367,38 +374,38 @@ class _RegisterState extends State<Register> {
                   child: AbsorbPointer(
                     child: CustomErrorTextFormField(
                       controller: birthDateController,
-                        hintText: '생년월일',
+                      hintText: '생년월일',
                       keyboardType: TextInputType.number,
-                        errorText: birthDateError.isEmpty ? null : birthDateError,
-                      ),
+                      errorText: birthDateError.isEmpty ? null : birthDateError,
                     ),
                   ),
+                ),
                 SizedBox(height: 15),
                 Text('성별', style: TextStyle(fontSize: 12)),
                 SizedBox(height: 5),
               ],
             ),
             Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      genderButton('남성'),
-                      SizedBox(width: 10),
-                      genderButton('여성'),
-                    ],
-                  ),
-                  if (genderError.isNotEmpty) Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      '성별을 선택해주세요',
-                      style: TextStyle(fontSize: 12,color: Colors.red),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        genderButton('남성'),
+                        SizedBox(width: 10),
+                        genderButton('여성'),
+                      ],
                     ),
-                  ),
-                ],
-              )
+                    if (genderError.isNotEmpty) Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '성별을 선택해주세요',
+                        style: TextStyle(fontSize: 12,color: Colors.red),
+                      ),
+                    ),
+                  ],
+                )
 
 
             ),
@@ -427,7 +434,7 @@ class _RegisterState extends State<Register> {
             ),
           ],
         ),
-    ),
+      ),
     );
   }
 }
