@@ -13,7 +13,7 @@ Map<String, dynamic> loginInfo = {};
 Future<void> fetchUserInfo() async {
   try {
     final response = await http.get(
-      Uri.parse('$baseUrl/user/show-info'),
+      Uri.parse('$baseUrl/user/show-info/$userId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${globals.token}',
@@ -63,7 +63,7 @@ Future<bool> login(String id, String password, BuildContext context) async {
             globals.token = responseData['token'];
 
           //await saveToken(responseData['token']);
-          Navigator.pushNamed(context, '/Webtoon');
+          Navigator.pushNamed(context, '/webtoon');
           return true;
 
         case 'SF': // 로그인 실패
