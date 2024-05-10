@@ -61,7 +61,7 @@ Future<bool> login(String id, String password, BuildContext context) async {
             globals.token = responseData['token'];
 
           //await saveToken(responseData['token']);
-          Navigator.pushNamed(context, '/MyHomePage');
+          Navigator.pushNamed(context, '/Webtoon');
           return true;
 
         case 'SF': // 로그인 실패

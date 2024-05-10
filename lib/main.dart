@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         highlightColor: Colors.transparent, // 하이라이트 투명하게
       ),
 
-      home: Login(),//MyHomePage(key: UniqueKey(),),
+      home: IntroPage(),//Login(),//MyHomePage(key: UniqueKey(),),
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),

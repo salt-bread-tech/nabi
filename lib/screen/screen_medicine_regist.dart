@@ -252,9 +252,25 @@ class _MedicineRegistState extends State<MedicineRegist> {
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: medicineRegister,
-              child: Text('등록하기'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 60,
+                  height: 35,
+                  child: TextButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFE0F0FF),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10))),
+                    onPressed: medicineRegister,
+                    child: Text(
+                      '등록하기',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                )
+              ],
             ),
           ],
         ),
