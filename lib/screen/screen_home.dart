@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
+import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
 import 'package:intl/intl.dart';
@@ -37,7 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json','Authorization': 'Bearer $token',},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode == 200) {
@@ -110,49 +115,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               SizedBox(height: 20),
-              Container(
-                  width: MediaQuery.of(context).size.width - 50,
-                  height: 45,
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFFEBEB),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: FutureBuilder<List<Schedule>>(
-                    future: fetchSchedules(
-                        userId!, selectedDate.toString().substring(0, 10)),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('${snapshot.error}');
-                      } else {
-                        return ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            Schedule schedule = snapshot.data![index];
-                            int schedules = snapshot.data!.length;
-                            return SizedBox(
-                              height: 45 + (schedules - 1) * 5,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 7, horizontal: 10),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFEBEB),
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                child: ScheduleWidget(
-                                  time: schedule.date.hour,
-                                  minute: schedule.date.minute,
-                                  content: schedule.text,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    },
-                  )),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ScheduleCalendar()));
+                },
+                child: WidgetSchedule(
+                  datetime: selectedDate.toString(),
+                ),
+              ),
               SizedBox(height: 20),
               WidgetDiet(
                 onTap: () {

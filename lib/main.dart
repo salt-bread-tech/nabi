@@ -10,6 +10,7 @@ import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:doctor_nyang/screen/screen_webtoon.dart';
+import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/FoodSearch' : (context) => FoodSearch(),
         '/routine' : (context) => RoutineScreen(),
         '/webtoon' : (context) => WebtoonPage(),
+        '/schedule' : (context) => ScheduleCalendar(),
       },
     );
   }
