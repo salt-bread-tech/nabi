@@ -1,46 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import '../services/globals.dart' as globals;
-import '../services/globals.dart';
 import '../services/urls.dart';
-import '../widgets/widget_weekly_routine.dart';
+import '../widgets/widget_addRoutines.dart';
 
-
-Future<void> registerDailyRoutine({
-  required int userUid,
-  required String routineName,
-  required int maxPerform,
-  required String startDate,
-  required String colorCode,
-}) async {
-  final url = Uri.parse('$baseUrl/routine/register');
-  final response = await http.post(
-    url,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $token',
-    },
-    body: jsonEncode(<String, dynamic>{
-      'uid': userUid,
-      'name': routineName,
-      'maxPerform': maxPerform,
-      'date': startDate,
-      'colorCode': colorCode,
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    print('루틴 등록 성공');
-  } else if (response.statusCode == 400) {
-    print('사용자 정보를 찾을 수 없음');
-  } else {
-    throw Exception('루틴 등록 실패');
-  }
-}
 
 class RoutineScreen extends StatefulWidget {
   @override
@@ -55,6 +21,148 @@ class _RoutineScreenState extends State<RoutineScreen> {
     );
   }
 
+  List<dynamic> _routines = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRoutines();
+  }
+
+
+  Future<void> fetchRoutines() async {
+    final url = Uri.parse('$baseUrl/routine');
+    try {
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer ${globals.token}',
+        },
+      );
+
+      final decodedResponse = utf8.decode(response.bodyBytes);
+
+      if (response.statusCode == 200) {
+        print('루틴 조회 성공');
+        setState(() {
+          _routines = json.decode(decodedResponse);
+        });
+      } else if (response.statusCode == 400) {
+        print('사용자 정보를 찾을 수 없음');
+      } else {
+        throw Exception('루틴 조회 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('루틴 조회 실패: $e');
+    }
+  }
+
+
+
+  Widget _buildRoutineItem(Map routine) {
+    int currentCount = routine['counts'];
+    int maxCount = routine['max'];
+    String routineName = routine['name'];
+    String colorCode = routine['color'];
+    return ListTile(
+      tileColor: Color(0xFFF2F2F2),
+      title: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(routineName,style: TextStyle(fontSize: 13)),
+                SizedBox(height: 1),
+                Text(
+                  '$currentCount/$maxCount',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ]
+          ),
+
+          SizedBox(width: 10),
+          Container(
+            width: 0.5,
+            height: 40,
+            color: Colors.grey,
+          ),
+        ],
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(maxCount, (index) {
+          return GestureDetector(
+            onTap: () async {
+              bool updated = await _updateRoutineCount(routine['id'],routine['counts']);
+              if (updated) {
+                setState(() {
+                  if (index < routine['counts']) {
+                    routine['counts'] = index;
+                  } else if (routine['counts'] < routine['max']) {
+                    routine['counts']++;
+                  }
+                }
+                );
+              }
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              height: 25,
+              width: 25,
+              decoration: BoxDecoration(
+                color: index < currentCount ? Color(int.parse("0xFF$colorCode")) : Color(0xFFD9D9D9),
+                shape: BoxShape.circle,
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Future<bool> _updateRoutineCount(int routineId, int newCount) async {
+    final url = Uri.parse('$baseUrl/routine');
+    try {
+      final response = await http.put(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer ${globals.token}',
+        },
+        body: json.encode({'rid': routineId, 'counts': newCount+1}),
+      );
+
+      if (response.statusCode == 200) {
+        print('루틴 횟수 변경, counts: $newCount');
+        return true;
+      } else {
+        print('루틴 횟수 변경 실패: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('루틴 횟수 변경 실패: $e');
+      return false;
+    }
+  }
+
+
+
+  Widget _buildRoutineList() {
+    return ListView.builder(
+      itemCount: _routines.length,
+      itemBuilder: (context, index) {
+        return Card(
+          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: _buildRoutineItem(_routines[index]),
+        );
+      },
+    );
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,195 +171,10 @@ class _RoutineScreenState extends State<RoutineScreen> {
         actions: [
           IconButton(onPressed: _presentRoutineAddSheet, icon: Icon(Icons.add))
         ],
-      ),
-      body: SingleChildScrollView(
-    child: Padding(
-    padding: EdgeInsets.all(16.0),
-    child: Column(
-    children: [
-          RoutineStatusWidget()
-        ],
-      ),
-    ),
-    )
+      ), body: _routines.isEmpty
+        ? Center(child: CircularProgressIndicator())
+        : _buildRoutineList(),
     );
   }
 }
 
-class AddRoutineWidget extends StatefulWidget {
-  @override
-  _AddRoutineWidgetState createState() => _AddRoutineWidgetState();
-}
-
-class _AddRoutineWidgetState extends State<AddRoutineWidget> {
-  final TextEditingController _routineController = TextEditingController();
-  int _selectedFrequencyValue = 1;
-  Color _selectedColor = Color(0xFFFFDFEB);
-  String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-
-
-  void _registerRoutine() async {
-    int? userId = globals.userId;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("사용자 ID가 없습니다.")));
-      return;
-    }
-
-    String colorCodeWithoutAlpha = _selectedColor.value.toRadixString(16).substring(2).toUpperCase();
-
-    try {
-      await registerDailyRoutine(
-          userUid: userId,
-          routineName: _routineController.text,
-          maxPerform: _selectedFrequencyValue,
-          startDate: startDate,
-          colorCode: colorCodeWithoutAlpha
-      );
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 성공")));
-      print('userId: ${userId}, Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 실패: $e")));
-    }
-  }
-
-  void _showFrequencyPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext builder) {
-        return Container(
-          height: MediaQuery.of(context).copyWith().size.height / 3,
-          child: CupertinoPicker(
-            backgroundColor: CupertinoColors.white,
-            onSelectedItemChanged: (int value) {
-              setState(() {
-                _selectedFrequencyValue = value + 1;
-              });
-            },
-            itemExtent: 32.0,
-            children: List<Widget>.generate(10, (int index) {
-              return Center(
-                child: Text('${index + 1}'),
-              );
-            }),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFrequencyDisplay(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showFrequencyPicker(context),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 3.0,horizontal: 8),
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '$_selectedFrequencyValue',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
-            ),
-            Icon(Icons.arrow_drop_down),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildColorPicker() {
-    final List<Color> _colorOptions = [
-      Color(0xFFFFDFEB),
-      Color(0xFFFFAAD3),
-      Color(0xFFFFF27F),
-      Color(0xFFD3EAFF),
-      Color(0xFF6696DE),
-      Color(0xFFE8DAFF),
-      Color(0xFF9D79D8),
-    ];
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: _colorOptions.map((color) {
-        bool isSelected = _selectedColor == color;
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedColor = color;
-            });
-          },
-          child: Container(
-            padding: EdgeInsets.all(1),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isSelected ? Colors.grey : Colors.transparent,
-                width: 1.5,
-              ),
-            ),
-            child: CircleAvatar(
-              backgroundColor: color,
-              radius: 13,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.all(20.0),
-              children: [
-                Text('습관명'),
-                TextField(
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    hintText: '습관명 입력하기',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 15),
-                  ),
-                  controller: _routineController,
-                ),
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('횟수'),
-                        SizedBox(height: 5),
-                        _buildFrequencyDisplay(context),
-                      ],
-                    ),
-                    SizedBox(width: 30),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('색'),
-                        SizedBox(height: 5),
-                        _buildColorPicker(),
-                      ],
-                    ),
-                    Spacer(),
-                    IconButton(onPressed: _registerRoutine, icon: Icon(Iconsax.send_15))
-                  ],
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

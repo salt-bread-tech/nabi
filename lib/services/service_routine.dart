@@ -4,34 +4,14 @@ import 'dart:convert';
 
 import 'globals.dart';
 
-Future<void> registerRoutinePrototype(String routineName) async {
-  final url = Uri.parse('$baseUrl/routine/register');
-  final response = await http.post(
-    url,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      'routineName': routineName,
-      'Authorization': 'Bearer $token',
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    print('루틴 프로토타입 등록 성공');
-  } else {
-    throw Exception('루틴 프로토타입 등록 실패');
-  }
-}
 
 Future<void> registerDailyRoutine({
-  required int userUid,
-  required int routineId,
-  required DateTime startDate,
-  required DateTime endDate,
+  required String routineName,
   required int maxPerform,
+  required String startDate,
+  required String colorCode,
 }) async {
-  final url = Uri.parse('$baseUrl/set-routine/register');
+  final url = Uri.parse('$baseUrl/routine');
   final response = await http.post(
     url,
     headers: <String, String>{
@@ -39,34 +19,18 @@ Future<void> registerDailyRoutine({
       'Authorization': 'Bearer $token',
     },
     body: jsonEncode(<String, dynamic>{
-      'userUid': userUid,
-      'routineId': routineId,
-      'startDate': startDate.toIso8601String().split('T').first,
-      'endDate': endDate.toIso8601String().split('T').first,
+      'name': routineName,
       'maxPerform': maxPerform,
+      'date': startDate,
+      'colorCode': colorCode,
     }),
   );
 
   if (response.statusCode == 200) {
-    print('개인 데일리 루틴 등록 성공');
+    print('루틴 등록 성공');
+  } else if (response.statusCode == 400) {
+    print('사용자 정보를 찾을 수 없음');
   } else {
-    throw Exception('개인 데일리 루틴 등록 실패');
-  }
-}
-
-Future<List<dynamic>> fetchRegisteredRoutines(int userUid) async {
-  final response = await http.get(
-    Uri.parse('$baseUrl/get-routine/$userUid'),
-    headers: <String, String>{
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    List<dynamic> routines = json.decode(response.body);
-    return routines;
-  } else {
-    throw Exception('데일리 루틴 데이터 조회 실패');
+    throw Exception('루틴 등록 실패');
   }
 }
