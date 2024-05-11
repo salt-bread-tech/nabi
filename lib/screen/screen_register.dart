@@ -72,7 +72,7 @@ class _RegisterState extends State<Register> {
   Future<bool> register(String nickname, String id, String password,
       String birthDate, String gender, double height, double weight, int age,
       BuildContext context) async {
-    final url = Uri.parse('$baseUrl/user/register');
+    final url = Uri.parse('$baseUrl/user');
 
     try {
       final response = await http.post(
@@ -108,8 +108,9 @@ class _RegisterState extends State<Register> {
         case 'CF': // 올바른 형식이 아님
           print('올바른 형식이 아님: ${responseData['message']}');
           setState(() {
-            isInvalidBMR = true;
+            /*isInvalidBMR = true;
             isInvalidBMI = true;
+             */
           });
           break;
 
@@ -183,7 +184,14 @@ class _RegisterState extends State<Register> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('비밀번호', style: TextStyle(fontSize: 12)),
+        Row(
+          children: [
+            Text('비밀번호', style: TextStyle(fontSize: 12)),
+            SizedBox(width: 10),
+            Text('영문 숫자 조합 8자리 이상', style: TextStyle(fontSize: 9,color: Colors.grey[500])),
+          ],
+        ),
+
         SizedBox(height: 5),
         CustomErrorTextFormField(
           controller: passwordController,
