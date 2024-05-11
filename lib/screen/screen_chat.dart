@@ -22,6 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final _user = const types.User(id: '1');
   late int page = 0;
   late int day = 0;
+  late int feedresult = 0;
 
   bool _isLoading = false;
 
@@ -69,12 +70,13 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     if (response.statusCode == 200) {
-      final int feedData =
-          json.decode(utf8.decode(response.bodyBytes));
-      if(feedData == 200){
+      final int feedData = json.decode(utf8.decode(response.bodyBytes));
+      if (feedData == 200) {
         print('Feed success');
-      } else if(feedData == 300){
-        print('Already feeded');
+        feedresult = 200;
+      } else if (feedData == 300) {
+        print('Already fed');
+        feedresult = 300;
       }
     } else {
       print('Failed to load feed from server');
@@ -190,6 +192,47 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  void showPhoto() {
+    showFedResult();
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: EdgeInsets.zero,
+          child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Image.asset('images/chat_heart.png',
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height)),
+        );
+      },
+    );
+  }
+
+  void showFedResult() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: feedresult == 200 ? Text('고맙다냥!') : Text('이미 먹었다냥!'),
+          content: feedresult == 200
+              ? Text('나비에게 먹이를 주었습니다.')
+              : Text('이미 먹이를 주었습니다.'),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('확인'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -242,8 +285,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       IconButton(
                         icon: Icon(Iconsax.heart5,
                             size: 30, color: AppTheme.pastelPink),
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                       ),
                       Text('나비와 함께한지 ${day}일', style: TextStyle(fontSize: 16)),
                       IconButton(
@@ -251,6 +293,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             size: 30, color: AppTheme.pastelBlue),
                         onPressed: () {
                           feed();
+                          feedresult == 200 ? showPhoto() : showFedResult();
                         },
                       ),
                     ],
