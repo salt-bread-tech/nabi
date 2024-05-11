@@ -22,11 +22,6 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
 
 
   void _registerRoutine() async {
-    int? userId = globals.userId;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("사용자 ID가 없습니다.")));
-      return;
-    }
 
     String colorCodeWithoutAlpha = _selectedColor.value.toRadixString(16).substring(2).toUpperCase();
 
@@ -38,7 +33,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
           colorCode: colorCodeWithoutAlpha
       );
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 성공")));
-      print('userId: ${userId}, Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}');
+      print(' Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 실패: $e")));
     }
