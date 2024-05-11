@@ -28,10 +28,10 @@ class _WebtoonPageState extends State<WebtoonPage>
   final List<String> texts = [
     '비가 세차게 내리는 어느 날… 당신은 동네 골목 길을 걷고 있었습니다.',
     '어? 저 앞에 작은 택배 박스가 보이네요. 당신은 홀린듯이 박스를 향해 걸었습니다.',
-    '박스 안을 확인해보니… 안에는 작은 고양이가 들어 있었어요!',
-    '그 고양이는 비에 젖은 채 추위에 떨고 있습니다. ',
-    '목에는 ‘나비’ 라는 목걸이가 걸려 있었어요.',
-    '박스에 붙어있는 쪽지에는 ‘데려가주세요.’ 라고 적혀있네요.',
+    '박스 안을 확인해보니… 작은 고양이가 들어 있었어요!',
+    '고양이는 비에 젖은 채 추위에 떨고 있었습니다. ',
+    '목에는 ‘나비’ 라고 쓰여 있는 목걸이를 하고 있었어요.',
+    '박스에는 ‘데려가주세요.’ 라는 문구가 적혀있네요.',
     '누가 키우던 고양이였을까요?',
     '당신은 고양이… 나비를 집에 데려가기로 결심했습니다.'
   ];
@@ -79,7 +79,7 @@ class _WebtoonPageState extends State<WebtoonPage>
           _setupAnimation();
         });
       }
-      if(currentIndex == 7){
+      if (currentIndex == 8) {
         Navigator.pushNamed(context, '/MyHomePage');
       }
     }
