@@ -10,7 +10,6 @@ import 'package:doctor_nyang/widgets/widget_schedule.dart';
 import 'package:intl/intl.dart';
 import '../models/model_diet.dart';
 import '../services/globals.dart';
-import '../services/service_schedule.dart';
 import '../services/urls.dart';
 import '../widgets/widget_diet.dart';
 import '../widgets/widget_weekly_routine.dart';
