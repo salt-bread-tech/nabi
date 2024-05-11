@@ -64,6 +64,7 @@ class _FoodSearchState extends State<FoodSearch> {
   List<dynamic> searchResults = [];
   Map<int, Food> foodsInfo = {};
   Map<String, Food> foodInfo = {};
+  String searchText = '';
 
   Future<void> searchFood(String food) async {
     final response = await http.get(Uri.parse('$baseUrl/foods/$food'),headers: {
@@ -594,13 +595,15 @@ class _FoodSearchState extends State<FoodSearch> {
                   decoration: InputDecoration(
                       border: InputBorder.none, hintText: '검색어 입력'),
                   onChanged: (text) {
-                    searchFood(text);
+                    searchText = text;
                   },
                 ),
               ),
               IconButton(
                 icon: Icon(Icons.search),
-                onPressed: () {},
+                onPressed: () async{
+              searchFood(searchText);
+              },
               ),
             ],
           ),
