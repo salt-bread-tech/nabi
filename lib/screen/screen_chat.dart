@@ -24,6 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late int day = 0;
   late int feedresult = 0;
 
+  bool _isPressed = false;
   bool _isLoading = false;
 
   AutoScrollController _scrollController = AutoScrollController();
@@ -240,8 +241,10 @@ class _ChatScreenState extends State<ChatScreen> {
         image: DecorationImage(
           fit: BoxFit.cover,
           image: AssetImage('images/chat_default.png'),
-          colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.5), BlendMode.dstATop),
+          colorFilter: _isPressed == false
+              ? ColorFilter.mode(
+                  Colors.white.withOpacity(0.5), BlendMode.dstATop)
+              : null,
         ),
       ),
       child: Scaffold(
@@ -251,7 +254,7 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Chat(
+              _isPressed == false ? Chat(
                 theme: const DefaultChatTheme(
                   inputBackgroundColor: Colors.white,
                   inputTextColor: Colors.black,
@@ -268,7 +271,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 onSendPressed: _handleSendPressed,
                 user: _user,
                 // scrollController: _scrollController,
-              ),
+              ) : Container(),
               Positioned(
                   child: _isLoading
                       ? SpinKitPumpingHeart(color: AppTheme.pastelPink)
@@ -285,7 +288,15 @@ class _ChatScreenState extends State<ChatScreen> {
                       IconButton(
                         icon: Icon(Iconsax.heart5,
                             size: 30, color: AppTheme.pastelPink),
-                        onPressed: () {},
+                        onPressed: () {
+                          _isPressed == false
+                              ? _isPressed = true
+                              : _isPressed = false;
+                          setState(() {
+                            _isPressed = _isPressed;
+                          });
+                          print(_isPressed);
+                        },
                       ),
                       Text('나비와 함께한지 ${day}일', style: TextStyle(fontSize: 16)),
                       IconButton(
