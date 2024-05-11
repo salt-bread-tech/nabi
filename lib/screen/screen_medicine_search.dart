@@ -13,6 +13,7 @@ class MedicineSearch extends StatefulWidget {
 
 class _MedicineSearchState extends State<MedicineSearch> {
   List<dynamic> searchResults = [];
+  String searchText = '';
 
   Future<void> searchMedicines(String query) async {
     final response = await http.get(Uri.parse('$baseUrl/medicines/$query'),headers: {
@@ -68,14 +69,14 @@ class _MedicineSearchState extends State<MedicineSearch> {
                   decoration: InputDecoration(
                       border: InputBorder.none, hintText: '검색어 입력'),
                   onChanged: (text) {
-                    searchMedicines(text);
+                    searchText = text;
                   },
                 ),
               ),
               IconButton(
                 icon: Icon(Icons.search),
-                onPressed: () {
-
+                onPressed: () async{
+                  searchMedicines(searchText);
                 },
               ),
             ],
