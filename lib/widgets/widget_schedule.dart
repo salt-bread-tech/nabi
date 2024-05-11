@@ -8,20 +8,14 @@ import '../services/globals.dart';
 import '../services/urls.dart';
 
 class Schedule {
-  final int userUid;
   final String text;
   final DateTime date;
   final bool isDone;
 
-  Schedule(
-      {required this.userUid,
-      required this.text,
-      required this.date,
-      this.isDone = false});
+  Schedule({required this.text, required this.date, this.isDone = false});
 
   factory Schedule.fromJson(Map<String, dynamic> json) {
     return Schedule(
-      userUid: json["userUid"]["uid"],
       text: json['text'],
       date: DateTime.parse(json['date']),
     );
@@ -40,21 +34,19 @@ class WidgetSchedule extends StatefulWidget {
 }
 
 class _WidgetScheduleState extends State<WidgetSchedule> {
-  String dateTIme = DateTime.now().toString().substring(0, 10);
+
 
   Future<List<Schedule>> fetchSchedule(String dateTime) async {
     {
-      final url = Uri.parse('$baseUrl/schedule/weekly-calendar');
-      final response = await http.post(
+      String dateTime = widget.datetime.toString().substring(0, 10);
+
+      final url = Uri.parse('$baseUrl/schedule/$dateTime');
+      final response = await http.get(
         url,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'userUid': userId,
-          'date': dateTime,
-        }),
       );
       List<Schedule> schedules = [];
       final decodedBody = utf8.decode(response.bodyBytes);
@@ -63,13 +55,14 @@ class _WidgetScheduleState extends State<WidgetSchedule> {
       if (data is int) {
         throw Exception('조회 실패 ${response.statusCode}');
       }
+
+
       for (var jsonItem in data[dateTime]) {
-        int userUid = jsonItem['userUid']['uid'];
         String text = jsonItem['text'];
         DateTime datetime = DateTime.parse(jsonItem['date']);
         bool isDone = DateTime.now().isAfter(datetime) ? true : false;
-        Schedule schedule = Schedule(
-            userUid: userUid, text: text, date: datetime, isDone: isDone);
+        Schedule schedule =
+            Schedule(text: text, date: datetime, isDone: isDone);
         schedules.add(schedule);
       }
 
