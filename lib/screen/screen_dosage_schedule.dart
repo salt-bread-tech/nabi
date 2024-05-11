@@ -27,7 +27,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
   //일정 가져오기
   Future<void> fetchDosageSchedule() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String url = '$baseUrl/medicine';
+    final String url = '$baseUrl/dosage';
 
     try {
       final response = await http.get(
@@ -52,19 +52,25 @@ class _DosageScheduleState extends State<DosageSchedule> {
       }
     } catch (e) {
       print('네트워크 오류 $e');
+      print('Token: $token');
+      print('Formatted Date: $formattedDate');
+      print('userId : $userId');
+
     }
   }
 
   //일정 토글
-  Future<void> toggleDosage(int userUid,int medicineId, String date,int times) async {
+  Future<void> toggleDosage(int medicineId, String date,int times) async {
     final String url = '$baseUrl/dosage';
 
     try {
-      final response = await http.post(
+      final response = await http.put(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
         body: json.encode({
-          'userUid': userId,
           'medicineId': medicineId,
           'date': date,
           'times': times,
@@ -81,6 +87,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
       print('네트워크 오류 $e');
     }
   }
+
 
 //날짜 선택
   Future<void> _selectDate(BuildContext context) async {
@@ -173,8 +180,8 @@ class _DosageScheduleState extends State<DosageSchedule> {
                       ),
                       onTap: () async {
                         int timeValue = timesToInt[dosage['times']] ?? -1;
-                        await toggleDosage(userId!, dosage['medicineId'], dosage['date'], timeValue);
-                        print('userId: $userId, medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
+                        await toggleDosage(dosage['medicineId'], dosage['date'], timeValue);
+                        print('medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
                       },
                     ),
                   );
