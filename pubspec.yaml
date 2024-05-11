@@ -75,6 +75,11 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  fonts:
+    - family: omyu_pretty
+      fonts:
+        - asset: fonts/omyu_pretty.ttf
+
   assets:
     - images/chat_default.png
     - images/chat_heart.png
