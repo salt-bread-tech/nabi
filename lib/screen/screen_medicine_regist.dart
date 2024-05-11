@@ -84,7 +84,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
   }
 
 
-  Future<void> registMedicine(BuildContext context, int uid, String startDate,
+  Future<void> registMedicine(BuildContext context, String startDate,
       String medicineName, int once, int total, int daily, String dosage) async {
     final url = Uri.parse('$baseUrl/medicine');
 
@@ -93,7 +93,6 @@ class _MedicineRegistState extends State<MedicineRegist> {
         url,
         headers: {'Content-Type': 'application/json','Authorization': 'Bearer $token',},
         body: json.encode({
-          'uid': uid,
           'startDate': startDate,
           'medicineName': medicineName,
           'once': once,
@@ -132,7 +131,6 @@ class _MedicineRegistState extends State<MedicineRegist> {
 
     if (dateError == '' && onceError == '' && totalError == '' && dailyError == '' &&
         dosageError == '') {
-      final uid = userId;
       final String startDate = _formatDate(selectedDate);
       final String medicineName = widget.name;
       final int? once = int.tryParse(onceController.text);
@@ -140,7 +138,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
       final int? daily = int.tryParse(dailyController.text);
       final String dosage = _selectedDosage;
 
-      await registMedicine(context, uid!, startDate, medicineName,
+      await registMedicine(context, startDate, medicineName,
           once!, total!, daily!, dosage);
     }
   }
