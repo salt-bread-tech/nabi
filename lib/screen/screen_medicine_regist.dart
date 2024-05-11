@@ -86,7 +86,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
 
   Future<void> registMedicine(BuildContext context, int uid, String startDate,
       String medicineName, int once, int total, int daily, String dosage) async {
-    final url = Uri.parse('$baseUrl/medicine/register');
+    final url = Uri.parse('$baseUrl/medicine');
 
     try {
       final response = await http.post(
