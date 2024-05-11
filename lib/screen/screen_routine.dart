@@ -59,13 +59,15 @@ class _RoutineScreenState extends State<RoutineScreen> {
   }
 
 
-
   Widget _buildRoutineItem(Map routine) {
     int currentCount = routine['counts'];
     int maxCount = routine['max'];
     String routineName = routine['name'];
     String colorCode = routine['color'];
     return ListTile(
+      shape: RoundedRectangleBorder( //<-- SEE HERE
+        borderRadius: BorderRadius.circular(10),
+      ),
       tileColor: Color(0xFFF2F2F2),
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -73,7 +75,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
           Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(routineName,style: TextStyle(fontSize: 13)),
+                Text(routineName, style: TextStyle(fontSize: 13)),
                 SizedBox(height: 1),
                 Text(
                   '$currentCount/$maxCount',
@@ -95,7 +97,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
         children: List.generate(maxCount, (index) {
           return GestureDetector(
             onTap: () async {
-              bool updated = await _updateRoutineCount(routine['id'],routine['counts']);
+              bool updated = await _updateRoutineCount(routine['id'], routine['counts']);
               if (updated) {
                 setState(() {
                   if (index < routine['counts']) {
@@ -103,8 +105,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                   } else if (routine['counts'] < routine['max']) {
                     routine['counts']++;
                   }
-                }
-                );
+                });
               }
             },
             child: Container(
@@ -121,6 +122,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
       ),
     );
   }
+
 
   Future<bool> _updateRoutineCount(int routineId, int newCount) async {
     final url = Uri.parse('$baseUrl/routine');
@@ -148,13 +150,16 @@ class _RoutineScreenState extends State<RoutineScreen> {
   }
 
 
-
   Widget _buildRoutineList() {
     return ListView.builder(
       itemCount: _routines.length,
       itemBuilder: (context, index) {
         return Card(
           margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 0,
           child: _buildRoutineItem(_routines[index]),
         );
       },
