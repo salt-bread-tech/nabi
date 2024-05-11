@@ -13,7 +13,7 @@ Map<String, dynamic> loginInfo = {};
 Future<void> fetchUserInfo() async {
   try {
     final response = await http.get(
-      Uri.parse('$baseUrl/user/show-info/$userId'),
+      Uri.parse('$baseUrl/user'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${globals.token}',
@@ -32,8 +32,7 @@ Future<void> fetchUserInfo() async {
         globals.age = userInfo['age'];
         globals.bmr = userInfo['bmr'];
         print({globals.nickName});
-        print('${globals.gender},${globals.age},$age,$gender');
-        print('${globals.bmr}');
+        //print('${globals.bmr}');
       };
     } else {
       throw Exception('Failed to fetch user info: ${response.statusCode}');
@@ -61,6 +60,7 @@ Future<bool> login(String id, String password, BuildContext context) async {
         case 'SU': // 로그인 성공
           print('로그인 성공: 토큰 = ${responseData['token']}');
             globals.token = responseData['token'];
+          fetchUserInfo();
 
           //await saveToken(responseData['token']);
           Navigator.pushNamed(context, '/webtoon');

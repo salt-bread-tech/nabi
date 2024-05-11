@@ -27,7 +27,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
   //일정 가져오기
   Future<void> fetchDosageSchedule() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String url = '$baseUrl/dosage/show/$userId';
+    final String url = '$baseUrl/medicine';
 
     try {
       final response = await http.get(
@@ -57,7 +57,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
 
   //일정 토글
   Future<void> toggleDosage(int userUid,int medicineId, String date,int times) async {
-    final String url = '$baseUrl/dosage/management';
+    final String url = '$baseUrl/dosage';
 
     try {
       final response = await http.post(

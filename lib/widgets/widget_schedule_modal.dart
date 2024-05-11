@@ -17,7 +17,7 @@ void showAddScheduleModal(BuildContext context) {
   String content = '';
 
   Future<void> addSchedule() async {
-    final String url = '$baseUrl/schedule/register';
+    final String url = '$baseUrl/schedule';
 
     try {
       final response = await http.post(
@@ -27,9 +27,8 @@ void showAddScheduleModal(BuildContext context) {
           'Authorization': 'Bearer $token',
         },
         body: json.encode({
-          'userUid': userId,
-          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate),
           'text': content,
+          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate),
         }),
       );
 

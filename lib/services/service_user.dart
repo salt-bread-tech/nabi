@@ -13,7 +13,7 @@ Future<void> updateBodyInfo({
   required String birth,
   required int age,
 }) async {
-  final url = Uri.parse('$baseUrl/user/enter-body-information');
+  final url = Uri.parse('$baseUrl/user');
   final response = await http.post(
     url,
     headers: <String, String>{
