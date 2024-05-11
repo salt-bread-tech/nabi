@@ -45,14 +45,14 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
       page++;
-      getChats(1);
+      // getChats(1);
       _scrollController.scrollToIndex(0,
           preferPosition: AutoScrollPosition.begin);
     } else if (_scrollController.position.pixels ==
         _scrollController.position.minScrollExtent) {
       if (page > 0) {
         page--;
-        getChats(1);
+        // getChats(1);
         _scrollController.scrollToIndex(0,
             preferPosition: AutoScrollPosition.end);
       } else {
@@ -100,7 +100,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> getChats(int uid) async {
-    final url = Uri.parse('$baseUrl/chats/$userId/$page');
+    final url = Uri.parse('$baseUrl/chats/$userId/recent');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
       'Authorization': 'Bearer $token',
@@ -224,7 +224,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 messages: _messages,
                 onSendPressed: _handleSendPressed,
                 user: _user,
-                scrollController: _scrollController,
+                // scrollController: _scrollController,
               ),
               Positioned(
                   child: _isLoading
