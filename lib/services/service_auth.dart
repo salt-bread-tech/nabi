@@ -1,3 +1,7 @@
+import 'package:intl/intl.dart';
+
+import 'package:doctor_nyang/main.dart';
+import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/services/urls.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +32,7 @@ Future<void> fetchUserInfo() async {
         globals.birth = userInfo['birth'];
         globals.height = userInfo['height'];
         globals.weight = userInfo['weight'];
-        globals.gender = userInfo['sex'];
+        globals.gender = userInfo['gender'];
         globals.age = userInfo['age'];
         globals.bmr = userInfo['bmr'];
         print({globals.nickName});
@@ -63,7 +67,13 @@ Future<bool> login(String id, String password, BuildContext context) async {
           fetchUserInfo();
 
           //await saveToken(responseData['token']);
-          Navigator.pushNamed(context, '/MyHomePage');
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => MyHomePage()),
+            ModalRoute.withName('/MyHomePage'),  // MyhomePage 화면까지 모든 화면을 제거
+          );
+
+          //Navigator.pushNamed(context, '/MyHomePage');
           return true;
 
         case 'SF': // 로그인 실패
@@ -94,3 +104,25 @@ Future<bool> login(String id, String password, BuildContext context) async {
   return false;
 }
 
+
+Future<void> logoutUser() async {
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/user/logout'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print("로그아웃 성공");
+
+    } else {
+      print("로그아웃 실패: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("네트워크 오류: $e");
+  }
+}

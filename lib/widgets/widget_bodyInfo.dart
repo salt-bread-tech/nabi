@@ -33,6 +33,7 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
     return AlertDialog(
       backgroundColor: Colors.white,
       contentPadding: EdgeInsets.all(20),
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       content: SingleChildScrollView(
         child: Column(
@@ -57,7 +58,6 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
       children: [
         Expanded(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text('생년월일', style: TextStyle(fontSize: 12)),
               _buildDatePicker(),
@@ -153,8 +153,10 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: Colors.grey[600]!),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
           ),
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 14),
         ),
       ),
     );
@@ -182,6 +184,8 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           ),
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 14),
         ),
       ),
     );
@@ -200,6 +204,8 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
 
 
   void _showGenderPicker(BuildContext context) {
+    int selectedIndex = genders.indexOf(selectedGender ?? genders.first);
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext builder) {
@@ -211,39 +217,47 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
             onSelectedItemChanged: (int index) {
               setState(() {
                 selectedGender = genders[index];
+                genderController.text = selectedGender!;
               });
             },
             children: genders.map((String value) => Center(child: Text(value, style: TextStyle(fontSize: 14)))).toList(),
+            scrollController: FixedExtentScrollController(initialItem: selectedIndex),
           ),
         );
       },
     );
   }
 
+
   Widget _buildUpdateButton() {
     return ElevatedButton(
       onPressed: _updateBodyInfo,
-      style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFE0F0FF), minimumSize: Size.fromHeight(50)),
-      child: Text('수정하기', style: TextStyle(color: Colors.black, fontSize: 18)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Color(0xFFE0F0FF),
+        minimumSize: Size.fromHeight(45),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 0,
+        splashFactory: NoSplash.splashFactory,
+        enableFeedback: false,
+      ),
+      child: Text('수정하기', style: TextStyle(color: Colors.black, fontSize: 15)),
     );
   }
 
+
   Future<void> _updateBodyInfo() async {
-    final userUid = globals.userId;
-    final sex = selectedGender;
+    final gender = selectedGender;
     final birth = DateFormat('yyyy-MM-dd').format(selectedDate);
     final height = double.tryParse(heightController.text);
     final weight = double.tryParse(weightController.text);
     final age = calculateAge(selectedDate);
 
-    if (height != null && weight != null && sex != null && userUid != null) {
-      await updateBodyInfo(userUid: userUid, sex: sex, height: height, weight: weight, birth: birth, age: age);
-      Navigator.of(context).pop();
+    if (height != null && weight != null && gender != null) {
+      await updateBodyInfo( gender: gender, height: height, weight: weight, birth: birth, age: age);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("정확히 입력해주세요")));
     }
   }
-
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showCupertinoModalPopup(

@@ -65,7 +65,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
     String routineName = routine['name'];
     String colorCode = routine['color'];
     return ListTile(
-      shape: RoundedRectangleBorder( //<-- SEE HERE
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
       tileColor: Color(0xFFF2F2F2),

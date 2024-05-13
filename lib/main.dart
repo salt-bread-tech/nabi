@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:doctor_nyang/screen/screen_chat.dart';
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:doctor_nyang/screen/screen_dosage_schedule.dart';
@@ -11,6 +13,7 @@ import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:doctor_nyang/screen/screen_webtoon.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -27,19 +30,21 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: AppBarTheme(backgroundColor: Colors.white),
+        cardColor: Colors.white,
+        cupertinoOverrideTheme: CupertinoThemeData(barBackgroundColor: Colors.white),
+        dialogBackgroundColor: Colors.white,
         brightness: Brightness.light,
-        primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         splashColor: Colors.transparent, // 잉크 투명하게
         highlightColor: Colors.transparent, // 하이라이트 투명하게
       ),
 
-      home: IntroPage(),//Login(),//MyHomePage(key: UniqueKey(),),
+      home: IntroPage(),//Login()
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
         '/home': (context) => HomeScreen(),
-        '/MyHomePage': (context) => MyHomePage(key: UniqueKey()),
+        '/MyHomePage': (context) => MyHomePage(),
         '/chat': (context) => ChatScreen(),
         '/DosageSchedule': (context) => DosageSchedule(),
         '/MedicineSearch': (context) => MedicineSearch(),
@@ -53,7 +58,6 @@ class MyApp extends StatelessWidget {
   }
 }
 class MyHomePage extends StatefulWidget {
-  MyHomePage({required Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();

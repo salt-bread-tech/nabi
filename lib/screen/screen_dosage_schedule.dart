@@ -128,9 +128,11 @@ class _DosageScheduleState extends State<DosageSchedule> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios), onPressed: () { Navigator.pushNamed(context, '/MyHomePage');},
+        /*leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),//, onPressed: () { Navigator.pushNamed(context, '/MyHomePage');},
         ),
+
+         */
         title: Text(
           '$nickName님의 복용 일정',
           style: TextStyle(color: Colors.black,fontSize: 17),
