@@ -10,7 +10,6 @@ import 'dart:convert';
 import 'globals.dart' as globals;
 import 'globals.dart';
 
-
 Map<String, dynamic> userInfo = {};
 Map<String, dynamic> loginInfo = {};
 
@@ -37,7 +36,8 @@ Future<void> fetchUserInfo() async {
         globals.bmr = userInfo['bmr'];
         print({globals.nickName});
         //print('${globals.bmr}');
-      };
+      }
+      ;
     } else {
       throw Exception('Failed to fetch user info: ${response.statusCode}');
     }
@@ -46,6 +46,21 @@ Future<void> fetchUserInfo() async {
   }
 }
 
+Future<void> getDday() async {
+  final url = Uri.parse('$baseUrl/user/d-day');
+  final response = await http.get(url, headers: {
+    "Content-Type": "application/json; charset=UTF-8",
+    'Authorization': 'Bearer $token',
+  });
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> ddayData =
+        json.decode(utf8.decode(response.bodyBytes));
+    day = ddayData['days'];
+  } else {
+    print('Failed to load dday from server');
+  }
+}
 
 Future<bool> login(String id, String password, BuildContext context) async {
   //final String baseUrl = GlobalConfiguration().getString('baseUrl');
@@ -58,39 +73,40 @@ Future<bool> login(String id, String password, BuildContext context) async {
       body: json.encode({'id': id, 'password': password}),
     );
 
-      final responseData = json.decode(response.body);
+    final responseData = json.decode(response.body);
 
-      switch (responseData['code']) {
-        case 'SU': // 로그인 성공
-          print('로그인 성공: 토큰 = ${responseData['token']}');
-            globals.token = responseData['token'];
-          fetchUserInfo();
+    switch (responseData['code']) {
+      case 'SU': // 로그인 성공
+        print('로그인 성공: 토큰 = ${responseData['token']}');
+        globals.token = responseData['token'];
+        fetchUserInfo();
+        getDday();
 
-          //await saveToken(responseData['token']);
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => MyHomePage()),
-            ModalRoute.withName('/MyHomePage'),  // MyhomePage 화면까지 모든 화면을 제거
-          );
+        //await saveToken(responseData['token']);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage()),
+          ModalRoute.withName('/MyHomePage'), // MyhomePage 화면까지 모든 화면을 제거
+        );
 
-          //Navigator.pushNamed(context, '/MyHomePage');
-          return true;
+        //Navigator.pushNamed(context, '/MyHomePage');
+        return true;
 
-        case 'SF': // 로그인 실패
-          print('로그인 실패: ${responseData['message']}');
-          break;
+      case 'SF': // 로그인 실패
+        print('로그인 실패: ${responseData['message']}');
+        break;
 
-        case 'DBE': // 데이터베이스 에러
-          print('데이터베이스 에러: ${responseData['message']}');
-          break;
+      case 'DBE': // 데이터베이스 에러
+        print('데이터베이스 에러: ${responseData['message']}');
+        break;
 
-        case 'VF': // 올바르지 않은 요청
-          print('올바르지 않은 요청: ${responseData['message']}');
-          break;
-        default:
-          print('알 수 없는 응답 코드: ${responseData['code']}');
-          break;
-      }
+      case 'VF': // 올바르지 않은 요청
+        print('올바르지 않은 요청: ${responseData['message']}');
+        break;
+      default:
+        print('알 수 없는 응답 코드: ${responseData['code']}');
+        break;
+    }
 
 //네트워크 요청 실패 시
     if (responseData['code'] != 'SU') {
@@ -104,9 +120,7 @@ Future<bool> login(String id, String password, BuildContext context) async {
   return false;
 }
 
-
 Future<void> logoutUser() async {
-
   try {
     final response = await http.post(
       Uri.parse('$baseUrl/user/logout'),
@@ -118,7 +132,6 @@ Future<void> logoutUser() async {
 
     if (response.statusCode == 200) {
       print("로그아웃 성공");
-
     } else {
       print("로그아웃 실패: ${response.statusCode}");
     }

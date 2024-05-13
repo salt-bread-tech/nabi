@@ -21,7 +21,6 @@ class _ChatScreenState extends State<ChatScreen> {
   List<types.Message> _messages = [];
   final _user = const types.User(id: '1');
   late int page = 0;
-  late int day = 0;
   late int feedresult = 0;
 
   bool _isPressed = false;
@@ -33,35 +32,34 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_scrollListener);
+    // _scrollController.addListener(_scrollListener);
     getChats(1);
-    getDday();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
 
-  void _scrollListener() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      page++;
-      // getChats(1);
-      _scrollController.scrollToIndex(0,
-          preferPosition: AutoScrollPosition.begin);
-    } else if (_scrollController.position.pixels ==
-        _scrollController.position.minScrollExtent) {
-      if (page > 0) {
-        page--;
-        // getChats(1);
-        _scrollController.scrollToIndex(0,
-            preferPosition: AutoScrollPosition.end);
-      } else {
-        print('Reached the top');
-      }
-    }
-  }
+  // void _scrollListener() {
+  //   if (_scrollController.position.pixels ==
+  //       _scrollController.position.maxScrollExtent) {
+  //     page++;
+  //     // getChats(1);
+  //     _scrollController.scrollToIndex(0,
+  //         preferPosition: AutoScrollPosition.begin);
+  //   } else if (_scrollController.position.pixels ==
+  //       _scrollController.position.minScrollExtent) {
+  //     if (page > 0) {
+  //       page--;
+  //       // getChats(1);
+  //       _scrollController.scrollToIndex(0,
+  //           preferPosition: AutoScrollPosition.end);
+  //     } else {
+  //       print('Reached the top');
+  //     }
+  //   }
+  // }
 
   Future<void> feed() async {
     final url = Uri.parse('$baseUrl/feed/$userId');
@@ -84,23 +82,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<void> getDday() async {
-    final url = Uri.parse('$baseUrl/user/d-day');
-    final response = await http.get(url, headers: {
-      "Content-Type": "application/json; charset=UTF-8",
-      'Authorization': 'Bearer $token',
-    });
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> ddayData =
-          json.decode(utf8.decode(response.bodyBytes));
-      setState(() {
-        day = ddayData['days'];
-      });
-    } else {
-      print('Failed to load dday from server');
-    }
-  }
 
   Future<void> getChats(int uid) async {
     final url = Uri.parse('$baseUrl/chats/$userId/recent');
