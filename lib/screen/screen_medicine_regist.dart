@@ -1,3 +1,5 @@
+import 'package:doctor_nyang/main.dart';
+import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:doctor_nyang/widgets/widget_custom_textFormField.dart';
 import 'package:flutter/cupertino.dart';
@@ -108,6 +110,12 @@ class _MedicineRegistState extends State<MedicineRegist> {
         switch (responseData) {
           case 200:
             print('약물 등록 성공');
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => MyHomePage()),
+              ModalRoute.withName('/MyHomePage'),
+            );
+
             Navigator.pushNamed(context, '/DosageSchedule');
             break;
           case 100:
