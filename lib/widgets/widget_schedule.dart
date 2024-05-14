@@ -22,11 +22,49 @@ class Schedule {
   }
 }
 
+Future<List<Schedule>> fetchSchedule(String dateTime) async {
+  {
+    String datetime = dateTime.toString().substring(0, 10);
+
+    final url = Uri.parse('$baseUrl/schedule/$datetime');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    List<Schedule> schedules = [];
+    final decodedBody = utf8.decode(response.bodyBytes);
+    final data = json.decode(decodedBody);
+
+    if (data is int) {
+      throw Exception('조회 실패 ${response.statusCode}');
+    }
+
+
+    for (var jsonItem in data[dateTime]) {
+      String text = jsonItem['text'];
+      DateTime datetime = DateTime.parse(jsonItem['date']);
+      bool isDone = DateTime.now().isAfter(datetime) ? true : false;
+      Schedule schedule =
+      Schedule(text: text, date: datetime, isDone: isDone);
+      schedules.add(schedule);
+    }
+
+    schedules.sort((a, b) => a.date.compareTo(b.date));
+
+    return schedules;
+  }
+}
+
 class WidgetSchedule extends StatefulWidget {
   final String datetime;
+  final bool isWidget;
 
   WidgetSchedule({
     required this.datetime,
+    required this.isWidget,
   });
 
   @override
@@ -35,48 +73,11 @@ class WidgetSchedule extends StatefulWidget {
 
 class _WidgetScheduleState extends State<WidgetSchedule> {
 
-
-  Future<List<Schedule>> fetchSchedule(String dateTime) async {
-    {
-      String dateTime = widget.datetime.toString().substring(0, 10);
-
-      final url = Uri.parse('$baseUrl/schedule/$dateTime');
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-      List<Schedule> schedules = [];
-      final decodedBody = utf8.decode(response.bodyBytes);
-      final data = json.decode(decodedBody);
-
-      if (data is int) {
-        throw Exception('조회 실패 ${response.statusCode}');
-      }
-
-
-      for (var jsonItem in data[dateTime]) {
-        String text = jsonItem['text'];
-        DateTime datetime = DateTime.parse(jsonItem['date']);
-        bool isDone = DateTime.now().isAfter(datetime) ? true : false;
-        Schedule schedule =
-            Schedule(text: text, date: datetime, isDone: isDone);
-        schedules.add(schedule);
-      }
-
-      schedules.sort((a, b) => a.date.compareTo(b.date));
-
-      return schedules;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.pastelBlue.withOpacity(0.5),
+        color: widget.isWidget ? AppTheme.pastelBlue.withOpacity(0.5) : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
       ),
       margin: EdgeInsets.all(10),
@@ -96,7 +97,7 @@ class _WidgetScheduleState extends State<WidgetSchedule> {
                   margin: EdgeInsets.all(5),
                   width: double.infinity,
                   child: Text(
-                    '${schedule.date.hour}:${schedule.date.minute.toString().padLeft(2, '0')} | ${schedule.text}',
+                    '${schedule.date.hour.toString().padLeft(2, '0')}:${schedule.date.minute.toString().padLeft(2, '0')} | ${schedule.text}',
                     style: schedule.isDone
                         ? TextStyle(
                             color: Colors.grey,

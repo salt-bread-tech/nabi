@@ -123,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: WidgetSchedule(
                   datetime: selectedDate.toString(),
+                  isWidget: true,
                 ),
               ),
               SizedBox(height: 20),
