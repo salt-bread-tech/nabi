@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
+import 'package:timelines/timelines.dart';
 
 import '../assets/theme.dart';
 import '../services/globals.dart';
@@ -33,7 +36,6 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
     datetime = DateFormat('yyyy-MM-dd').format(_selectedDay);
 
     getSchedule();
-
   }
 
   int getHashCode(DateTime key) {
@@ -56,23 +58,23 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
       throw Exception('조회 실패 ${response.statusCode}');
     }
 
-    for(var key in data.keys) {
+    for (var key in data.keys) {
       for (var jsonItem in data[key]) {
         DateTime datetime = DateTime.parse(jsonItem['date']);
         String text = jsonItem['text'];
-        String schedule = "${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')} | $text";
+        String schedule =
+            "${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')} | $text";
         if (_eventsList[DateTime.parse(key)] == null) {
           _eventsList[DateTime.parse(key)] = [];
         }
         _eventsList[DateTime.parse(key)]!.add(schedule);
+
+        _eventsList[DateTime.parse(key)]!.sort((a, b) {
+          return a.substring(0, 5).compareTo(b.substring(0, 5));
+        });
       }
     }
-
-    print(_eventsList);
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +113,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
             locale: 'ko_KR',
             firstDay: DateTime.utc(2000, 1, 1),
             lastDay: DateTime.utc(2101, 12, 31),
-            focusedDay: DateTime.now(),
+            focusedDay: _focusedDay,
             headerStyle: const HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
@@ -123,7 +125,6 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                 Icons.arrow_right,
                 size: 0.0,
               ),
-
             ),
             calendarStyle: const CalendarStyle(
               selectedDecoration: BoxDecoration(
@@ -136,15 +137,14 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
               ),
               selectedTextStyle: TextStyle(color: Colors.white),
               todayTextStyle: TextStyle(color: Colors.black),
-              canMarkersOverflow : false,
-              markersAutoAligned : true,
-              markerSize : 5.0,
-              markersMaxCount : 4,
+              canMarkersOverflow: false,
+              markersAutoAligned: true,
+              markerSize: 5.0,
+              markersMaxCount: 4,
               markerDecoration: BoxDecoration(
                 color: AppTheme.pastelPink,
                 shape: BoxShape.circle,
               ),
-
             ),
             selectedDayPredicate: (day) {
               return isSameDay(_selectedDay, day);
@@ -164,12 +164,33 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
               });
             },
             eventLoader: getEventForDay,
-
           ),
-          WidgetSchedule(
-            datetime: _selectedDay.toString(),
-            isWidget: false,
-          ),
+          Expanded(
+              child: Timeline.tileBuilder(
+                  theme: TimelineThemeData(
+                    nodePosition: 0.07,
+                    color: AppTheme.pastelBlue,
+                    indicatorTheme: IndicatorThemeData(
+                      position: 0.5,
+                      size: 17.0,
+                    ),
+                    connectorTheme: ConnectorThemeData(
+                      thickness: 2.0,
+                    ),
+                  ),
+                  builder: TimelineTileBuilder.fromStyle(
+                    contentsAlign: ContentsAlign.basic,
+                    contentsBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Text(
+                          getEventForDay(_selectedDay)[index],
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      );
+                    },
+                    itemCount: getEventForDay(_selectedDay).length,
+                  ))),
         ],
       ),
     );

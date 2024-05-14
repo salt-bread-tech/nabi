@@ -47,6 +47,7 @@ dependencies:
   iconsax: ^0.0.8
   date_time_picker: ^2.1.0
   table_calendar: ^3.0.8
+  timelines: ^0.1.0
 
 
 
