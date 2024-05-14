@@ -14,7 +14,6 @@ import '../assets/theme.dart';
 import '../services/globals.dart';
 import '../services/urls.dart';
 import '../widgets/widget_schedule_modal.dart';
-import '../widgets/widget_schedule.dart';
 
 class ScheduleCalendar extends StatefulWidget {
   @override
@@ -27,7 +26,6 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
   String datetime = 'today';
   Map<DateTime, List> _eventsList = {};
 
-  CalendarFormat _calendarFormat = CalendarFormat.month;
 
   @override
   void initState() {
@@ -157,12 +155,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                 getEventForDay(_selectedDay);
               });
             },
-            calendarFormat: _calendarFormat,
-            onFormatChanged: (format) {
-              setState(() {
-                _calendarFormat = format;
-              });
-            },
+            calendarFormat: CalendarFormat.month,
             eventLoader: getEventForDay,
           ),
           Expanded(
