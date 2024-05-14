@@ -52,11 +52,11 @@ Future<List<Schedule>> fetchSchedule(String dateTime) async {
       Schedule(text: text, date: datetime, isDone: isDone);
       schedules.add(schedule);
     }
-
     schedules.sort((a, b) => a.date.compareTo(b.date));
 
     return schedules;
   }
+
 }
 
 class WidgetSchedule extends StatefulWidget {

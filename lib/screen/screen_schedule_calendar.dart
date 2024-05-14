@@ -100,7 +100,11 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              showAddScheduleModal(context);
+              showModalBottomSheet(
+                isScrollControlled: true,
+                context: context,
+                builder: (BuildContext bCtx) => AddScheduleModal(parentContext: context),
+              );
             },
           ),
         ],

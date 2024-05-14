@@ -1,18 +1,22 @@
 import 'dart:convert';
-
-import 'package:doctor_nyang/assets/theme.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:date_time_picker/date_time_picker.dart';
-
+import 'package:doctor_nyang/assets/theme.dart';  // 가정한 경로
 import '../services/globals.dart';
 import '../services/urls.dart';
 
-void showAddScheduleModal(BuildContext context) {
+class AddScheduleModal extends StatefulWidget {
+  final BuildContext parentContext;
+
+  const AddScheduleModal({Key? key, required this.parentContext}) : super(key: key);
+
+  @override
+  _AddScheduleModalState createState() => _AddScheduleModalState();
+}
+
+class _AddScheduleModalState extends State<AddScheduleModal> {
   DateTime selectedDate = DateTime.now();
   String content = '';
 
@@ -42,68 +46,100 @@ void showAddScheduleModal(BuildContext context) {
     }
   }
 
-  showModalBottomSheet(
-    isScrollControlled: true,
-    context: context,
-    builder: (bCtx) {
-      return Padding(
-        padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
-              width: double.infinity,
-              height: 250,
-              decoration: BoxDecoration(
-                color: AppTheme.appbackgroundColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(widget.parentContext).viewInsets.bottom),
+        child: Container(
+            width: double.infinity,
+            height: 240,
+            decoration: BoxDecoration(
+              color: AppTheme.appbackgroundColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
-              padding: EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  DateTimePicker(
-                    type: DateTimePickerType.dateTimeSeparate,
-                    dateMask: 'yyyy/MM/dd',
-                    initialValue: DateFormat('yyyy/MM/dd').format(selectedDate),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                    icon: Icon(Iconsax.calendar),
-                    onChanged: (val) {
-                      selectedDate = DateTime.parse(val);
-                    },
+            ),
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: '새로운 일정',
+                    labelStyle: TextStyle(color: Colors.black),
+                    border: InputBorder.none,
                   ),
-                  TextField(
-                    decoration: InputDecoration(labelText: '일정'),
-                    onChanged: (value) {
-                      content = value;
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[],
-                  ),
-                  Container(
-                      width: double.infinity,
-                      height: 55,
-                      child: TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: Color(0xFFEBEBEB),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                  onChanged: (value) {
+                    content = value;
+                  },
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text('날짜', style: TextStyle(color: Colors.black)),
+                    TextButton(
+                      onPressed: () {
+                        showCupertinoModalPopup(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Container(
+                                height: 300,
+                                color: Colors.white,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: 200,
+                                      child: CupertinoDatePicker(
+                                        initialDateTime: selectedDate,
+                                        onDateTimeChanged: (DateTime newDateTime) {
+                                          setState(() {
+                                            selectedDate = newDateTime;
+                                          });
+                                        },
+                                        use24hFormat: true,
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      child: Text('확인'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                        );
+                      },
+                      child: Text(
+                          '${selectedDate.year}년 ${selectedDate.month}월 ${selectedDate.day}일 ${selectedDate.hour}시 ${selectedDate.minute}분',
+                          style: TextStyle(color: Colors.black)
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Container(
+                    width: double.infinity,
+                    height: 55,
+                    child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color(0xFFEBEBEB),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          onPressed: () {
-                            addSchedule();
-                            Navigator.of(context).pop();
-                            print('Schedule Added: $selectedDate $content');
-                          },
-                          child: Text('일정 추가',
-                              style: TextStyle(color: Colors.black)))),
-                ],
-              )));
-    },
-  );
+                        ),
+                        onPressed: () {
+                          addSchedule();
+                          Navigator.of(widget.parentContext).pop();  // 주의: context 대신 parentContext 사용
+                          print('Schedule Added: $selectedDate $content');
+                        },
+                        child: Text('일정 추가', style: TextStyle(color: Colors.black))
+                    )
+                ),
+              ],
+            )
+        )
+    );
+  }
 }
