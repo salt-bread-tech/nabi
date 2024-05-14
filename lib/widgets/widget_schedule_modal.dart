@@ -43,62 +43,67 @@ void showAddScheduleModal(BuildContext context) {
   }
 
   showModalBottomSheet(
+    isScrollControlled: true,
     context: context,
     builder: (bCtx) {
-      return Container(
-        width: double.infinity,
-        height: 300,
-          decoration: BoxDecoration(
-            color: AppTheme.appbackgroundColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          padding: EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              DateTimePicker(
-                type: DateTimePickerType.dateTimeSeparate,
-                dateMask: 'yyyy/MM/dd',
-                initialValue: DateFormat('yyyy/MM/dd').format(selectedDate),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-                icon: Icon(Iconsax.calendar),
-                onChanged: (val) {
-                  selectedDate = DateTime.parse(val);
-                },
+      return Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+              width: double.infinity,
+              height: 250,
+              decoration: BoxDecoration(
+                color: AppTheme.appbackgroundColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
               ),
-              TextField(
-                decoration: InputDecoration(labelText: '일정'),
-                onChanged: (value) {
-                  content = value;
-                },
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[],
-              ),
-              Container(
-                width: double.infinity,
-                  height: 55,
-                  child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Color(0xFFEBEBEB),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        addSchedule();
-                        Navigator.of(context).pop();
-                        print('Schedule Added: $selectedDate $content');
-                      },
-                      child: Text('일정 추가', style: TextStyle(color: Colors.black)))),
-            ],
-          ));
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  DateTimePicker(
+                    type: DateTimePickerType.dateTimeSeparate,
+                    dateMask: 'yyyy/MM/dd',
+                    initialValue: DateFormat('yyyy/MM/dd').format(selectedDate),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                    icon: Icon(Iconsax.calendar),
+                    onChanged: (val) {
+                      selectedDate = DateTime.parse(val);
+                    },
+                  ),
+                  TextField(
+                    decoration: InputDecoration(labelText: '일정'),
+                    onChanged: (value) {
+                      content = value;
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[],
+                  ),
+                  Container(
+                      width: double.infinity,
+                      height: 55,
+                      child: TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Color(0xFFEBEBEB),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () {
+                            addSchedule();
+                            Navigator.of(context).pop();
+                            print('Schedule Added: $selectedDate $content');
+                          },
+                          child: Text('일정 추가',
+                              style: TextStyle(color: Colors.black)))),
+                ],
+              )));
     },
   );
 }
