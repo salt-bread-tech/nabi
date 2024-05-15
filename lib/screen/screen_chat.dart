@@ -22,8 +22,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final _user = const types.User(id: '1');
   late int page = 0;
   late int day = 0;
-  late int feedresult = 0;
 
+  int feedresult = 0;
   bool _isPressed = false;
   bool _isLoading = false;
 
