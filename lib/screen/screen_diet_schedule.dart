@@ -11,6 +11,7 @@ import '../models/model_diet.dart';
 import '../services/urls.dart';
 import '../services/globals.dart';
 import '../widgets/widget_diet.dart';
+import '../widgets/widget_weekly_calendar.dart';
 
 class DietSchedule extends StatefulWidget {
   @override
@@ -22,6 +23,13 @@ class _DietScheduleState extends State<DietSchedule> {
   List<dynamic> dietSchedule = [];
   List<dynamic> ingestionSchedule = [];
   List<String> times = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
+
+  void _handleDateChange(DateTime newDate) {
+    setState(() {
+      selectedDate = newDate;
+      fetchIngestion();
+    });
+  }
 
   @override
   void initState() {
@@ -141,17 +149,11 @@ class _DietScheduleState extends State<DietSchedule> {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            GestureDetector(
-              onTap: () => _selectDate(context),
-              child: Text(
-                DateFormat('yyyy년 MM월 dd일').format(selectedDate),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-            ),
+            WidgetCalendar(onDateSelected: _handleDateChange),
             SizedBox(height: 20),
             WidgetDiet(
               onTap: () {},
