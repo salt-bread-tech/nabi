@@ -13,6 +13,7 @@ import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:doctor_nyang/screen/screen_webtoon.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
+import 'package:doctor_nyang/widgets/widget_OCR_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
