@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
@@ -15,28 +16,79 @@ class AddRoutineWidget extends StatefulWidget {
 
 class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   final TextEditingController _routineController = TextEditingController();
+  final TextEditingController _maxTermController = TextEditingController();  // Controller for max term input
   int _selectedFrequencyValue = 1;
   Color _selectedColor = Color(0xFFFFDFEB);
   String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  int _selectedMaxTerm = 1;
 
 
 
   void _registerRoutine() async {
 
     String colorCodeWithoutAlpha = _selectedColor.value.toRadixString(16).substring(2).toUpperCase();
+    int maxTerm = int.tryParse(_maxTermController.text) ?? 1;
 
     try {
       await registerDailyRoutine(
           routineName: _routineController.text,
           maxPerform: _selectedFrequencyValue,
           startDate: startDate,
-          colorCode: colorCodeWithoutAlpha
+          colorCode: colorCodeWithoutAlpha,
+        maxTerm: maxTerm,
       );
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 성공")));
-      print(' Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}');
+      print(' Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}, maxTerm : $maxTerm');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 실패: $e")));
     }
+  }
+
+
+  Widget firstField(){
+    return Row(
+      children: [
+        Expanded(child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('습관명',style: TextStyle(fontSize: 13),),
+            _buildRoutineNameInput()
+          ],
+        ),
+        ),
+        SizedBox(width: 20),
+        Expanded(child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Text('반복 할 횟수',style: TextStyle(fontSize: 13),),
+        _buildMaxTermInput(),
+        ],))
+      ],
+    );
+  }
+
+  Widget _buildRoutineNameInput(){
+    return TextField(
+      autocorrect: false,
+      decoration: InputDecoration(
+        hintText: '습관명 입력하기',
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 15),
+      ),
+      controller: _routineController,
+    );
+  }
+  Widget _buildMaxTermInput() {
+    return TextField(
+      autocorrect: false,
+      keyboardType: TextInputType.number, // Ensure numeric input
+      decoration: InputDecoration(
+        hintText: '횟수',
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 15),
+      ),
+      controller: _maxTermController,
+    );
   }
 
   void _showFrequencyPicker(BuildContext context) {
@@ -138,22 +190,14 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
             child: ListView(
               padding: EdgeInsets.all(20.0),
               children: [
-                Text('습관명'),
-                TextField(
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    hintText: '습관명 입력하기',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 15),
-                  ),
-                  controller: _routineController,
-                ),
+                firstField(),
+                SizedBox(height: 10,),
                 Row(
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('횟수'),
+                        Text('횟수',style: TextStyle(fontSize: 13),),
                         SizedBox(height: 5),
                         _buildFrequencyDisplay(context),
                       ],
@@ -162,11 +206,12 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('색'),
+                        Text('색',style: TextStyle(fontSize: 13),),
                         SizedBox(height: 5),
                         _buildColorPicker(),
                       ],
                     ),
+
                     Spacer(),
                     IconButton(onPressed: _registerRoutine, icon: Icon(Iconsax.send_15))
                   ],

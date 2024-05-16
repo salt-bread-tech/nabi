@@ -35,19 +35,22 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
       contentPadding: EdgeInsets.all(20),
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text('정보 수정하기', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            SizedBox(height: 24),
-            _buildFirstFields(),
-            SizedBox(height: 16),
-            _buildSecondFields(),
-            SizedBox(height: 24),
-            _buildUpdateButton(),
-          ],
+      content: Container(
+        width: MediaQuery.of(context).size.width * 0.9, // 최소 너비 설정
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text('정보 수정하기', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              SizedBox(height: 24),
+              _buildFirstFields(),
+              SizedBox(height: 16),
+              _buildSecondFields(),
+              SizedBox(height: 24),
+              _buildUpdateButton(),
+            ],
+          ),
         ),
       ),
     );
@@ -60,6 +63,7 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
           child: Column(
             children: [
               Text('생년월일', style: TextStyle(fontSize: 12)),
+              SizedBox(height: 5),
               _buildDatePicker(),
             ],
           ),
@@ -69,6 +73,7 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
           child: Column(
             children: [
               Text('성별', style: TextStyle(fontSize: 12)),
+              SizedBox(height: 5),
               _buildGenderPicker(),
             ],
           ),
@@ -84,6 +89,7 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
           child: Column(
             children: [
               Text('키', style: TextStyle(fontSize: 12)),
+              SizedBox(height: 5),
               _buildTextField('cm', heightController),
             ],
           ),
@@ -92,6 +98,7 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
         Expanded(child: Column(
             children: [
             Text('몸무게', style: TextStyle(fontSize: 12)),
+              SizedBox(height: 5),
           _buildTextField('kg', weightController),
         ],
     ),
@@ -153,7 +160,7 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: Colors.grey[600]!),
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           ),
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 14),
