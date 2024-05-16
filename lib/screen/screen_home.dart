@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
+import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,8 @@ import '../models/model_diet.dart';
 import '../services/globals.dart';
 import '../services/urls.dart';
 import '../widgets/widget_diet.dart';
+import '../widgets/widget_routineList.dart';
+import '../widgets/widget_weekly_calendar.dart';
 import '../widgets/widget_weekly_routine.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,6 +26,15 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
   late DateTime selectedDate;
   List<dynamic> ingestionSchedule = [];
+
+
+  void _handleDateChange(DateTime newDate) {
+    setState(() {
+      selectedDate = newDate;
+      fetchIngestion();
+    });
+  }
+
 
   @override
   void initState() {
@@ -59,21 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-        fetchIngestion();
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
-            children: [
+            children: <Widget>[
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -101,19 +98,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 20),
               Container(
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.only(left: 15),
               ),
-              GestureDetector(
-                onTap: () => _selectDate(context),
-                child: Text(
-                  DateFormat('yyyy년 MM월 dd일').format(selectedDate),
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-              ),
-              SizedBox(height: 20),
+              WidgetCalendar(onDateSelected: _handleDateChange),
+              SizedBox(height: 10),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -123,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: WidgetSchedule(
                   datetime: selectedDate.toString(),
+                  isWidget: true,
                 ),
               ),
               SizedBox(height: 20),
@@ -156,7 +148,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     : 0,
               ),
               SizedBox(height: 20),
-              //RoutineStatusWidget(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RoutineScreen()));
+                },
+                child: Container(
+                  height: 190,
+                  child: RoutineListWidget(),
+                ),
+              )
             ],
           ),
         ),

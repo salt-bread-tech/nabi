@@ -61,11 +61,6 @@ class _UserScreenState extends State<UserScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.grey,
-                  //사진 추가??
-                ),
                 SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
