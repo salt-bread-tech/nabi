@@ -257,11 +257,6 @@ class RoutineItem extends StatelessWidget {
                 ],
               ),
               SizedBox(width: 10),
-              Container(
-                width: 0.5,
-                height: 40,
-                color: Colors.grey,
-              ),
             ],
           ),
           trailing: Row(
