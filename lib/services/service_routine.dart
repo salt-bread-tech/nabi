@@ -10,6 +10,7 @@ Future<void> registerDailyRoutine({
   required int maxPerform,
   required String startDate,
   required String colorCode,
+  required int maxTerm,
 }) async {
   final url = Uri.parse('$baseUrl/routine');
   final response = await http.post(
@@ -23,6 +24,7 @@ Future<void> registerDailyRoutine({
       'maxPerform': maxPerform,
       'date': startDate,
       'colorCode': colorCode,
+      'maxTerm': maxTerm,
     }),
   );
 
@@ -34,3 +36,4 @@ Future<void> registerDailyRoutine({
     throw Exception('루틴 등록 실패');
   }
 }
+

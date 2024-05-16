@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
+import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,7 @@ import '../models/model_diet.dart';
 import '../services/globals.dart';
 import '../services/urls.dart';
 import '../widgets/widget_diet.dart';
+import '../widgets/widget_routineList.dart';
 import '../widgets/widget_weekly_calendar.dart';
 import '../widgets/widget_weekly_routine.dart';
 
@@ -82,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
-            children: [
+            children: <Widget>[
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -146,7 +148,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     : 0,
               ),
               SizedBox(height: 20),
-              //RoutineStatusWidget(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RoutineScreen()));
+                },
+                child: Container(
+                  height: 190,
+                  child: RoutineListWidget(),
+                ),
+              )
             ],
           ),
         ),
