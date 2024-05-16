@@ -8,7 +8,10 @@ import '../services/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 
 class RoutineListWidget extends StatefulWidget {
-  RoutineListWidget({Key? key}) : super(key: key);
+
+  final String datetime;
+
+  RoutineListWidget({Key? key, required this.datetime}) : super(key: key);
 
   @override
   _RoutineListWidgetState createState() => _RoutineListWidgetState();
@@ -24,22 +27,24 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
   }
 
   Future<void> _fetchRoutines() async {
-    final url = Uri.parse('$baseUrl/routine');
+    final url = Uri.parse('$baseUrl/routine/${widget.datetime}');
     try {
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer ${globals.token}',
       });
 
+      final decodedResponse = utf8.decode(response.bodyBytes);
+
       if (response.statusCode == 200) {
         setState(() {
-          _routines = json.decode(response.body);
+          _routines = json.decode(decodedResponse);
         });
       } else {
-        throw Exception('Failed to load routines');
+        throw Exception('루틴 조회 실패: ${response.statusCode}');
       }
     } catch (e) {
-      print('Failed to load routines: $e');
+      print('루틴 조회 실패: $e');
     }
   }
 
@@ -108,7 +113,7 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final itemHeight = 70.0; // 각 항목의 높이
+    final itemHeight = 70.0;
     final listHeight = _routines.length * itemHeight;
 
     return Container(
@@ -183,11 +188,6 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
                   ]
               ),
               SizedBox(width: 10),
-              Container(
-                width: 0.5,
-                height: 40,
-                color: Colors.grey,
-              ),
             ],
           ),
           trailing: Row(

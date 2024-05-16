@@ -5,8 +5,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../services/service_routine.dart';
-import '../services/service_user.dart';
-import '../services/globals.dart' as globals;
 
 
 class AddRoutineWidget extends StatefulWidget {
@@ -211,7 +209,6 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
                         _buildColorPicker(),
                       ],
                     ),
-
                     Spacer(),
                     IconButton(onPressed: _registerRoutine, icon: Icon(Iconsax.send_15))
                   ],
