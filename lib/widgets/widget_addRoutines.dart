@@ -8,6 +8,10 @@ import '../services/service_routine.dart';
 
 
 class AddRoutineWidget extends StatefulWidget {
+  final VoidCallback onRoutineAdded;
+
+  AddRoutineWidget({Key? key, required this.onRoutineAdded}) : super(key: key);
+
   @override
   _AddRoutineWidgetState createState() => _AddRoutineWidgetState();
 }
@@ -36,6 +40,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
         maxTerm: maxTerm,
       );
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 성공")));
+      widget.onRoutineAdded();
       print(' Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}, maxTerm : $maxTerm');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 실패: $e")));

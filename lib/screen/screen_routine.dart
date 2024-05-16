@@ -22,13 +22,19 @@ class _RoutineScreenState extends State<RoutineScreen> {
   @override
   void initState() {
     super.initState();
+    _selectedDate = DateTime.now();
+    _selectedDateRange = _formatDateRange(_selectedDate!);
     fetchRoutines();
   }
+  void refreshRoutines() {
+    fetchRoutines();
+  }
+
 
   void _presentRoutineAddSheet() {
     showModalBottomSheet(
       context: context,
-      builder: (_) => AddRoutineWidget(),
+      builder: (_) => AddRoutineWidget(onRoutineAdded: refreshRoutines),
     );
   }
 
