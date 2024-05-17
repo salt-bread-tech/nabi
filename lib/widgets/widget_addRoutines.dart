@@ -54,7 +54,6 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
         Expanded(child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('습관명',style: TextStyle(fontSize: 13),),
             _buildRoutineNameInput()
           ],
         ),
@@ -63,7 +62,6 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
         Expanded(child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          Text('반복 할 횟수',style: TextStyle(fontSize: 13),),
         _buildMaxTermInput(),
         ],))
       ],
@@ -86,9 +84,10 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
       autocorrect: false,
       keyboardType: TextInputType.number, // Ensure numeric input
       decoration: InputDecoration(
-        hintText: '횟수',
+        hintText: '1',
+        suffixText: '주 동안 반복',
         border: InputBorder.none,
-        contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 15),
+        contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 60),
       ),
       controller: _maxTermController,
     );
@@ -129,7 +128,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '$_selectedFrequencyValue',
+              '$_selectedFrequencyValue 회',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.black54,
@@ -200,16 +199,14 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('횟수',style: TextStyle(fontSize: 13),),
                         SizedBox(height: 5),
                         _buildFrequencyDisplay(context),
                       ],
                     ),
-                    SizedBox(width: 30),
+                    SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('색',style: TextStyle(fontSize: 13),),
                         SizedBox(height: 5),
                         _buildColorPicker(),
                       ],
