@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
+import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -10,8 +11,10 @@ import 'package:doctor_nyang/widgets/widget_schedule.dart';
 import 'package:intl/intl.dart';
 import '../models/model_diet.dart';
 import '../services/globals.dart';
+import '../services/globals.dart' as globals;
 import '../services/urls.dart';
 import '../widgets/widget_diet.dart';
+import '../widgets/widget_routineList.dart';
 import '../widgets/widget_weekly_calendar.dart';
 import '../widgets/widget_weekly_routine.dart';
 
@@ -24,12 +27,14 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
   late DateTime selectedDate;
   List<dynamic> ingestionSchedule = [];
+  String _selectedDateRange = '';
 
 
   void _handleDateChange(DateTime newDate) {
     setState(() {
       selectedDate = newDate;
       fetchIngestion();
+      _fetchRoutines();
     });
   }
 
@@ -38,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
+    _selectedDateRange = _formatDateRange(selectedDate);
     fetchIngestion();
   }
 
@@ -69,6 +75,38 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _fetchRoutines() async {
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final url = Uri.parse('$baseUrl/routine/$formattedDate');
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ${globals.token}',
+      });
+
+      final decodedResponse = utf8.decode(response.bodyBytes);
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _selectedDateRange = _formatDateRange(selectedDate);
+        });
+      } else {
+        throw Exception('루틴 조회 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('루틴 조회 실패: $e');
+    }
+  }
+
+  String _formatDateRange(DateTime date) {
+    int weekday = date.weekday;
+    DateTime startOfWeek = date.subtract(Duration(days: weekday - 1));
+    DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+    return '${DateFormat('M.dd').format(startOfWeek)}~${DateFormat('M.dd').format(endOfWeek)}';
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
-            children: [
+            children: <Widget>[
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -146,7 +184,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     : 0,
               ),
               SizedBox(height: 20),
-              //RoutineStatusWidget(),
+              Row(mainAxisAlignment: MainAxisAlignment.start,
+              children: [Text('습관 만들기 ($_selectedDateRange)',style: TextStyle(fontSize: 13,color: Colors.grey[600]),),],),
+              // Inside HomeScreen's build method
+            // Inside HomeScreen's build method
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RoutineScreen(
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                height: 190,
+                alignment: Alignment.topCenter,
+                child: RoutineListWidget(key: ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                  datetime: DateFormat('yyyy-MM-dd').format(selectedDate),)
+              ),
+            ),
             ],
           ),
         ),

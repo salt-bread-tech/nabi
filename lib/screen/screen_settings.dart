@@ -1,9 +1,7 @@
-import 'dart:ui';
 
 import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import '../services/service_auth.dart';
 import '../widgets/widget_bodyInfo.dart';
 
@@ -79,7 +77,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (context) => Login()),
             );
-            Navigator.of(context).pop();
+            Navigator.popAndPushNamed(context, '/login');
           },
         ),
       ],

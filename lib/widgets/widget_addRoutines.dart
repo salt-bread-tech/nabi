@@ -1,42 +1,96 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../services/service_routine.dart';
-import '../services/service_user.dart';
-import '../services/globals.dart' as globals;
 
 
 class AddRoutineWidget extends StatefulWidget {
+  final VoidCallback onRoutineAdded;
+
+  AddRoutineWidget({Key? key, required this.onRoutineAdded}) : super(key: key);
+
   @override
   _AddRoutineWidgetState createState() => _AddRoutineWidgetState();
 }
 
 class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   final TextEditingController _routineController = TextEditingController();
+  final TextEditingController _maxTermController = TextEditingController();  // Controller for max term input
   int _selectedFrequencyValue = 1;
   Color _selectedColor = Color(0xFFFFDFEB);
   String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  int _selectedMaxTerm = 1;
 
 
 
   void _registerRoutine() async {
 
     String colorCodeWithoutAlpha = _selectedColor.value.toRadixString(16).substring(2).toUpperCase();
+    int maxTerm = int.tryParse(_maxTermController.text) ?? 1;
 
     try {
       await registerDailyRoutine(
           routineName: _routineController.text,
           maxPerform: _selectedFrequencyValue,
           startDate: startDate,
-          colorCode: colorCodeWithoutAlpha
+          colorCode: colorCodeWithoutAlpha,
+        maxTerm: maxTerm,
       );
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 성공")));
-      print(' Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}');
+      widget.onRoutineAdded();
+      print(' Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}, maxTerm : $maxTerm');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("데일리 루틴 등록 실패: $e")));
     }
+  }
+
+
+  Widget firstField(){
+    return Row(
+      children: [
+        Expanded(child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildRoutineNameInput()
+          ],
+        ),
+        ),
+        SizedBox(width: 20),
+        Expanded(child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+        _buildMaxTermInput(),
+        ],))
+      ],
+    );
+  }
+
+  Widget _buildRoutineNameInput(){
+    return TextField(
+      autocorrect: false,
+      decoration: InputDecoration(
+        hintText: '습관명 입력하기',
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 15),
+      ),
+      controller: _routineController,
+    );
+  }
+  Widget _buildMaxTermInput() {
+    return TextField(
+      autocorrect: false,
+      keyboardType: TextInputType.number, // Ensure numeric input
+      decoration: InputDecoration(
+        hintText: '1',
+        suffixText: '주 동안 반복',
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 60),
+      ),
+      controller: _maxTermController,
+    );
   }
 
   void _showFrequencyPicker(BuildContext context) {
@@ -74,7 +128,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '$_selectedFrequencyValue',
+              '$_selectedFrequencyValue 회',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.black54,
@@ -138,31 +192,21 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
             child: ListView(
               padding: EdgeInsets.all(20.0),
               children: [
-                Text('습관명'),
-                TextField(
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    hintText: '습관명 입력하기',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(bottom: 11, top: 11, right: 15),
-                  ),
-                  controller: _routineController,
-                ),
+                firstField(),
+                SizedBox(height: 10,),
                 Row(
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('횟수'),
                         SizedBox(height: 5),
                         _buildFrequencyDisplay(context),
                       ],
                     ),
-                    SizedBox(width: 30),
+                    SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('색'),
                         SizedBox(height: 5),
                         _buildColorPicker(),
                       ],
