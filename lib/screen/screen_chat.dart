@@ -34,8 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    getChats(1);
-    getDday();
+    getChats();
   }
 
   @override
@@ -64,7 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> feed() async {
-    final url = Uri.parse('$baseUrl/feed/$userId');
+    final url = Uri.parse('$baseUrl/feed');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
       'Authorization': 'Bearer $token',
@@ -84,26 +83,8 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<void> getDday() async {
-    final url = Uri.parse('$baseUrl/user/d-day');
-    final response = await http.get(url, headers: {
-      "Content-Type": "application/json; charset=UTF-8",
-      'Authorization': 'Bearer $token',
-    });
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> ddayData =
-          json.decode(utf8.decode(response.bodyBytes));
-      setState(() {
-        day = ddayData['days'];
-      });
-    } else {
-      print('Failed to load dday from server');
-    }
-  }
-
-  Future<void> getChats(int uid) async {
-    final url = Uri.parse('$baseUrl/chats/$userId/recent');
+  Future<void> getChats() async {
+    final url = Uri.parse('$baseUrl/chats/recent');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
       'Authorization': 'Bearer $token',
@@ -145,14 +126,13 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<bool> sendChat(int uid, String content) async {
+  Future<bool> sendChat(String content) async {
     final url = Uri.parse('$baseUrl/chat');
     final headers = {
       "Content-Type": "application/json",
       'Authorization': 'Bearer $token',
     };
     final body = json.encode({
-      'uid': uid,
       'content': content,
     });
 
@@ -167,7 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
         page = 0;
         setState(() {
           _isLoading = false;
-          getChats(1);
+          getChats();
         });
         return true;
       } else {
@@ -184,10 +164,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSendPressed(types.PartialText message) async {
-    final int? uid = userId;
     final content = message.text;
 
-    final success = await sendChat(uid!, content);
+    final success = await sendChat(content);
     if (!success) {
       print('메시지 전송 실패');
     }

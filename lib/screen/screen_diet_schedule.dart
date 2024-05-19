@@ -42,7 +42,7 @@ class _DietScheduleState extends State<DietSchedule> {
 
   Future<void> fetchDietSchedule() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String url = '$baseUrl/diet/$userId/$formattedDate';
+    final String url = '$baseUrl/diet/$formattedDate';
 
     try {
       final response = await http.get(
@@ -73,7 +73,7 @@ class _DietScheduleState extends State<DietSchedule> {
 
   FutureOr<Ingestion?> fetchIngestion() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String url = '$baseUrl/ingestion/total/$userId/$formattedDate';
+    final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
       final response = await http.get(

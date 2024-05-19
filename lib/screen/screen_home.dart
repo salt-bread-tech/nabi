@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   FutureOr<Ingestion?> fetchIngestion() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String url = '$baseUrl/ingestion/total/$userId/$formattedDate';
+    final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
       final response = await http.get(
