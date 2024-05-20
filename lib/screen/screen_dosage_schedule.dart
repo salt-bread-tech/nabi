@@ -156,7 +156,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
             GestureDetector(
               onTap: () => _selectDate(context),
               child: Text(
-                DateFormat('yyyy년 MM월 dd일 EEEE').format(selectedDate),
+                DateFormat('yyyy년 MM월 dd일 EEEE', 'ko_KR').format(selectedDate),
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ),

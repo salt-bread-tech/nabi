@@ -56,12 +56,16 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
       throw Exception('조회 실패 ${response.statusCode}');
     }
 
+    Map<DateTime, List> newEventsList = {};
+
     for (var key in data.keys) {
+      List schedules = [];
       for (var jsonItem in data[key]) {
         DateTime datetime = DateTime.parse(jsonItem['date']);
         String text = jsonItem['text'];
         String schedule =
             "${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')} | $text";
+        schedules.add(schedule);
         if (_eventsList[DateTime.parse(key)] == null) {
           _eventsList[DateTime.parse(key)] = [];
         }
@@ -71,7 +75,11 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
           return a.substring(0, 5).compareTo(b.substring(0, 5));
         });
       }
+      newEventsList[DateTime.parse(key)] = schedules;
     }
+    setState(() {
+      _eventsList = newEventsList;
+    });
   }
 
   @override
@@ -103,7 +111,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
               showModalBottomSheet(
                 isScrollControlled: true,
                 context: context,
-                builder: (BuildContext bCtx) => AddScheduleModal(parentContext: context),
+                builder: (BuildContext bCtx) => AddScheduleModal(parentContext: context,initialDate: _selectedDay,)
               );
             },
           ),
