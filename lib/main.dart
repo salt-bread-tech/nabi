@@ -8,6 +8,7 @@ import 'package:doctor_nyang/screen/screen_intro.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_medicine_regist.dart';
 import 'package:doctor_nyang/screen/screen_medicine_search.dart';
+import 'package:doctor_nyang/screen/screen_prescription.dart';
 import 'package:doctor_nyang/screen/screen_register.dart';
 import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_settings.dart';
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
         '/webtoon' : (context) => WebtoonPage(),
         '/schedule' : (context) => ScheduleCalendar(),
         '/Setting': (context) => SettingsScreen(),
+        '/Prescription' : (context) => PrescriptionScreen(),
       },
     );
   }
