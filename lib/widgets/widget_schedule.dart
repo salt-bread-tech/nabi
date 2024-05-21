@@ -112,7 +112,11 @@ class _WidgetScheduleState extends State<WidgetSchedule> {
           } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
           }
-          return CircularProgressIndicator();
+          return Container(
+            margin: EdgeInsets.all(5),
+            width: double.infinity,
+            child: Text('일정을 불러오는 중입니다...'),
+          );
         },
       ),
     );
