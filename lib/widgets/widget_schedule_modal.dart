@@ -9,16 +9,23 @@ import '../services/urls.dart';
 
 class AddScheduleModal extends StatefulWidget {
   final BuildContext parentContext;
+  final DateTime initialDate;
 
-  const AddScheduleModal({Key? key, required this.parentContext}) : super(key: key);
+  const AddScheduleModal({Key? key, required this.parentContext, required this.initialDate}) : super(key: key);
 
   @override
   _AddScheduleModalState createState() => _AddScheduleModalState();
 }
 
 class _AddScheduleModalState extends State<AddScheduleModal> {
-  DateTime selectedDate = DateTime.now();
+  late DateTime selectedDate;
   String content = '';
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = widget.initialDate;  // 초기 선택된 날짜를 사용합니다.
+  }
 
   Future<void> addSchedule() async {
     final String url = '$baseUrl/schedule';
