@@ -22,7 +22,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final _user = const types.User(id: '1');
   late int page = 0;
   late int day = 0;
-
   int feedresult = 0;
   bool _isPressed = false;
   bool _isLoading = false;
@@ -72,11 +71,15 @@ class _ChatScreenState extends State<ChatScreen> {
     if (response.statusCode == 200) {
       final int feedData = json.decode(utf8.decode(response.bodyBytes));
       if (feedData == 200) {
+        setState(() {
+          feedresult = 200;
+        });
         print('Feed success');
-        feedresult = 200;
       } else if (feedData == 300) {
+        setState(() {
+          feedresult = 300;
+        });
         print('Already fed');
-        feedresult = 300;
       }
     } else {
       print('Failed to load feed from server');
