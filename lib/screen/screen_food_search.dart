@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -56,6 +54,8 @@ class Food {
 }
 
 class FoodSearch extends StatefulWidget {
+  const FoodSearch({super.key});
+
   @override
   _FoodSearchState createState() => _FoodSearchState();
 }
@@ -212,7 +212,7 @@ class _FoodSearchState extends State<FoodSearch> {
               return Container(
                 height: 530,
                 padding: const EdgeInsets.all(30.0),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
@@ -227,28 +227,28 @@ class _FoodSearchState extends State<FoodSearch> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          '${food.name.length > 12 ? food.name.substring(0, 12) + '···' : food.name}',
-                          style: TextStyle(
+                          food.name.length > 12 ? '${food.name.substring(0, 12)}···' : food.name,
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           '${food.servingSize.toStringAsFixed(0)}g',
-                          style: TextStyle(fontSize: 12),
+                          style: const TextStyle(fontSize: 12),
                         ),
                         Expanded(
                           child: Text(
                             '${food.calories.toStringAsFixed(0)} kcal',
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.end,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -259,7 +259,7 @@ class _FoodSearchState extends State<FoodSearch> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: Color(0xFFD9D9D9),
+                                color: const Color(0xFFD9D9D9),
                                 width: 1,
                               ),
                               color: Colors.white,
@@ -547,7 +547,7 @@ class _FoodSearchState extends State<FoodSearch> {
                                 : food.transFattyAcid *
                                     _selectedQuantity /
                                     food.servingSize,
-                            date: DateTime.now(),
+                            date: selectedDate,
                           );
                           Navigator.pop(context);
                         },
