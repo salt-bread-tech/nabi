@@ -84,20 +84,17 @@ Future<bool> login(String id, String password, BuildContext context) async {
       final responseData = json.decode(response.body);
 
       switch (responseData['code']) {
-        case 'SU': // 로그인 성공
+        case 'SU':
           print('로그인 성공: 토큰 = ${responseData['token']}');
             globals.token = responseData['token'];
           fetchUserInfo();
           fetchDday();
 
-          //await saveToken(responseData['token']);
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => MyHomePage()),
-            ModalRoute.withName('/MyHomePage'),  // MyhomePage 화면까지 모든 화면을 제거
+            ModalRoute.withName('/MyHomePage'),
           );
-
-          //Navigator.pushNamed(context, '/MyHomePage');
           return true;
 
         case 'SF': // 로그인 실패

@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import '../models/model_diet.dart';
 import '../services/globals.dart';
 import '../services/globals.dart' as globals;
+import '../services/service_auth.dart';
 import '../services/urls.dart';
 import '../widgets/widget_diet.dart';
 import '../widgets/widget_routineList.dart';
@@ -45,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     selectedDate = DateTime.now();
     _selectedDateRange = _formatDateRange(selectedDate);
     fetchIngestion();
+    fetchUserInfo();
   }
 
   FutureOr<Ingestion?> fetchIngestion() async {

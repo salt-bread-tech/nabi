@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import '../services/globals.dart' as globals;
 import '../services/urls.dart';
@@ -165,6 +166,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
 
       if (response.statusCode == 200) {
         print('루틴 삭제 성공');
+        fetchRoutines();
         return true;
       } else {
         throw Exception('루틴 삭제 실패: ${response.statusCode}');
@@ -230,10 +232,9 @@ class RoutineItem extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (context) => onDelete(routine['id']),
-            backgroundColor: Colors.red,
+            backgroundColor: Color(0xFFFF5050),
             foregroundColor: Colors.white,
-            icon: Icons.delete,
-            label: '삭제',
+            icon: Iconsax.trash,
           ),
         ],
       ),
@@ -254,7 +255,7 @@ class RoutineItem extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(routineName, style: TextStyle(fontSize: 13)),
+                  Text(routineName, style: TextStyle(fontSize: 12)),
                   SizedBox(height: 1),
                   Text(
                     '$currentCount/$maxCount',
@@ -262,7 +263,7 @@ class RoutineItem extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(width: 10),
+              SizedBox(width: 0),
             ],
           ),
           trailing: Row(
@@ -271,7 +272,7 @@ class RoutineItem extends StatelessWidget {
               return GestureDetector(
                 onTap: () => onCountChange(index),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
                   height: 25,
                   width: 25,
                   decoration: BoxDecoration(
