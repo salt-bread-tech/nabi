@@ -21,7 +21,6 @@ class _ChatScreenState extends State<ChatScreen> {
   List<types.Message> _messages = [];
   final _user = const types.User(id: '1');
   late int page = 0;
-  late int day = 0;
   int feedresult = 0;
   bool _isPressed = false;
   bool _isLoading = false;
@@ -280,7 +279,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           print(_isPressed);
                         },
                       ),
-                      Text('나비와 함께한지 ${day}일', style: TextStyle(fontSize: 16)),
+                      Text('나비와 함께한지 ${dday}일', style: TextStyle(fontSize: 16)),
                       IconButton(
                         icon: Icon(Iconsax.milk5,
                             size: 30, color: AppTheme.pastelBlue),

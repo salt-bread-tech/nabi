@@ -46,6 +46,29 @@ Future<void> fetchUserInfo() async {
   }
 }
 
+Future<void> fetchDday() async {
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/user/d-day'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+    if (response.statusCode == 200) {
+      String responseBody = utf8.decode(response.bodyBytes);
+      loginInfo = jsonDecode(responseBody);
+      {
+        globals.dday = loginInfo['days'];
+        print({globals.dday});
+      };
+    } else {
+      throw Exception('Failed to fetch user info: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('네트워크 오류: $error');
+  }
+}
 
 Future<bool> login(String id, String password, BuildContext context) async {
   //final String baseUrl = GlobalConfiguration().getString('baseUrl');
@@ -65,6 +88,7 @@ Future<bool> login(String id, String password, BuildContext context) async {
           print('로그인 성공: 토큰 = ${responseData['token']}');
             globals.token = responseData['token'];
           fetchUserInfo();
+          fetchDday();
 
           //await saveToken(responseData['token']);
           Navigator.pushAndRemoveUntil(
