@@ -45,6 +45,7 @@ class _AddScheduleModalState extends State<AddScheduleModal> {
 
       if (response.statusCode == 200) {
         print('Schedule added');
+
       } else {
         throw Exception('Failed to add schedule');
       }

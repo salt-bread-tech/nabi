@@ -6,9 +6,11 @@ import 'package:doctor_nyang/screen/screen_dosage_schedule.dart';
 import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:doctor_nyang/screen/screen_intro.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
+import 'package:doctor_nyang/screen/screen_medicine_regist.dart';
 import 'package:doctor_nyang/screen/screen_medicine_search.dart';
 import 'package:doctor_nyang/screen/screen_register.dart';
 import 'package:doctor_nyang/screen/screen_routine.dart';
+import 'package:doctor_nyang/screen/screen_settings.dart';
 import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:doctor_nyang/screen/screen_webtoon.dart';
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.white),
+        appBarTheme: AppBarTheme(backgroundColor: Colors.white, scrolledUnderElevation: 0),
         cardColor: Colors.white,
         cupertinoOverrideTheme: CupertinoThemeData(barBackgroundColor: Colors.white),
         dialogBackgroundColor: Colors.white,
@@ -55,16 +57,19 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
+        '/intro':(context) => IntroPage(),
         '/home': (context) => HomeScreen(),
         '/MyHomePage': (context) => MyHomePage(),
         '/chat': (context) => ChatScreen(),
         '/DosageSchedule': (context) => DosageSchedule(),
         '/MedicineSearch': (context) => MedicineSearch(),
+        '/MedicineRegister': (context) => MedicineRegist(),
         '/DietSchedule': (context) => DietSchedule(),
         '/FoodSearch' : (context) => FoodSearch(),
         '/routine' : (context) => RoutineScreen(),
         '/webtoon' : (context) => WebtoonPage(),
         '/schedule' : (context) => ScheduleCalendar(),
+        '/Setting': (context) => SettingsScreen(),
       },
     );
   }

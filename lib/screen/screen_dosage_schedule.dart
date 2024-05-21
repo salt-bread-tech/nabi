@@ -1,11 +1,14 @@
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../services/urls.dart';
+import '../widgets/widget_weeklyCalendar2.dart';
+import '../widgets/widget_weekly_calendar.dart';
 
 
 class DosageSchedule extends StatefulWidget {
@@ -89,6 +92,27 @@ class _DosageScheduleState extends State<DosageSchedule> {
   }
 
 
+  Future<void> deleteMedicine(int dosageId) async {
+    final url = Uri.parse('$baseUrl/dosage/$dosageId');
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        print('약물 일정 삭제 성공');
+        fetchDosageSchedule();
+      } else {
+        print('약물 일정 삭제 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류: $e');
+    }
+  }
+
+
 //날짜 선택
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -105,6 +129,91 @@ class _DosageScheduleState extends State<DosageSchedule> {
     }
   }
 
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          backgroundColor: Colors.white,
+          contentPadding: EdgeInsets.all(20),
+          elevation: 0,
+          title: Text('의약품 복용 일정 추가하기',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600),textAlign: TextAlign.center,),
+          children: <Widget>[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 130,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    //color: Color(0xFFE0F0FF),
+                    border: Border.all(
+                      color: Colors.grey,
+
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/MedicineRegister');
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(Iconsax.edit, size: 20),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8),
+                          child: Text('직접 작성하기'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Container(
+                  width: 130,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE0F0FF),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/MedicineSearch');
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(Iconsax.search_normal, size: 30),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8),
+                          child: Text('검색하기'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void _handleDateChange(DateTime newDate) {
+    setState(() {
+      selectedDate = newDate;
+      fetchDosageSchedule();
+    });
+  }
   Map<String, int> timesToInt = {
     '아침 식전': 0,
     '아침 식후': 1,
@@ -128,11 +237,6 @@ class _DosageScheduleState extends State<DosageSchedule> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        /*leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),//, onPressed: () { Navigator.pushNamed(context, '/MyHomePage');},
-        ),
-
-         */
         title: Text(
           '$nickName님의 복용 일정',
           style: TextStyle(color: Colors.black,fontSize: 17),
@@ -141,35 +245,43 @@ class _DosageScheduleState extends State<DosageSchedule> {
         iconTheme: IconThemeData(color: Colors.black),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Iconsax.add),
+            icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.pushNamed(context, '/MedicineSearch');
+              _showDialog();
+              //Navigator.pushNamed(context, '/MedicineSearch');
             },
           ),
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            GestureDetector(
-              onTap: () => _selectDate(context),
-              child: Text(
-                DateFormat('yyyy년 MM월 dd일 EEEE', 'ko_KR').format(selectedDate),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-            ),
+            WidgetCalendar2(onDateSelected: _handleDateChange),
             SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: dosageSchedule.length,
                 itemBuilder: (context, index) {
                   var dosage = dosageSchedule[index];
-                  return Card(
+                  return Slidable(
+                      key: Key(dosage['dosageId'].toString()),
+                      endActionPane: ActionPane(
+                        motion: const DrawerMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) => deleteMedicine(dosage['dosageId']),
+                            backgroundColor: Color(0xFFFF5050),
+                            foregroundColor: Colors.white,
+                            icon: Iconsax.trash,
+                          ),
+                        ],
+                      ),
+                  child: Card(
                     shadowColor: Colors.black,
                     elevation: 0,
-                    color: dosage['medicineTaken'] ? Color(0xFFD3EAFF) : Color(0xFFF1F1F1),
+                    color: dosage['medicineTaken'] ? Color(0xFFE3F2FF) : Color(0xFFF1F1F1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -186,6 +298,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
                         print('medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
                       },
                     ),
+                  ),
                   );
                 },
               ),

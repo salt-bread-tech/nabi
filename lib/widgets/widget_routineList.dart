@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../services/urls.dart';
 import '../services/globals.dart' as globals;
@@ -156,10 +157,9 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
         children: [
           SlidableAction(
             onPressed: (context) => onDelete(routine['id']),
-            backgroundColor: Colors.red,
+            backgroundColor: Color(0xFFFF5050),
             foregroundColor: Colors.white,
-            icon: Icons.delete,
-            label: '삭제',
+            icon: Iconsax.trash,
           ),
         ],
       ),
@@ -179,7 +179,7 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(routineName, style: TextStyle(fontSize: 13)),
+                    Text(routineName, style: TextStyle(fontSize: 12)),
                     SizedBox(height: 1),
                     Text(
                       '$currentCount/$maxCount',
@@ -187,7 +187,6 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
                     ),
                   ]
               ),
-              SizedBox(width: 10),
             ],
           ),
           trailing: Row(
@@ -196,9 +195,9 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
               return GestureDetector(
                 onTap: () => onCountChange(index),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                  height: 25,
-                  width: 25,
+                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                  height: 23,
+                  width: 23,
                   decoration: BoxDecoration(
                     color: index < currentCount ? Color(int.parse("0xFF$colorCode")) : Color(0xFFD9D9D9),
                     shape: BoxShape.circle,

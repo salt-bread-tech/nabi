@@ -1,5 +1,4 @@
 import 'package:doctor_nyang/main.dart';
-import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:doctor_nyang/widgets/widget_custom_textFormField.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,15 +11,22 @@ import '../services/urls.dart';
 
 
 class MedicineRegist extends StatefulWidget {
-  final String name;
+  final String? name;
 
-  MedicineRegist({required this.name});
+  MedicineRegist({this.name});
 
   @override
   _MedicineRegistState createState() => _MedicineRegistState();
 }
 
 class _MedicineRegistState extends State<MedicineRegist> {
+
+  @override
+  void initState() {
+    super.initState();
+    MedicineController = TextEditingController(text: widget.name ?? '');
+    DateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  }
 
   String _selectedDosage = 'none';
   Widget DosageButton(String gender) {
@@ -52,12 +58,14 @@ class _MedicineRegistState extends State<MedicineRegist> {
 
 
   DateTime selectedDate = DateTime.now();
+  TextEditingController MedicineController = TextEditingController();
   TextEditingController DateController = TextEditingController();
   TextEditingController onceController = TextEditingController();
   TextEditingController totalController = TextEditingController();
   TextEditingController dailyController = TextEditingController();
   //TextEditingController dosageController = TextEditingController();
 
+  String MedicineError = '';
   String dateError = '';
   String onceError = '';
   String totalError = '';
@@ -67,6 +75,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
 
   void validateFields() {
     setState(() {
+      MedicineError = MedicineController.text.isEmpty ? '날짜를 선택해주세요' : '';
       dateError = DateController.text.isEmpty ? '날짜를 선택해주세요' : '';
       onceError = onceController.text.isEmpty ? '1회 복용량을 입력해주세요.' : '';
       totalError = totalController.text.isEmpty ? '총 복용량을 입력해주세요.' : '';
@@ -110,10 +119,11 @@ class _MedicineRegistState extends State<MedicineRegist> {
         switch (responseData) {
           case 200:
             print('약물 등록 성공');
+            print('');
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => MyHomePage()),
-              ModalRoute.withName('/MyHomePage'),
+              ModalRoute.withName('/DosageSchedule'),
             );
 
             Navigator.pushNamed(context, '/DosageSchedule');
@@ -140,7 +150,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
     if (dateError == '' && onceError == '' && totalError == '' && dailyError == '' &&
         dosageError == '') {
       final String startDate = _formatDate(selectedDate);
-      final String medicineName = widget.name;
+      final String medicineName = MedicineController.text;
       final int? once = int.tryParse(onceController.text);
       final int? total = int.tryParse(totalController.text);
       final int? daily = int.tryParse(dailyController.text);
@@ -152,11 +162,6 @@ class _MedicineRegistState extends State<MedicineRegist> {
   }
 
 
-  @override
-  void initState() {
-    super.initState();
-    DateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  }
 
   String _formatDate(DateTime dateTime) {
     return DateFormat('yyyy-MM-dd').format(dateTime);
@@ -166,7 +171,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext builder) {
-        final initDate = selectedDate;  // Use the current `selectedDate` directly, which is already a DateTime object
+        final initDate = selectedDate;
 
         return Container(
           height: MediaQuery.of(context).copyWith().size.height / 3,
@@ -192,7 +197,6 @@ class _MedicineRegistState extends State<MedicineRegist> {
   }
 
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,8 +210,15 @@ class _MedicineRegistState extends State<MedicineRegist> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('약 이름: ${widget.name}'),
+            Text('약 이름'),
+            SizedBox(height: 5),
+            CustomTextFormField(
+              controller: MedicineController,
+              keyboardType: TextInputType.text,
+              hintText: '약 이름을 입력해주세요',
+            ),
             SizedBox(height: 10),
+
             Text('1회 복용량'),
             SizedBox(height: 5),
             CustomTextFormField(
@@ -235,7 +246,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
             SizedBox(height: 5),
             Container(
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   DosageButton('식후'),
                   SizedBox(width: 10),
@@ -259,7 +270,7 @@ class _MedicineRegistState extends State<MedicineRegist> {
             ),
             SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 60,
