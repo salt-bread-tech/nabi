@@ -147,11 +147,11 @@ class _RegisterState extends State<Register> {
     validateGender();
     _validatePasswordRequirements();
     if (!isPrivacyPolicyAgreed) {
-      showDialog(
+      showCupertinoDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
+        builder: (ctx) => CupertinoAlertDialog(
           title: Text('알림'),
-          content: Text('개인정보 취급방침에 동의해야 회원가입이 가능합니다.'),
+          content: Text('개인정보 취급방침에 동의해야 \n 회원가입이 가능합니다.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -213,7 +213,7 @@ class _RegisterState extends State<Register> {
     if (passwordController.text.isEmpty) {
       passwordError = '비밀번호를 입력해주세요.';
     } else if (!passwordRegExp.hasMatch(passwordController.text)) {
-      passwordError = '비밀번호는 영문, 숫자 및 특수문자를 포함하여 8자 이상이어야 합니다.';
+      passwordError = '비밀번호는 영문 및 숫자를 포함하여 8자 이상이어야 합니다.';
     } else {
       passwordError = '';
     }
