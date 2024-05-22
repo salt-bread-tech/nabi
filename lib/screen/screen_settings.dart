@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import '../services/service_auth.dart';
 import '../widgets/widget_bodyInfo.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class SettingsScreen extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +55,9 @@ class SettingsScreen extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) => deletionConfirmDialog(),
                 ); },),
+            settingList(title: '개인정보 처리방침', onTap: (){
+              _launchPrivacyPolicyUrl();
+            }),
             Divider(),
           ],
         ),
@@ -59,6 +65,17 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
+
+void _launchPrivacyPolicyUrl() async {
+  const url = 'https://betterjeong.notion.site/8ee47ca98af64da09be8f98231a59c7a';
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
+
 class LogoutConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -106,7 +123,7 @@ class deletionConfirmDialog extends StatelessWidget {
           child: Text('탈퇴'),
           isDestructiveAction: true,
           onPressed: () {
-            logoutUser();
+            withdrawUser();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => Login()),

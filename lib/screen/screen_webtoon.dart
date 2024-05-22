@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../main.dart';
+
 class WebtoonPage extends StatefulWidget {
   @override
   _WebtoonPageState createState() => _WebtoonPageState();
@@ -78,12 +80,16 @@ class _WebtoonPageState extends State<WebtoonPage>
           _isClickable = false;
           _setupAnimation();
         });
-      }
-      if (currentIndex == 8) {
-        Navigator.pushNamed(context, '/MyHomePage');
+      } else {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage()),
+          ModalRoute.withName('/MyHomePage'),
+        );
       }
     }
   }
+
 
   void _changeBackground() {
     setState(() {

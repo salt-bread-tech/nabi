@@ -5,7 +5,6 @@ import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter/material.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> ingestionSchedule = [];
   String _selectedDateRange = '';
 
-
   void _handleDateChange(DateTime newDate) {
     setState(() {
       selectedDate = newDate;
@@ -38,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _fetchRoutines();
     });
   }
-
 
   @override
   void initState() {
@@ -107,10 +104,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return '${DateFormat('M.dd').format(startOfWeek)}~${DateFormat('M.dd').format(endOfWeek)}';
   }
 
-
-
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final fontSize = screenSize.width * 0.038; // 화면 너비에 비례하여 폰트 크기 설정
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -186,27 +184,33 @@ class _HomeScreenState extends State<HomeScreen> {
                     : 0,
               ),
               SizedBox(height: 20),
-              Row(mainAxisAlignment: MainAxisAlignment.start,
-              children: [Text('습관 만들기 ($_selectedDateRange)',style: TextStyle(fontSize: 13,color: Colors.grey[600]),),],),
-              // Inside HomeScreen's build method
-            // Inside HomeScreen's build method
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => RoutineScreen(
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    '습관 만들기 ($_selectedDateRange)',
+                    style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
                   ),
-                );
-              },
-              child: Container(
-                height: 190,
-                alignment: Alignment.topCenter,
-                child: RoutineListWidget(key: ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
-                  datetime: DateFormat('yyyy-MM-dd').format(selectedDate),)
+                ],
               ),
-            ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RoutineScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  height: screenSize.height * 0.25,
+                  alignment: Alignment.topCenter,
+                  child: RoutineListWidget(
+                    key: ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                    datetime: DateFormat('yyyy-MM-dd').format(selectedDate),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
