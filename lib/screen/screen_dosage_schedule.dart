@@ -86,6 +86,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
       if (response.statusCode == 200) {
         fetchDosageSchedule();
         print('복용 일정 완료(미완료) 토글링 성공');
+        print('$medicineId $times');
       } else {
         print('복용 일정 변경 실패');
       }
@@ -250,11 +251,11 @@ class _DosageScheduleState extends State<DosageSchedule> {
 
     for (var dosage in dosageSchedule) {
       int timeValue = timesToInt[dosage['times']] ?? -1;
-      if ([0, 1, 8].contains(timeValue)) {
+      if ([0, 1].contains(timeValue)) {
         categorizedSchedule['아침']?.add(dosage);
-      } else if ([2, 3, 9].contains(timeValue)) {
+      } else if ([2, 3].contains(timeValue)) {
         categorizedSchedule['점심']?.add(dosage);
-      } else if ([4, 5, 10].contains(timeValue)) {
+      } else if ([4, 5].contains(timeValue)) {
         categorizedSchedule['저녁']?.add(dosage);
       }
     }
@@ -295,8 +296,10 @@ class _DosageScheduleState extends State<DosageSchedule> {
                 children: [
                   if (categorizedSchedule['아침']!.isNotEmpty)
                     timeSection('아침', categorizedSchedule['아침']!),
+                  SizedBox(height: 10),
                   if (categorizedSchedule['점심']!.isNotEmpty)
                     timeSection('점심', categorizedSchedule['점심']!),
+                  SizedBox(height: 10),
                   if (categorizedSchedule['저녁']!.isNotEmpty)
                     timeSection('저녁', categorizedSchedule['저녁']!),
                 ],
@@ -356,6 +359,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
                     int timeValue = timesToInt[dosage['times']] ?? -1;
                     await toggleDosage(
                         dosage['medicineId'], dosage['date'], timeValue);
+                    print('medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
                   },
                 ),
               ),

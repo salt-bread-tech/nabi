@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../screen/screen_webtoon.dart';
 import 'globals.dart' as globals;
 import 'globals.dart';
 
@@ -36,7 +37,6 @@ Future<void> fetchUserInfo() async {
         globals.age = userInfo['age'];
         globals.bmr = userInfo['bmr'];
         print({globals.nickName});
-        //print('${globals.bmr}');
       };
     } else {
       throw Exception('Failed to fetch user info: ${response.statusCode}');
@@ -89,12 +89,21 @@ Future<bool> login(String id, String password, BuildContext context) async {
             globals.token = responseData['token'];
           fetchUserInfo();
           fetchDday();
-
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => MyHomePage()),
-            ModalRoute.withName('/MyHomePage'),
-          );
+print('donetutorial : ${responseData['doneTutorial']}');
+          if (responseData['doneTutorial'] == true) {
+            print('myhomepage');
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => MyHomePage()),
+              ModalRoute.withName('/MyHomePage'),
+            );
+          } else {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => WebtoonPage()),
+              ModalRoute.withName('/webtoon'),
+            );
+          }
           return true;
 
         case 'SF': // 로그인 실패
@@ -142,6 +151,27 @@ Future<void> logoutUser() async {
 
     } else {
       print("로그아웃 실패: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("네트워크 오류: $e");
+  }
+}
+
+
+Future<void> withdrawUser() async {
+  try {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/user'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${globals.token}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print("회원탈퇴 성공");
+    } else {
+      print("회원탈퇴 실패: ${response.statusCode}");
     }
   } catch (e) {
     print("네트워크 오류: $e");

@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../services/globals.dart';
 import '../services/urls.dart';
 import '../widgets/widget_custom_textFormField.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 enum Gender { male, female }
 
@@ -18,8 +21,9 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   bool isIdDuplicated = false;
   bool isPasswordConfirmed = true;
-  bool isInvalidBMR = false; // BMR
-  bool isInvalidBMI = false; // BMI
+  bool isInvalidBMR = false;
+  bool isInvalidBMI = false;
+  bool isPrivacyPolicyAgreed = false;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -108,9 +112,8 @@ class _RegisterState extends State<Register> {
         case 'CF': // 올바른 형식이 아님
           print('올바른 형식이 아님: ${responseData['message']}');
           setState(() {
-            /*isInvalidBMR = true;
+            isInvalidBMR = true;
             isInvalidBMI = true;
-             */
           });
           break;
 
@@ -142,9 +145,28 @@ class _RegisterState extends State<Register> {
   Future<void> attemptRegister() async {
     validateFields();
     validateGender();
+    _validatePasswordRequirements();
+    if (!isPrivacyPolicyAgreed) {
+      showCupertinoDialog(
+        context: context,
+        builder: (ctx) => CupertinoAlertDialog(
+          title: Text('알림'),
+          content: Text('개인정보 취급방침에 동의해야 \n 회원가입이 가능합니다.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
+              child: Text('확인'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
 
     if (nicknameError == '' && idError == '' && passwordError == '' && confirmPasswordError == '' &&
-        birthDateError == '' && heightError == '' && weightError == '') {
+        birthDateError == '' && heightError == '' && weightError == '' && isPasswordConfirmed) {
       final nickname = nicknameController.text;
       final id = emailController.text;
       final password = passwordController.text;
@@ -176,6 +198,25 @@ class _RegisterState extends State<Register> {
       hintText: '아이디를 입력해주세요',
       errorText: isIdDuplicated ? '중복된 아이디입니다.' : (idError.isNotEmpty ? idError : null),
     );
+  }
+
+  void _validatePasswordConfirmation() {
+    setState(() {
+      isPasswordConfirmed = passwordController.text == confirmPWController.text;
+    });
+  }
+
+  void _validatePasswordRequirements() {
+    // Updated RegExp to allow special characters in addition to at least one letter and one number
+    final RegExp passwordRegExp = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+{}\[\]:;<>,.?~`|-]{8,}$');
+
+    if (passwordController.text.isEmpty) {
+      passwordError = '비밀번호를 입력해주세요.';
+    } else if (!passwordRegExp.hasMatch(passwordController.text)) {
+      passwordError = '비밀번호는 영문 및 숫자를 포함하여 8자 이상이어야 합니다.';
+    } else {
+      passwordError = '';
+    }
   }
 
 
@@ -226,7 +267,7 @@ class _RegisterState extends State<Register> {
           keyboardType: TextInputType.number,
           hintText: '키를 입력해주세요 (cm)',
           suffixText: 'cm',
-          errorText: isInvalidBMR ? '키를 확인해주세요' : (heightError.isNotEmpty ? heightError : null),
+          errorText: isInvalidBMR ? '키를 정확히 입력해주세요' : (heightError.isNotEmpty ? heightError : null),
         ),
         SizedBox(height: 10),
         Text('몸무게', style: TextStyle(fontSize: 12)),
@@ -236,7 +277,7 @@ class _RegisterState extends State<Register> {
           keyboardType: TextInputType.number,
           hintText: '몸무게를 입력해주세요 (kg)',
           suffixText: 'kg',
-          errorText: isInvalidBMI ? '몸무게를 확인해주세요' : (weightError.isNotEmpty ? weightError : null),
+          errorText: isInvalidBMI ? '몸무게를 정확히 입력해주세요' : (weightError.isNotEmpty ? weightError : null),
         ),
       ],
     );
@@ -317,12 +358,57 @@ class _RegisterState extends State<Register> {
     );
   }
 
+  void _togglePrivacyPolicy(bool? newValue) {
+    setState(() {
+      isPrivacyPolicyAgreed = newValue ?? false;
+    });
+  }
+
+  void _launchPrivacyPolicyUrl() async {
+    const url = 'https://betterjeong.notion.site/8ee47ca98af64da09be8f98231a59c7a';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Widget _buildPrivacyPolicyAgreement() {
+    return Theme(
+        data: ThemeData(
+        unselectedWidgetColor: Colors.grey[300], // 비활성화 상태의 체크박스 테두리 색상
+    ),
+    child: CheckboxListTile(
+      contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+    value: isPrivacyPolicyAgreed,
+    onChanged: isPrivacyPolicyAgreed != null ? _togglePrivacyPolicy : null,
+      title: GestureDetector(
+        child: Row(
+          children: [
+            Text(
+              '이용약관 동의',
+              style: TextStyle(fontSize: 15),
+            ),
+            Spacer(),
+            IconButton(
+              icon: Icon(Icons.arrow_forward_ios,size: 14,),
+              onPressed: _launchPrivacyPolicyUrl,
+            ),
+          ],
+        ),
+      ),
+      controlAffinity: ListTileControlAffinity.leading,
+      activeColor: Color(0xFFD3EAFF),
+    )
+    );
+  }
+
 
   @override
   void initState() {
     super.initState();
-    passwordController.addListener(_validatePassword);
-    confirmPWController.addListener(_validatePassword);
+    passwordController.addListener(_validatePasswordConfirmation);
+    confirmPWController.addListener(_validatePasswordConfirmation);
   }
 
   @override
@@ -330,11 +416,6 @@ class _RegisterState extends State<Register> {
     passwordController.dispose();
     confirmPWController.dispose();
     super.dispose();
-  }
-  void _validatePassword() {
-    setState(() {
-      isPasswordConfirmed = passwordController.text == confirmPWController.text;
-    });
   }
 
 
@@ -414,12 +495,11 @@ class _RegisterState extends State<Register> {
                     ),
                   ],
                 )
-
-
             ),
             SizedBox(height: 15),
             _buildBMIField(),
             SizedBox(height: 20),
+            _buildPrivacyPolicyAgreement(),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -446,4 +526,5 @@ class _RegisterState extends State<Register> {
     );
   }
 }
+
 

@@ -228,13 +228,16 @@ class RoutineItem extends StatelessWidget {
     return Slidable(
       key: Key(routine['id'].toString()),
       endActionPane: ActionPane(
+        extentRatio: 0.2,
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
+          flex: 1,
             onPressed: (context) => onDelete(routine['id']),
             backgroundColor: Color(0xFFFF5050),
             foregroundColor: Colors.white,
             icon: Iconsax.trash,
+            borderRadius:BorderRadius.all(Radius.circular(20)),
           ),
         ],
       ),

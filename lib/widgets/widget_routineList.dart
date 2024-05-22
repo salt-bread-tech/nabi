@@ -2,14 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:iconsax/iconsax.dart';
 
 import '../services/urls.dart';
 import '../services/globals.dart' as globals;
 import 'package:http/http.dart' as http;
 
 class RoutineListWidget extends StatefulWidget {
-
   final String datetime;
 
   RoutineListWidget({Key? key, required this.datetime}) : super(key: key);
@@ -78,8 +76,8 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
     }
   }
 
-  Future<bool> _updateRoutineCount(int routineId, int indexClicked,
-      int currentCount, int maxCount) async {
+  Future<bool> _updateRoutineCount(
+      int routineId, int indexClicked, int currentCount, int maxCount) async {
     int newCount = currentCount;
     if (indexClicked < currentCount) {
       newCount = indexClicked;
@@ -111,10 +109,10 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final itemHeight = 70.0;
+    final screenSize = MediaQuery.of(context).size;
+    final itemHeight = screenSize.height * 0.1; // 화면 높이에 비례하여 항목 높이 설정
     final listHeight = _routines.length * itemHeight;
 
     return Container(
@@ -135,16 +133,23 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
   }
 }
 
-
-  class RoutineItem extends StatelessWidget {
+class RoutineItem extends StatelessWidget {
   final Map routine;
   final Function(int) onDelete;
   final Function(int) onCountChange;
 
-  const RoutineItem({Key? key, required this.routine, required this.onDelete, required this.onCountChange}) : super(key: key);
+  const RoutineItem(
+      {Key? key,
+        required this.routine,
+        required this.onDelete,
+        required this.onCountChange})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final fontSize = screenSize.width * 0.03; // 화면 너비에 비례하여 폰트 크기 설정
+
     int currentCount = routine['counts'];
     int maxCount = routine['max'];
     String routineName = routine['name'];
@@ -152,17 +157,6 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
 
     return Slidable(
       key: Key(routine['id'].toString()),
-      endActionPane: ActionPane(
-        motion: const DrawerMotion(),
-        children: [
-          SlidableAction(
-            onPressed: (context) => onDelete(routine['id']),
-            backgroundColor: Color(0xFFFF5050),
-            foregroundColor: Colors.white,
-            icon: Iconsax.trash,
-          ),
-        ],
-      ),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -176,35 +170,44 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
+              Flexible(
+                flex: 3,
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(routineName, style: TextStyle(fontSize: 12)),
+                    Text(routineName, style: TextStyle(fontSize: fontSize)),
                     SizedBox(height: 1),
                     Text(
                       '$currentCount/$maxCount',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(fontSize: fontSize, color: Colors.grey),
                     ),
-                  ]
+                  ],
+                ),
+              ),
+              Spacer(),
+              Flexible(
+                flex: 7,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: List.generate(maxCount, (index) {
+                    return GestureDetector(
+                      onTap: () => onCountChange(index),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                        height: 23,
+                        width: 23,
+                        decoration: BoxDecoration(
+                          color: index < currentCount
+                              ? Color(int.parse("0xFF$colorCode"))
+                              : Color(0xFFD9D9D9),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
               ),
             ],
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(maxCount, (index) {
-              return GestureDetector(
-                onTap: () => onCountChange(index),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                  height: 23,
-                  width: 23,
-                  decoration: BoxDecoration(
-                    color: index < currentCount ? Color(int.parse("0xFF$colorCode")) : Color(0xFFD9D9D9),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              );
-            }),
           ),
         ),
       ),
