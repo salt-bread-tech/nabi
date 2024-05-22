@@ -2,6 +2,7 @@ import 'package:doctor_nyang/assets/theme.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
@@ -12,7 +13,7 @@ import '../services/urls.dart';
 import '../widgets/widget_weeklyCalendar2.dart';
 import '../widgets/widget_weekly_calendar.dart';
 
-class Prescription{
+class Prescription {
   final String medicineName;
   final int dailyDosage;
   final int totalDosage;
@@ -36,7 +37,6 @@ class Prescription{
       medicineDosage: json['medicineDosage'],
     );
   }
-
 }
 
 class PrescriptionScreen extends StatefulWidget {
@@ -47,7 +47,9 @@ class PrescriptionScreen extends StatefulWidget {
 class _PrescriptionScreenState extends State<PrescriptionScreen> {
   late DateTime selectedMonth;
   List<dynamic> prescriptions = [];
+  List<Widget> widgets = [];
   Map<String, Prescription> prescription = {};
+  DateTime _selectedDay = DateTime.now();
 
   @override
   void initState() {
@@ -105,16 +107,11 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
       if (response.statusCode == 200) {
         String responseBody = utf8.decode(response.bodyBytes);
         Map<String, dynamic> _prescription = json.decode(responseBody);
-        print(_prescription);
 
+        prescription = {};
         for (var item in _prescription['medicineTakings']) {
           prescription[item['medicineName']] = Prescription.fromJson(item);
-          print(prescription[item['medicineName']]?.medicineName);
         }
-
-        print (prescription['보령아스트릭스캡슐100밀리그람']?.medicineName);
-
-
 
         print('처방전 조회 성공');
       } else {
@@ -123,6 +120,207 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     } catch (e) {
       print('네트워크 오류 $e');
     }
+  }
+
+  void showPrescriptionAddModal() {
+    showModalBottomSheet(
+        scrollControlDisabledMaxHeightRatio: 0.9,
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            width: double.infinity,
+            height: 300 + widgets.length * 80.0,
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      const SizedBox(
+                        width: 130,
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: '처방전 이름',
+                            hintStyle:
+                                TextStyle(color: Colors.grey, fontSize: 16),
+                            border: InputBorder.none,
+                          ),
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          showCupertinoModalPopup(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Container(
+                                  height: 300,
+                                  color: Colors.white,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        height: 200,
+                                        child: CupertinoDatePicker(
+                                          mode: CupertinoDatePickerMode.date,
+                                          initialDateTime: _selectedDay,
+                                          onDateTimeChanged:
+                                              (DateTime newDateTime) {
+                                            setState(() {
+                                              _selectedDay = newDateTime;
+                                            });
+                                          },
+                                          use24hFormat: true,
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('확인'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
+                        },
+                        child: Text(
+                            '${DateFormat('yyyy년 MM월 dd일').format(_selectedDay)}',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 16)),
+                      ),
+                    ]),
+                Column(
+                  children: <Widget>[
+                    Column(
+                      children: widgets,
+                    ),
+                    Container(
+                        width: double.infinity,
+                        height: 55,
+                        child: TextButton(
+                      style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          addWidget();
+                          Navigator.pop(context);
+                          showPrescriptionAddModal();
+                        });
+                      },
+                      child: Text('약 추가', style: TextStyle(color: Colors.black)),
+                    ))
+                  ],
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  Column addMedicine() {
+    return const Column(children: <Widget>[
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: 200,
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: '약 이름',
+                hintStyle: TextStyle(color: Colors.grey),
+                border: InputBorder.none,
+              ),
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          SizedBox(
+            width: 130,
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: '복용 방법',
+                hintStyle: TextStyle(color: Colors.grey),
+                border: InputBorder.none,
+              ),
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            '총',
+            style: TextStyle(color: Colors.black),
+          ),
+          SizedBox(
+            width: 30,
+            child: TextField(
+              decoration: InputDecoration(
+                hintStyle: TextStyle(color: Colors.grey),
+                hintText: '1',
+                border: InputBorder.none,
+              ),
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          Text(
+            '일',
+            style: TextStyle(color: Colors.black),
+          ),
+          Text(
+            '하루',
+            style: TextStyle(color: Colors.black),
+          ),
+          SizedBox(
+            width: 30,
+            child: TextField(
+              decoration: InputDecoration(
+                hintStyle: TextStyle(color: Colors.grey),
+                hintText: '1',
+                border: InputBorder.none,
+              ),
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          Text(
+            '회',
+            style: TextStyle(color: Colors.black),
+          ),
+          SizedBox(
+            width: 30,
+            child: TextField(
+              decoration: InputDecoration(
+                hintStyle: TextStyle(color: Colors.grey),
+                hintText: '1',
+                border: InputBorder.none,
+              ),
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          Text(
+            '정(포)',
+            style: TextStyle(color: Colors.black),
+          ),
+        ],
+      )
+    ]);
+  }
+
+  void addWidget() {
+    widgets.add(addMedicine());
   }
 
   @override
@@ -141,7 +339,10 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () {
+              widgets = [];
+              showPrescriptionAddModal();
+            },
           ),
         ],
       ),
@@ -192,10 +393,13 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                           onTap: () {
                             getPrescription(
                                 prescriptions[index]['prescriptionId']);
-                            showModalBottomSheet(context: context,
+                            showModalBottomSheet(
+                                context: context,
+                                scrollControlDisabledMaxHeightRatio: 0.8,
                                 builder: (BuildContext context) {
                                   return Container(
                                     width: double.infinity,
+                                    height: 300 + prescriptions.length * 50.0,
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 30, vertical: 30),
                                     decoration: BoxDecoration(
@@ -206,12 +410,12 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                       ),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment
-                                          .start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment
-                                              .spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             Text(
                                               '${prescriptions[index]['name']}',
@@ -233,25 +437,26 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                         Column(
                                           children: List<Widget>.generate(
                                               prescription.length, (index) {
-                                            String medicineName = prescription.keys
+                                            String medicineName = prescription
+                                                .keys
                                                 .elementAt(index);
-                                            Prescription medicine = prescription[
-                                            medicineName]!;
+                                            Prescription medicine =
+                                                prescription[medicineName]!;
                                             return Slidable(
                                               child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20, vertical: 10),
                                                 decoration: BoxDecoration(
-                                                  color: AppTheme.pastelYellow,
-                                                  borderRadius: BorderRadius.circular(10),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
                                                 ),
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment
-                                                      .spaceBetween,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: <Widget>[
                                                     Column(
-                                                      crossAxisAlignment: CrossAxisAlignment
-                                                          .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: <Widget>[
                                                         Text(
                                                           '$medicineName',
@@ -267,9 +472,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                                             fontSize: 14,
                                                           ),
                                                         ),
-
                                                       ],
-
                                                     ),
                                                     Text(
                                                       '${medicine.medicineDosage}',
