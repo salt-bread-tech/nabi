@@ -68,7 +68,7 @@ class _RoutineStatusWidgetState extends State<RoutineStatusWidget> {
         child: GestureDetector(
           onTap: () => _handleTap(index),
           child: CircleAvatar(
-            radius: 12,
+            radius: 11,
             backgroundColor:
             index < _currentCount ? Color(0xFFFF7070) : Color(0xFFD9D9D9),
           ),
@@ -119,7 +119,7 @@ class _RoutineStatusWidgetState extends State<RoutineStatusWidget> {
                 },
                 child:
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 13, horizontal: 10),
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 10),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +131,6 @@ class _RoutineStatusWidgetState extends State<RoutineStatusWidget> {
                 ),
               ),
               Container(width: 1,height: 30,color: Colors.grey,),
-              SizedBox(width: 10),
               Row(
                 children: _indicators,
                 mainAxisAlignment: MainAxisAlignment.start,

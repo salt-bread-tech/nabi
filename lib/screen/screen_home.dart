@@ -5,12 +5,13 @@ import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter/material.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
 import 'package:intl/intl.dart';
 import '../models/model_diet.dart';
 import '../services/globals.dart';
+import '../services/globals.dart' as globals;
+import '../services/service_auth.dart';
 import '../services/urls.dart';
 import '../widgets/widget_diet.dart';
 import '../widgets/widget_routineList.dart';
@@ -26,26 +27,28 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
   late DateTime selectedDate;
   List<dynamic> ingestionSchedule = [];
-
+  String _selectedDateRange = '';
 
   void _handleDateChange(DateTime newDate) {
     setState(() {
       selectedDate = newDate;
       fetchIngestion();
+      _fetchRoutines();
     });
   }
-
 
   @override
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
+    _selectedDateRange = _formatDateRange(selectedDate);
     fetchIngestion();
+    fetchUserInfo();
   }
 
   FutureOr<Ingestion?> fetchIngestion() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String url = '$baseUrl/ingestion/total/$userId/$formattedDate';
+    final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
       final response = await http.get(
@@ -71,8 +74,41 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _fetchRoutines() async {
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final url = Uri.parse('$baseUrl/routine/$formattedDate');
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ${globals.token}',
+      });
+
+      final decodedResponse = utf8.decode(response.bodyBytes);
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _selectedDateRange = _formatDateRange(selectedDate);
+        });
+      } else {
+        throw Exception('루틴 조회 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('루틴 조회 실패: $e');
+    }
+  }
+
+  String _formatDateRange(DateTime date) {
+    int weekday = date.weekday;
+    DateTime startOfWeek = date.subtract(Duration(days: weekday - 1));
+    DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+    return '${DateFormat('M.dd').format(startOfWeek)}~${DateFormat('M.dd').format(endOfWeek)}';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final fontSize = screenSize.width * 0.036; // 화면 너비에 비례하여 폰트 크기 설정
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -151,15 +187,21 @@ class _HomeScreenState extends State<HomeScreen> {
               GestureDetector(
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => RoutineScreen()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RoutineScreen(),
+                    ),
+                  );
                 },
                 child: Container(
-                  height: 190,
-                  child: RoutineListWidget(),
+                  height: screenSize.height * 0.25,
+                  alignment: Alignment.topCenter,
+                  child: RoutineListWidget(
+                    key: ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                    datetime: DateFormat('yyyy-MM-dd').format(selectedDate),
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ),

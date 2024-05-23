@@ -21,7 +21,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<types.Message> _messages = [];
   final _user = const types.User(id: '1');
   late int page = 0;
-  late int feedresult = 0;
+  int feedresult = 0;
 
   bool _isPressed = false;
   bool _isLoading = false;
@@ -33,7 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     // _scrollController.addListener(_scrollListener);
-    getChats(1);
+    getChats();
   }
 
   // @override
@@ -62,7 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
   // }
 
   Future<void> feed() async {
-    final url = Uri.parse('$baseUrl/feed/$userId');
+    final url = Uri.parse('$baseUrl/feed');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
       'Authorization': 'Bearer $token',
@@ -71,21 +71,23 @@ class _ChatScreenState extends State<ChatScreen> {
     if (response.statusCode == 200) {
       final int feedData = json.decode(utf8.decode(response.bodyBytes));
       if (feedData == 200) {
+        setState(() {
+          feedresult = 200;
+        });
         print('Feed success');
-        feedresult = 200;
       } else if (feedData == 300) {
+        setState(() {
+          feedresult = 300;
+        });
         print('Already fed');
-        feedresult = 300;
       }
     } else {
       print('Failed to load feed from server');
     }
   }
 
-
-
-  Future<void> getChats(int uid) async {
-    final url = Uri.parse('$baseUrl/chats/$userId/recent');
+  Future<void> getChats() async {
+    final url = Uri.parse('$baseUrl/chats/recent');
     final response = await http.get(url, headers: {
       "Content-Type": "application/json; charset=UTF-8",
       'Authorization': 'Bearer $token',
@@ -127,14 +129,13 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<bool> sendChat(int uid, String content) async {
+  Future<bool> sendChat(String content) async {
     final url = Uri.parse('$baseUrl/chat');
     final headers = {
       "Content-Type": "application/json",
       'Authorization': 'Bearer $token',
     };
     final body = json.encode({
-      'uid': uid,
       'content': content,
     });
 
@@ -149,7 +150,7 @@ class _ChatScreenState extends State<ChatScreen> {
         page = 0;
         setState(() {
           _isLoading = false;
-          getChats(1);
+          getChats();
         });
         return true;
       } else {
@@ -166,10 +167,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSendPressed(types.PartialText message) async {
-    final int? uid = userId;
     final content = message.text;
 
-    final success = await sendChat(uid!, content);
+    final success = await sendChat(content);
     if (!success) {
       print('메시지 전송 실패');
     }
@@ -252,6 +252,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 messages: _messages,
                 onSendPressed: _handleSendPressed,
                 user: _user,
+                l10n: ChatL10nEn(
+                  inputPlaceholder: '나비와 대화하기',
+                ),
                 // scrollController: _scrollController,
               ) : Container(),
               Positioned(
@@ -280,7 +283,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           print(_isPressed);
                         },
                       ),
-                      Text('나비와 함께한지 ${day}일', style: TextStyle(fontSize: 16)),
+                      Text('나비와 함께한지 ${dday}일', style: TextStyle(fontSize: 16)),
                       IconButton(
                         icon: Icon(Iconsax.milk5,
                             size: 30, color: AppTheme.pastelBlue),

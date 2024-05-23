@@ -1,11 +1,15 @@
 import 'package:doctor_nyang/services/globals.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../services/urls.dart';
+import '../widgets/widget_weeklyCalendar2.dart';
+import '../widgets/widget_weekly_calendar.dart';
 
 
 class DosageSchedule extends StatefulWidget {
@@ -32,7 +36,10 @@ class _DosageScheduleState extends State<DosageSchedule> {
     try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {'Content-Type': 'application/json','Authorization': 'Bearer $token',},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode == 200) {
@@ -55,12 +62,11 @@ class _DosageScheduleState extends State<DosageSchedule> {
       print('Token: $token');
       print('Formatted Date: $formattedDate');
       print('userId : $userId');
-
     }
   }
 
   //일정 토글
-  Future<void> toggleDosage(int medicineId, String date,int times) async {
+  Future<void> toggleDosage(int medicineId, String date, int times) async {
     final String url = '$baseUrl/dosage';
 
     try {
@@ -80,11 +86,36 @@ class _DosageScheduleState extends State<DosageSchedule> {
       if (response.statusCode == 200) {
         fetchDosageSchedule();
         print('복용 일정 완료(미완료) 토글링 성공');
+        print('$medicineId $times');
       } else {
         print('복용 일정 변경 실패');
       }
     } catch (e) {
       print('네트워크 오류 $e');
+    }
+  }
+
+
+  Future<void> deleteMedicine(int dosageId) async {
+    final url = Uri.parse('$baseUrl/dosage/$dosageId');
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('약물 일정 삭제 성공');
+        fetchDosageSchedule();
+      } else {
+        print('약물 일정 삭제 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류: $e');
     }
   }
 
@@ -105,6 +136,96 @@ class _DosageScheduleState extends State<DosageSchedule> {
     }
   }
 
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          backgroundColor: Colors.white,
+          contentPadding: EdgeInsets.all(20),
+          elevation: 0,
+          title: Text('의약품 복용 일정 추가하기',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+            textAlign: TextAlign.center,),
+          children: <Widget>[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 130,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    //color: Color(0xFFE0F0FF),
+                    border: Border.all(
+                      color: Colors.grey,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/MedicineRegister');
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(Iconsax.edit, size: 20),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8),
+                          child: Text('직접 작성하기'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Container(
+                  width: 130,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/MedicineSearch');
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(Iconsax.search_normal, size: 20),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8),
+                          child: Text('검색하기'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleDateChange(DateTime newDate) {
+    setState(() {
+      selectedDate = newDate;
+      fetchDosageSchedule();
+    });
+  }
+
   Map<String, int> timesToInt = {
     '아침 식전': 0,
     '아침 식후': 1,
@@ -121,78 +242,129 @@ class _DosageScheduleState extends State<DosageSchedule> {
   };
 
 
+  Map<String, List<dynamic>> categorizeDosage() {
+    Map<String, List<dynamic>> categorizedSchedule = {
+      '아침': [],
+      '점심': [],
+      '저녁': [],
+    };
+
+    for (var dosage in dosageSchedule) {
+      int timeValue = timesToInt[dosage['times']] ?? -1;
+      if ([0, 1].contains(timeValue)) {
+        categorizedSchedule['아침']?.add(dosage);
+      } else if ([2, 3].contains(timeValue)) {
+        categorizedSchedule['점심']?.add(dosage);
+      } else if ([4, 5].contains(timeValue)) {
+        categorizedSchedule['저녁']?.add(dosage);
+      }
+    }
+
+    return categorizedSchedule;
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    var categorizedSchedule = categorizeDosage();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        /*leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),//, onPressed: () { Navigator.pushNamed(context, '/MyHomePage');},
-        ),
-
-         */
         title: Text(
           '$nickName님의 복용 일정',
-          style: TextStyle(color: Colors.black,fontSize: 17),
+          style: TextStyle(color: Colors.black, fontSize: 17),
           textAlign: TextAlign.center,
         ),
         iconTheme: IconThemeData(color: Colors.black),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Iconsax.add),
-            onPressed: () {
-              Navigator.pushNamed(context, '/MedicineSearch');
-            },
+            icon: Icon(Icons.add),
+            onPressed: _showDialog,
           ),
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            GestureDetector(
-              onTap: () => _selectDate(context),
-              child: Text(
-                DateFormat('yyyy년 MM월 dd일 EEEE').format(selectedDate),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-            ),
-            SizedBox(height: 20),
+          children: [
+            WidgetCalendar2(onDateSelected: _handleDateChange),
             Expanded(
-              child: ListView.builder(
-                itemCount: dosageSchedule.length,
-                itemBuilder: (context, index) {
-                  var dosage = dosageSchedule[index];
-                  return Card(
-                    shadowColor: Colors.black,
-                    elevation: 0,
-                    color: dosage['medicineTaken'] ? Color(0xFFD3EAFF) : Color(0xFFF1F1F1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListTile(
-                      title: Text('${dosage['medicineName']}'),
-                      subtitle: Text(dosage['times']),
-                      trailing: Icon(
-                        dosage['medicineTaken'] ? Icons.check : Icons.check,
-                        color: dosage['medicineTaken'] ? Color(0xFF6696DE) : Colors.grey,
-                      ),
-                      onTap: () async {
-                        int timeValue = timesToInt[dosage['times']] ?? -1;
-                        await toggleDosage(dosage['medicineId'], dosage['date'], timeValue);
-                        print('medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
-                      },
-                    ),
-                  );
-                },
+              child: ListView(
+                children: [
+                  if (categorizedSchedule['아침']!.isNotEmpty)
+                    timeSection('아침', categorizedSchedule['아침']!),
+                  SizedBox(height: 10),
+                  if (categorizedSchedule['점심']!.isNotEmpty)
+                    timeSection('점심', categorizedSchedule['점심']!),
+                  SizedBox(height: 10),
+                  if (categorizedSchedule['저녁']!.isNotEmpty)
+                    timeSection('저녁', categorizedSchedule['저녁']!),
+                ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+
+  Widget timeSection(String title, List<dynamic> schedule) {
+    if (schedule.isEmpty) {
+      return SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+              title,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        ),
+        ...schedule.map((dosage) =>
+            Slidable(
+              key: Key(dosage['dosageId'].toString()),
+              endActionPane: ActionPane(
+                motion: const DrawerMotion(),
+                children: [
+                  SlidableAction(
+                    onPressed: (context) => deleteMedicine(dosage['dosageId']),
+                    backgroundColor: Color(0xFFFF5050),
+                    foregroundColor: Colors.white,
+                    icon: Iconsax.trash,
+                  ),
+                ],
+              ),
+              child: Card(
+                shadowColor: Colors.black,
+                elevation: 0,
+                color: dosage['medicineTaken'] ? Color(0xFFE3F2FF) : Color(
+                    0xFFF1F1F1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: ListTile(
+                  title: Text('${dosage['medicineName']}'),
+                  subtitle: Text(dosage['times']),
+                  trailing: Icon(
+                    dosage['medicineTaken'] ? Icons.check : Icons.check,
+                    color: dosage['medicineTaken'] ? Color(0xFF6696DE) : Colors
+                        .grey,
+                  ),
+                  onTap: () async {
+                    int timeValue = timesToInt[dosage['times']] ?? -1;
+                    await toggleDosage(
+                        dosage['medicineId'], dosage['date'], timeValue);
+                    print('medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
+                  },
+                ),
+              ),
+            )).toList(),
+      ],
     );
   }
 }

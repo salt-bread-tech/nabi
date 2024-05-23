@@ -9,4 +9,6 @@ String? id;
 String? token;
 int? day;
 
+DateTime selectedDate = DateTime.now();
 int userId = 1;
+int? dday;

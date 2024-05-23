@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,6 @@ import 'package:timelines/timelines.dart';
 import '../assets/theme.dart';
 import '../services/globals.dart';
 import '../services/urls.dart';
-import '../widgets/widget_schedule_modal.dart';
 
 class ScheduleCalendar extends StatefulWidget {
   @override
@@ -25,14 +25,16 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
   DateTime _focusedDay = DateTime.now();
   String datetime = 'today';
   Map<DateTime, List> _eventsList = {};
-
+  String content = '';
+  late DateTime selectedDate;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _selectedDay = DateTime.now();
     datetime = DateFormat('yyyy-MM-dd').format(_selectedDay);
-
+    selectedDate = _selectedDay;
     getSchedule();
   }
 
@@ -56,22 +58,185 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
       throw Exception('조회 실패 ${response.statusCode}');
     }
 
+    Map<DateTime, List> newEventsList = {};
+
     for (var key in data.keys) {
+      List schedules = [];
       for (var jsonItem in data[key]) {
         DateTime datetime = DateTime.parse(jsonItem['date']);
         String text = jsonItem['text'];
-        String schedule =
-            "${datetime.hour.toString().padLeft(2, '0')}:${datetime.minute.toString().padLeft(2, '0')} | $text";
-        if (_eventsList[DateTime.parse(key)] == null) {
-          _eventsList[DateTime.parse(key)] = [];
-        }
-        _eventsList[DateTime.parse(key)]!.add(schedule);
-
-        _eventsList[DateTime.parse(key)]!.sort((a, b) {
-          return a.substring(0, 5).compareTo(b.substring(0, 5));
-        });
+        int ScheduleId = jsonItem['scheduleId'];
+        schedules.add(ScheduleId.toString() +
+            ' ' +
+            datetime.hour.toString().padLeft(2, '0') +
+            ':' +
+            datetime.minute.toString().padLeft(2, '0') +
+            ' ' +
+            text);
       }
+      newEventsList[DateTime.parse(key)] = schedules;
     }
+
+    newEventsList.forEach((key, value) {
+      value.sort((a, b) {
+        return a.split(' ')[1].compareTo(b.split(' ')[1]);
+      });
+    });
+
+    setState(() {
+      _eventsList = newEventsList;
+    });
+  }
+
+  Future<void> addSchedule() async {
+    final String url = '$baseUrl/schedule';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'text': content,
+          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(_selectedDay),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Schedule added');
+      } else {
+        throw Exception('Failed to add schedule');
+      }
+    } catch (e) {
+      print('error: $e');
+    }
+  }
+
+  Future<void> deleteSchedule(int scheduleId) async {
+    final String url = '$baseUrl/schedule/$scheduleId';
+
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Schedule deleted');
+        getSchedule();
+      } else {
+        throw Exception('Failed to delete schedule');
+      }
+    } catch (e) {
+      print('error: $e');
+    }
+  }
+
+  void showScheduleModal(BuildContext context, DateTime initialDate) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                  width: double.infinity,
+                  height: 240,
+                  decoration: BoxDecoration(
+                    color: AppTheme.appbackgroundColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          hintText: '새로운 일정',
+                          labelStyle: TextStyle(color: Colors.black),
+                          border: InputBorder.none,
+                        ),
+                        onChanged: (value) {
+                          content = value;
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('날짜', style: TextStyle(color: Colors.black)),
+                          TextButton(
+                            onPressed: () {
+                              showCupertinoModalPopup(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      height: 300,
+                                      color: Colors.white,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 200,
+                                            child: CupertinoDatePicker(
+                                              initialDateTime: _selectedDay,
+                                              onDateTimeChanged:
+                                                  (DateTime newDateTime) {
+                                                setState(() {
+                                                  _selectedDay = newDateTime;
+                                                });
+                                              },
+                                              use24hFormat: true,
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('확인'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            },
+                            child: Text(
+                                '${_selectedDay.year}년 ${_selectedDay.month}월 ${_selectedDay.day}일 ${_selectedDay.hour}시 ${_selectedDay.minute}분',
+                                style: TextStyle(color: Colors.black)),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                          width: double.infinity,
+                          height: 55,
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Color(0xFFEBEBEB),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              addSchedule();
+                              getSchedule();
+                              Navigator.of(context).pop();
+                              print('Schedule Added: $selectedDate $content');
+                            },
+                            child: Text('일정 추가',
+                                style: TextStyle(color: Colors.black)),
+                          )),
+                    ],
+                  )));
+        });
   }
 
   @override
@@ -84,12 +249,14 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
     List getEventForDay(DateTime day) {
       return _events[day] ?? [];
     }
+
     getEventForDay(_selectedDay);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: Text(
           '$nickName님의 일정',
           style: TextStyle(color: Colors.black, fontSize: 17),
@@ -100,11 +267,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (BuildContext bCtx) => AddScheduleModal(parentContext: context),
-              );
+              showScheduleModal(context, _selectedDay);
             },
           ),
         ],
@@ -178,12 +341,39 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                   builder: TimelineTileBuilder.fromStyle(
                     contentsAlign: ContentsAlign.basic,
                     contentsBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Text(
-                          getEventForDay(_selectedDay)[index],
-                          style: TextStyle(fontSize: 14),
+                      return Slidable(
+                        endActionPane: ActionPane(
+                          motion: const DrawerMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (context) => {
+                                deleteSchedule(int.parse(
+                                    getEventForDay(_selectedDay)[index]
+                                        .split(' ')[0])),
+                              },
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              icon: Icons.delete,
+                              label: '삭제',
+                            ),
+                          ],
                         ),
+                        child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: AppTheme.appbackgroundColor,
+                            ),
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              getEventForDay(_selectedDay)[index]
+                                      .split(' ')[1] +
+                                  '  ' +
+                                  getEventForDay(_selectedDay)[index]
+                                      .split(' ')
+                                      .skip(2)
+                                      .join(' '),
+                              style: TextStyle(fontSize: 14),
+                            )),
                       );
                     },
                     itemCount: getEventForDay(_selectedDay).length,
