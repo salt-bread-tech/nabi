@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:doctor_nyang/assets/theme.dart';
+import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -38,6 +42,21 @@ class _DietScheduleState extends State<DietSchedule> {
     selectedDate = DateTime.now();
     fetchIngestion();
     fetchDietSchedule();
+    _controller.text = _selectedGram == '인분'
+        ? _selectedQuantity.toString()
+        : _selectedQuantity.toStringAsFixed(0);
+    setState(() {
+      _selectedMeal = _meals[0];
+      _selectedGram = _grams[0];
+    });
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
   }
 
   Future<void> fetchDietSchedule() async {
@@ -99,8 +118,53 @@ class _DietScheduleState extends State<DietSchedule> {
     }
   }
 
-  Future<void> deleteDietSchedule(int dietid) async {
-    final String url = '$baseUrl/ingestion/$dietid/delete';
+  Future<void> updateIngestion(
+      {required ingestionId,
+      required servingSize,
+      required calories,
+      required carbohydrate,
+      required protein,
+      required fat,
+      required sugars,
+      required salt,
+      required cholesterol,
+      required saturatedFattyAcid,
+      required transFattyAcid}) async {
+    final String url = '$baseUrl/ingestion/update';
+
+    try {
+      final response = await http.post(Uri.parse(url), headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      }, body: json.encode({
+            'ingestionId': ingestionId,
+            'servingSize': servingSize,
+            'calories': calories,
+            'carbohydrate': carbohydrate,
+            'protein': protein,
+            'fat': fat,
+            'sugars': sugars,
+            'salt': salt,
+            'cholesterol': cholesterol,
+            'saturatedFattyAcid': saturatedFattyAcid,
+            'transFattyAcid': transFattyAcid,
+          }));
+
+      if (response.statusCode == 200) {
+        print('식단 업데이트 성공');
+        fetchIngestion();
+        fetchDietSchedule();
+      } else {
+        print('식단 업데이트 실패');
+        print(response.body + 'error');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
+  }
+
+  Future<void> deleteIngestion(int ingestionId) async {
+    final String url = '$baseUrl/ingestion/$ingestionId/delete';
 
     try {
       final response = await http.get(
@@ -113,6 +177,7 @@ class _DietScheduleState extends State<DietSchedule> {
 
       if (response.statusCode == 200) {
         print('식단 삭제 성공');
+        fetchIngestion();
         fetchDietSchedule();
       } else {
         print('식단 삭제 실패');
@@ -134,6 +199,346 @@ class _DietScheduleState extends State<DietSchedule> {
     }
   }
 
+  final TextEditingController _controller = TextEditingController();
+  final List<String> _meals = ['아침', '점심', '저녁', '간식'];
+  String _selectedMeal = '';
+  final List<String> _grams = ['인분', 'g'];
+  String _selectedGram = '';
+  double _selectedQuantity = 1.0;
+
+  void _incrementQuantity() {
+    setState(() {
+      _selectedQuantity += _selectedGram == '인분' ? 0.5 : 1.0;
+      _controller.text = _selectedGram == '인분'
+          ? _selectedQuantity.toString()
+          : _selectedQuantity.toStringAsFixed(0);
+    });
+  }
+
+  void _decrementQuantity() {
+    if (_selectedQuantity > 0.5) {
+      setState(() {
+        _selectedQuantity -= _selectedGram == '인분' ? 0.5 : 1.0;
+        _controller.text = _selectedGram == '인분'
+            ? _selectedQuantity.toString()
+            : _selectedQuantity.toStringAsFixed(0);
+      });
+    }
+  }
+
+  void showCustomModalBottomSheet(BuildContext context, int id, Food food) {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Container(
+                height: 530,
+                padding: const EdgeInsets.all(30.0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          food.name.length > 12 ? '${food.name.substring(0, 12)}···' : food.name,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${food.servingSize.toStringAsFixed(0)}g',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        Expanded(
+                          child: Text(
+                            '${food.calories.toStringAsFixed(0)} kcal',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                            alignment: Alignment.center,
+                            width: 85,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color(0xFFD9D9D9),
+                                width: 1,
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  value: _selectedMeal,
+                                  dropdownColor: Colors.white,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedMeal = value!;
+                                    });
+                                  },
+                                  items: _meals
+                                      .map((e) => DropdownMenuItem(
+                                      child: Text(e), value: e))
+                                      .toList(),
+                                  borderRadius: BorderRadius.circular(8),
+                                ))),
+                        SizedBox(width: 5),
+                        Container(
+                          alignment: Alignment.center,
+                          width: 135,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Color(0xFFD9D9D9),
+                              width: 1,
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.remove,
+                                    size: 20, color: Color(0xFFD9D9D9)),
+                                onPressed: _decrementQuantity,
+                              ),
+                              Container(
+                                width: 35,
+                                child: TextField(
+                                  controller: _controller,
+                                  textAlign: TextAlign.center,
+                                  keyboardType: TextInputType.numberWithOptions(
+                                      decimal: true),
+                                  decoration:
+                                  InputDecoration(border: InputBorder.none),
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.add,
+                                    size: 20, color: Color(0xFFD9D9D9)),
+                                onPressed: _incrementQuantity,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        Container(
+                            alignment: Alignment.center,
+                            width: 85,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Color(0xFFD9D9D9),
+                                width: 1,
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: _selectedGram,
+                                  dropdownColor: Colors.white,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      _selectedGram = newValue!;
+                                      if (_selectedGram == '인분') {
+                                        _selectedQuantity = 1.0;
+                                        _controller.text =
+                                            _selectedQuantity.toString();
+                                      } else {
+                                        _selectedQuantity = food.servingSize;
+                                        _controller.text =
+                                            _selectedQuantity.toStringAsFixed(0);
+                                      }
+                                    });
+                                  },
+                                  items: _grams
+                                      .map((e) => DropdownMenuItem(
+                                      child: Text(e), value: e))
+                                      .toList(),
+                                  borderRadius: BorderRadius.circular(8),
+                                ))),
+                      ],
+                    ),
+                    SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('탄수화물', style: TextStyle(fontSize: 16)),
+                        Text(
+                            food.carbohydrate == 9999999
+                                ? '정보없음'
+                                : '${food.carbohydrate.toStringAsFixed(0)}g',
+                            style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Icon(FontAwesomeIcons.caretRight,
+                            size: 16, color: AppTheme.subTitleTextColor),
+                        SizedBox(width: 5),
+                        Text('당류',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: AppTheme.subTitleTextColor)),
+                        Expanded(
+                          child: Text(
+                              food.sugars == 9999999
+                                  ? '정보없음'
+                                  : '${food.sugars.toStringAsFixed(0)}g',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppTheme.subTitleTextColor),
+                              textAlign: TextAlign.end),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('단백질', style: TextStyle(fontSize: 16)),
+                        Text(
+                            food.protein == 9999999
+                                ? '정보없음'
+                                : '${food.protein.toStringAsFixed(0)}g',
+                            style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('지방', style: TextStyle(fontSize: 16)),
+                        Text(
+                            food.fat == 9999999
+                                ? '정보없음'
+                                : '${food.fat.toStringAsFixed(0)}g',
+                            style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Icon(FontAwesomeIcons.caretRight,
+                            size: 16, color: AppTheme.subTitleTextColor),
+                        SizedBox(width: 5),
+                        Text('포화지방',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: AppTheme.subTitleTextColor)),
+                        Expanded(
+                          child: Text(
+                              food.saturatedFattyAcid == 9999999
+                                  ? '정보없음'
+                                  : '${food.saturatedFattyAcid.toStringAsFixed(0)}g',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppTheme.subTitleTextColor),
+                              textAlign: TextAlign.end),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Icon(FontAwesomeIcons.caretRight,
+                            size: 16, color: AppTheme.subTitleTextColor),
+                        SizedBox(width: 5),
+                        Text('트랜스지방',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: AppTheme.subTitleTextColor)),
+                        Expanded(
+                          child: Text(
+                              food.transFattyAcid == 9999999
+                                  ? '정보없음'
+                                  : '${food.transFattyAcid.toStringAsFixed(0)}g',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppTheme.subTitleTextColor),
+                              textAlign: TextAlign.end),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('나트륨', style: TextStyle(fontSize: 16)),
+                        Text(
+                            food.salt == 9999999
+                                ? '정보없음'
+                                : '${food.salt.toStringAsFixed(0)}mg',
+                            style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    SizedBox(height: 24),
+                    Container(
+                      width: double.infinity,
+                      height: 55,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color(0xFFEBEBEB),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          updateIngestion(
+                            ingestionId: id.toString(),
+                            servingSize: (food.servingSize * _selectedQuantity).toString(),
+                            calories:food.calories == 9999999 ? "9999999" : (food.calories * _selectedQuantity).toString(),
+                            carbohydrate: food.carbohydrate == 9999999 ? "9999999" : (food.carbohydrate * _selectedQuantity).toString(),
+                            protein: food.protein == 9999999 ? "9999999" : (food.protein * _selectedQuantity).toString(),
+                            fat: food.fat == 9999999 ? "9999999" : (food.fat * _selectedQuantity).toString(),
+                            sugars: food.sugars == 9999999 ? "9999999" : (food.sugars * _selectedQuantity).toString(),
+                            salt: food.salt == 9999999 ? "9999999" : (food.salt * _selectedQuantity).toString(),
+                            cholesterol: food.cholesterol == 9999999 ? "9999999" : (food.cholesterol * _selectedQuantity).toString(),
+                            saturatedFattyAcid: food.saturatedFattyAcid == 9999999 ? "9999999" : (food.saturatedFattyAcid * _selectedQuantity).toString(),
+                            transFattyAcid: food.transFattyAcid == 9999999 ? "9999999" : (food.transFattyAcid * _selectedQuantity).toString(),
+                          );
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          '기록하기',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,8 +556,13 @@ class _DietScheduleState extends State<DietSchedule> {
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.add),
-              onPressed: () {
-                Navigator.pushNamed(context, '/FoodSearch');
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FoodSearch()),
+                );
+                fetchIngestion();
+                fetchDietSchedule();
               },
             ),
           ],
@@ -200,23 +610,49 @@ class _DietScheduleState extends State<DietSchedule> {
                           motion: const DrawerMotion(),
                           children: [
                             SlidableAction(
+                              flex: 1,
                               onPressed: (context) => {
-                                deleteDietSchedule(diet['dietId']),
+                                showCustomModalBottomSheet(context, diet['dietId'], Food(
+                                  name: diet['name'],
+                                  servingSize: diet['servingSize'],
+                                  calories: diet['calories'],
+                                  carbohydrate: diet['carbohydrate'],
+                                  protein: diet['protein'],
+                                  fat: diet['fat'],
+                                  sugars: diet['sugars'],
+                                  salt: diet['salt'],
+                                  cholesterol: diet['cholesterol'],
+                                  saturatedFattyAcid: diet['saturatedFattyAcid'],
+                                  transFattyAcid: diet['transFattyAcid'],
+                                )),
                               },
-                              backgroundColor: Colors.red,
+                              backgroundColor: Colors.black12,
                               foregroundColor: Colors.white,
-                              icon: Icons.delete,
-                              label: '삭제',
+                              icon: Iconsax.edit,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                            ),
+                            SlidableAction(
+                              flex: 1,
+                              onPressed: (context) => {
+                                deleteIngestion(diet['dietId']),
+                                selectedDate = selectedDate
+                              },
+                              backgroundColor: Color(0xFFFF5050),
+                              foregroundColor: Colors.white,
+                              icon: Iconsax.trash,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
                             ),
                           ],
                         ),
                         child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        color: cardColor(diet['times']).withOpacity(0.4),
-                        elevation: 0,
-                        child: ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          color: cardColor(diet['times']).withOpacity(0.4),
+                          elevation: 0,
+                          child: ListTile(
                             title: Row(
                               children: [
                                 Text(

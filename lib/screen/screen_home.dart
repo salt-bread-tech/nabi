@@ -13,6 +13,7 @@ import '../services/globals.dart';
 import '../services/globals.dart' as globals;
 import '../services/service_auth.dart';
 import '../services/urls.dart';
+import '../widgets/widget_calendar.dart';
 import '../widgets/widget_diet.dart';
 import '../widgets/widget_routineList.dart';
 import '../widgets/widget_weekly_calendar.dart';
@@ -32,6 +33,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handleDateChange(DateTime newDate) {
     setState(() {
       selectedDate = newDate;
+      fetchIngestion();
+      _fetchRoutines();
+    });
+  }
+
+  void refreshData() {
+    setState(() {
+      selectedDate = selectedDate;
       fetchIngestion();
       _fetchRoutines();
     });
@@ -107,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final fontSize = screenSize.width * 0.038; // 화면 너비에 비례하여 폰트 크기 설정
+    final fontSize = screenSize.width * 0.036; // 화면 너비에 비례하여 폰트 크기 설정
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -142,11 +151,12 @@ class _HomeScreenState extends State<HomeScreen> {
               WidgetCalendar(onDateSelected: _handleDateChange),
               SizedBox(height: 10),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ScheduleCalendar()));
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ScheduleCalendar()),
+                  );
+                  refreshData();
                 },
                 child: WidgetSchedule(
                   datetime: selectedDate.toString(),
@@ -155,9 +165,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 20),
               WidgetDiet(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => DietSchedule()));
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DietSchedule()),
+                  );
+                  refreshData();
                 },
                 isWidget: true,
                 userCalories: bmr ?? 2000,
@@ -184,15 +197,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     : 0,
               ),
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    '습관 만들기 ($_selectedDateRange)',
-                    style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -206,7 +210,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: screenSize.height * 0.25,
                   alignment: Alignment.topCenter,
                   child: RoutineListWidget(
-                    key: ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                    key:
+                        ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
                     datetime: DateFormat('yyyy-MM-dd').format(selectedDate),
                   ),
                 ),

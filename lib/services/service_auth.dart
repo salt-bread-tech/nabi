@@ -1,3 +1,4 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 
 import 'package:doctor_nyang/main.dart';
@@ -11,6 +12,7 @@ import '../screen/screen_webtoon.dart';
 import 'globals.dart' as globals;
 import 'globals.dart';
 
+final storage = FlutterSecureStorage();
 
 Map<String, dynamic> userInfo = {};
 Map<String, dynamic> loginInfo = {};
@@ -71,7 +73,6 @@ Future<void> fetchDday() async {
 }
 
 Future<bool> login(String id, String password, BuildContext context) async {
-  //final String baseUrl = GlobalConfiguration().getString('baseUrl');
   final Uri url = Uri.parse('$baseUrl/user/login');
 
   try {
@@ -87,6 +88,12 @@ Future<bool> login(String id, String password, BuildContext context) async {
         case 'SU':
           print('로그인 성공: 토큰 = ${responseData['token']}');
             globals.token = responseData['token'];
+
+            //로그인 성공 시 사용자 정보 저장
+          await storage.write(key: 'token', value: responseData['token']);
+          await storage.write(key: 'id', value: id);
+          await storage.write(key: 'password', value: password);
+
           fetchUserInfo();
           fetchDday();
 print('donetutorial : ${responseData['doneTutorial']}');
@@ -148,6 +155,10 @@ Future<void> logoutUser() async {
 
     if (response.statusCode == 200) {
       print("로그아웃 성공");
+      await storage.delete(key: 'token');
+      await storage.delete(key: 'id');
+      await storage.delete(key: 'password');
+
 
     } else {
       print("로그아웃 실패: ${response.statusCode}");
