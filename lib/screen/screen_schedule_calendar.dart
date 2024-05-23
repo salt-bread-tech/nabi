@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:doctor_nyang/main.dart';
+import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
+import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -143,14 +146,10 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
         context: context,
         builder: (BuildContext buildContext) {
           return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState)
-          {
+              builder: (BuildContext context, StateSetter setModalState) {
             return Padding(
                 padding: EdgeInsets.only(
-                    bottom: MediaQuery
-                        .of(context)
-                        .viewInsets
-                        .bottom),
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
                 child: Container(
                     width: double.infinity,
                     height: 240,
@@ -206,7 +205,8 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                Navigator.of(context).pop(selectedDate);
+                                                Navigator.of(context)
+                                                    .pop(selectedDate);
                                               },
                                               child: Text('확인',
                                                   style: TextStyle(
@@ -221,13 +221,11 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                       selectedDate = newDate;
                                     });
                                   }
-                                });;
+                                });
+                                ;
                               },
                               child: Text(
-                                  '${selectedDate.year}년 ${selectedDate
-                                      .month}월 ${selectedDate
-                                      .day}일 ${selectedDate
-                                      .hour}시 ${selectedDate.minute}분',
+                                  '${selectedDate.year}년 ${selectedDate.month}월 ${selectedDate.day}일 ${selectedDate.hour}시 ${selectedDate.minute}분',
                                   style: TextStyle(color: Colors.black)),
                             ),
                           ],
@@ -255,8 +253,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                             )),
                       ],
                     )));
-          }
-          );
+          });
         });
   }
 
@@ -377,7 +374,8 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                               backgroundColor: Color(0xFFFF5050),
                               foregroundColor: Colors.white,
                               icon: Iconsax.trash,
-                              borderRadius:BorderRadius.all(Radius.circular(20)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
                             ),
                           ],
                         ),

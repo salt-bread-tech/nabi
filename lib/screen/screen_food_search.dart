@@ -96,7 +96,6 @@ class _FoodSearchState extends State<FoodSearch> {
   }
 
   Future<void> addIngestion({
-    required int uid,
     required int times,
     required String foodName,
     required double quantity,
@@ -119,7 +118,6 @@ class _FoodSearchState extends State<FoodSearch> {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode(<String, dynamic>{
-        'uid': uid,
         'times': times,
         'foodName': foodName,
         'servingSize': quantity,
@@ -138,7 +136,6 @@ class _FoodSearchState extends State<FoodSearch> {
     if (response.statusCode == 200) {
       print('식사 기록 성공');
       print(jsonEncode(<String, dynamic>{
-        'uid': uid,
         'times': times,
         'foodName': foodName,
         'quantity': quantity,
@@ -487,7 +484,6 @@ class _FoodSearchState extends State<FoodSearch> {
                         ),
                         onPressed: () {
                           addIngestion(
-                            uid: userId!,
                             times: _meals.indexOf(_selectedMeal),
                             foodName: food.name,
                             quantity:
