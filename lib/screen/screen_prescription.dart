@@ -4,14 +4,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../services/urls.dart';
-import '../widgets/widget_weeklyCalendar2.dart';
-import '../widgets/widget_weekly_calendar.dart';
+import '../widgets/widget_addPrescription.dart';
+
 
 class Prescription {
   final String medicineName;
@@ -55,6 +54,10 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
   void initState() {
     super.initState();
     selectedMonth = DateTime.now();
+    getPrescriptionList();
+  }
+
+  void refreshRoutines() {
     getPrescriptionList();
   }
 
@@ -124,203 +127,18 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
 
   void showPrescriptionAddModal() {
     showModalBottomSheet(
-        scrollControlDisabledMaxHeightRatio: 0.9,
         context: context,
         builder: (BuildContext context) {
-          return Container(
-            width: double.infinity,
-            height: 300 + widgets.length * 80.0,
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      const SizedBox(
-                        width: 130,
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: '처방전 이름',
-                            hintStyle:
-                                TextStyle(color: Colors.grey, fontSize: 16),
-                            border: InputBorder.none,
-                          ),
-                          style: TextStyle(color: Colors.black, fontSize: 16),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          showCupertinoModalPopup(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Container(
-                                  height: 300,
-                                  color: Colors.white,
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        height: 200,
-                                        child: CupertinoDatePicker(
-                                          mode: CupertinoDatePickerMode.date,
-                                          initialDateTime: _selectedDay,
-                                          onDateTimeChanged:
-                                              (DateTime newDateTime) {
-                                            setState(() {
-                                              _selectedDay = newDateTime;
-                                            });
-                                          },
-                                          use24hFormat: true,
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('확인'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              });
-                        },
-                        child: Text(
-                            '${DateFormat('yyyy년 MM월 dd일').format(_selectedDay)}',
-                            style:
-                                TextStyle(color: Colors.black, fontSize: 16)),
-                      ),
-                    ]),
-                Column(
-                  children: <Widget>[
-                    Column(
-                      children: widgets,
-                    ),
-                    Container(
-                        width: double.infinity,
-                        height: 55,
-                        child: TextButton(
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          addWidget();
-                          Navigator.pop(context);
-                          showPrescriptionAddModal();
-                        });
-                      },
-                      child: Text('약 추가', style: TextStyle(color: Colors.black)),
-                    ))
-                  ],
-                ),
-              ],
-            ),
+          return PrescriptionAddModal(
+            initialDate: _selectedDay,
+            onAdd: (List<Widget> addedWidgets) {
+              setState(() {
+                widgets = addedWidgets;
+                getPrescriptionList(); // 처방전 목록 새로고침
+              });
+            },
           );
         });
-  }
-
-  Column addMedicine() {
-    return const Column(children: <Widget>[
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: 200,
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: '약 이름',
-                hintStyle: TextStyle(color: Colors.grey),
-                border: InputBorder.none,
-              ),
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          SizedBox(
-            width: 130,
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: '복용 방법',
-                hintStyle: TextStyle(color: Colors.grey),
-                border: InputBorder.none,
-              ),
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            '총',
-            style: TextStyle(color: Colors.black),
-          ),
-          SizedBox(
-            width: 30,
-            child: TextField(
-              decoration: InputDecoration(
-                hintStyle: TextStyle(color: Colors.grey),
-                hintText: '1',
-                border: InputBorder.none,
-              ),
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          Text(
-            '일',
-            style: TextStyle(color: Colors.black),
-          ),
-          Text(
-            '하루',
-            style: TextStyle(color: Colors.black),
-          ),
-          SizedBox(
-            width: 30,
-            child: TextField(
-              decoration: InputDecoration(
-                hintStyle: TextStyle(color: Colors.grey),
-                hintText: '1',
-                border: InputBorder.none,
-              ),
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          Text(
-            '회',
-            style: TextStyle(color: Colors.black),
-          ),
-          SizedBox(
-            width: 30,
-            child: TextField(
-              decoration: InputDecoration(
-                hintStyle: TextStyle(color: Colors.grey),
-                hintText: '1',
-                border: InputBorder.none,
-              ),
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          Text(
-            '정(포)',
-            style: TextStyle(color: Colors.black),
-          ),
-        ],
-      )
-    ]);
-  }
-
-  void addWidget() {
-    widgets.add(addMedicine());
   }
 
   @override
@@ -331,7 +149,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          '$nickName님의 처방전',
+          '나만의 처방전',
           style: TextStyle(color: Colors.black, fontSize: 17),
           textAlign: TextAlign.center,
         ),
@@ -389,13 +207,14 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                 child: ListView.builder(
                     itemCount: prescriptions.length,
                     itemBuilder: (context, index) {
-                      return GestureDetector(
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: GestureDetector(
                           onTap: () {
                             getPrescription(
                                 prescriptions[index]['prescriptionId']);
                             showModalBottomSheet(
                                 context: context,
-                                scrollControlDisabledMaxHeightRatio: 0.8,
                                 builder: (BuildContext context) {
                                   return Container(
                                     width: double.infinity,
@@ -411,11 +230,11 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             Text(
                                               '${prescriptions[index]['name']}',
@@ -441,22 +260,22 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                                 .keys
                                                 .elementAt(index);
                                             Prescription medicine =
-                                                prescription[medicineName]!;
+                                            prescription[medicineName]!;
                                             return Slidable(
                                               child: Container(
                                                 decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(10),
+                                                  BorderRadius.circular(10),
                                                 ),
                                                 child: Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                                   children: <Widget>[
                                                     Column(
                                                       crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                      CrossAxisAlignment
+                                                          .start,
                                                       children: <Widget>[
                                                         Text(
                                                           '$medicineName',
@@ -522,7 +341,9 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                 ),
                               ],
                             ),
-                          ));
+                          ),
+                        ),
+                      );
                     }))
           ],
         ),
