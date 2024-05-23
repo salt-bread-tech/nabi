@@ -37,24 +37,3 @@ Future<void> registerDailyRoutine({
     throw Exception('루틴 등록 실패');
   }
 }
-
-Future<void> fetchRoutines2(void setState) async {
-  final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-  final url = Uri.parse('$baseUrl/routine/$formattedDate');
-  try {
-    final response = await http.get(url, headers: {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer ${token}',
-    });
-
-    final decodedResponse = utf8.decode(response.bodyBytes);
-
-    if (response.statusCode == 200) {
-
-    } else {
-      throw Exception('루틴 조회 실패: ${response.statusCode}');
-    }
-  } catch (e) {
-    print('루틴 조회 실패: $e');
-  }
-}
