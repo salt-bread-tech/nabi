@@ -60,6 +60,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_screenutil: ^5.9.1
+  flutter_secure_storage: ^5.0.2
 
 dev_dependencies:
   flutter_test:

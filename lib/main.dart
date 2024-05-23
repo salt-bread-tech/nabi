@@ -16,14 +16,20 @@ import 'package:doctor_nyang/screen/screen_user.dart';
 import 'package:doctor_nyang/screen/screen_food_search.dart';
 import 'package:doctor_nyang/screen/screen_webtoon.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
+import 'package:doctor_nyang/services/service_auth.dart';
 import 'package:doctor_nyang/widgets/widget_OCR_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'assets/theme.dart';
+
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting();
   runApp(MyApp());
 }
@@ -55,8 +61,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: [
         const Locale('ko', 'KR'),
       ],
-
-      home: IntroPage(),//Login()
+      home: SplashScreen(),
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
@@ -78,6 +83,51 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  final storage = FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    String? token = await storage.read(key: 'token');
+    String? id = await storage.read(key: 'id');
+    String? password = await storage.read(key: 'password');
+
+    if (token != null && id != null && password != null) {
+      // 자동 로그인 시도
+      bool loginSuccess = await login(id, password, context);
+      if (loginSuccess) {
+        return; // 로그인 성공 시 해당 페이지로 이동하므로 더 이상 진행하지 않음
+      }
+    }
+
+    // 로그인 정보가 없거나 자동 로그인 실패 시 로그인 페이지로 이동
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => IntroPage()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      body: Center(
+        child: SpinKitPumpingHeart(color: AppTheme.pastelPink)
+      )
+    );
+  }
+}
+
 class MyHomePage extends StatefulWidget {
 
   @override
