@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final fontSize = screenSize.width * 0.038; // 화면 너비에 비례하여 폰트 크기 설정
+    final fontSize = screenSize.width * 0.036; // 화면 너비에 비례하여 폰트 크기 설정
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -184,15 +184,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     : 0,
               ),
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    '습관 만들기 ($_selectedDateRange)',
-                    style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
