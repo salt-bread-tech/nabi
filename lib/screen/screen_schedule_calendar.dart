@@ -100,7 +100,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
         },
         body: json.encode({
           'text': content,
-          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(_selectedDay),
+          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate),
         }),
       );
 
@@ -141,101 +141,121 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext buildContext) {
-          return Padding(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: Container(
-                  width: double.infinity,
-                  height: 240,
-                  decoration: BoxDecoration(
-                    color: AppTheme.appbackgroundColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setModalState)
+          {
+            return Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery
+                        .of(context)
+                        .viewInsets
+                        .bottom),
+                child: Container(
+                    width: double.infinity,
+                    height: 240,
+                    decoration: BoxDecoration(
+                      color: AppTheme.appbackgroundColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
                     ),
-                  ),
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      TextField(
-                        controller: _controller,
-                        decoration: InputDecoration(
-                          hintText: '새로운 일정',
-                          labelStyle: TextStyle(color: Colors.black),
-                          border: InputBorder.none,
-                        ),
-                        onChanged: (value) {
-                          content = value;
-                        },
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text('날짜', style: TextStyle(color: Colors.black)),
-                          TextButton(
-                            onPressed: () {
-                              showCupertinoModalPopup(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      height: 300,
-                                      color: Colors.white,
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            height: 200,
-                                            child: CupertinoDatePicker(
-                                              initialDateTime: _selectedDay,
-                                              onDateTimeChanged:
-                                                  (DateTime newDateTime) {
-                                                setState(() {
-                                                  _selectedDay = newDateTime;
-                                                });
-                                              },
-                                              use24hFormat: true,
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('확인'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  });
-                            },
-                            child: Text(
-                                '${_selectedDay.year}년 ${_selectedDay.month}월 ${_selectedDay.day}일 ${_selectedDay.hour}시 ${_selectedDay.minute}분',
-                                style: TextStyle(color: Colors.black)),
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        TextField(
+                          controller: _controller,
+                          decoration: InputDecoration(
+                            hintText: '새로운 일정',
+                            labelStyle: TextStyle(color: Colors.black),
+                            border: InputBorder.none,
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      Container(
-                          width: double.infinity,
-                          height: 55,
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor: Color(0xFFEBEBEB),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                          onChanged: (value) {
+                            content = value;
+                          },
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text('날짜', style: TextStyle(color: Colors.black)),
+                            TextButton(
+                              onPressed: () {
+                                showCupertinoModalPopup(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        height: 300,
+                                        color: Colors.white,
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: 200,
+                                              child: CupertinoDatePicker(
+                                                initialDateTime: selectedDate,
+                                                onDateTimeChanged:
+                                                    (DateTime newDateTime) {
+                                                  setState(() {
+                                                    selectedDate = newDateTime;
+                                                  });
+                                                },
+                                                use24hFormat: true,
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(selectedDate);
+                                              },
+                                              child: Text('확인',
+                                                  style: TextStyle(
+                                                      color: Colors.black)),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }).then((newDate) {
+                                  if (newDate != null) {
+                                    setModalState(() {
+                                      selectedDate = newDate;
+                                    });
+                                  }
+                                });;
+                              },
+                              child: Text(
+                                  '${selectedDate.year}년 ${selectedDate
+                                      .month}월 ${selectedDate
+                                      .day}일 ${selectedDate
+                                      .hour}시 ${selectedDate.minute}분',
+                                  style: TextStyle(color: Colors.black)),
                             ),
-                            onPressed: () {
-                              addSchedule();
-                              getSchedule();
-                              Navigator.of(context).pop();
-                              print('Schedule Added: $selectedDate $content');
-                            },
-                            child: Text('일정 추가',
-                                style: TextStyle(color: Colors.black)),
-                          )),
-                    ],
-                  )));
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Container(
+                            width: double.infinity,
+                            height: 55,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Color(0xFFEBEBEB),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed: () {
+                                addSchedule();
+                                getSchedule();
+                                Navigator.of(context).pop();
+                                _controller.clear();
+                                print('Schedule Added: $selectedDate $content');
+                              },
+                              child: Text('일정 추가',
+                                  style: TextStyle(color: Colors.black)),
+                            )),
+                      ],
+                    )));
+          }
+          );
         });
   }
 
@@ -318,6 +338,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
               setState(() {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
+                selectedDate = _selectedDay;
                 datetime = DateFormat('yyyy-MM-dd').format(_selectedDay);
                 getEventForDay(_selectedDay);
               });
