@@ -61,7 +61,6 @@ class _DosageScheduleState extends State<DosageSchedule> {
       print('네트워크 오류 $e');
       print('Token: $token');
       print('Formatted Date: $formattedDate');
-      print('userId : $userId');
     }
   }
 

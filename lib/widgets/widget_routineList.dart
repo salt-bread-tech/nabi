@@ -195,7 +195,7 @@ class RoutineItem extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          tileColor: Color(0xFFF2F2F2),
+          tileColor: Color(0xFFF6F6F6),
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

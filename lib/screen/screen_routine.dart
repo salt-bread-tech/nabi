@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../services/globals.dart' as globals;
 import '../services/urls.dart';
 import '../widgets/widget_addRoutines.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import '../assets/theme.dart';
 
 class RoutineScreen extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
   DateTime? _selectedDate;
   List<dynamic> _routines = [];
   String _selectedDateRange = '';
-
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -28,10 +29,10 @@ class _RoutineScreenState extends State<RoutineScreen> {
     _selectedDateRange = _formatDateRange(_selectedDate!);
     fetchRoutines();
   }
+
   void refreshRoutines() {
     fetchRoutines();
   }
-
 
   void _presentRoutineAddSheet() {
     showModalBottomSheet(
@@ -41,6 +42,10 @@ class _RoutineScreenState extends State<RoutineScreen> {
   }
 
   Future<void> fetchRoutines() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final url = Uri.parse('$baseUrl/routine');
     try {
       final response = await http.get(
@@ -55,18 +60,28 @@ class _RoutineScreenState extends State<RoutineScreen> {
 
       if (response.statusCode == 200) {
         print('루틴 조회 성공');
+        final responseJson = json.decode(decodedResponse);
         setState(() {
-          _routines = json.decode(decodedResponse);
+          _routines = responseJson.isNotEmpty ? responseJson : [];
+          _isLoading = false;
         });
       } else {
         throw Exception('루틴 조회 실패: ${response.statusCode}');
       }
     } catch (e) {
       print('루틴 조회 실패: $e');
+      setState(() {
+        _routines = [];
+        _isLoading = false;
+      });
     }
   }
 
   Future<void> fetchWeekRoutines(DateTime date) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);
     final url = Uri.parse('$baseUrl/routine/$formattedDate');
     try {
@@ -75,9 +90,11 @@ class _RoutineScreenState extends State<RoutineScreen> {
         'Authorization': 'Bearer ${globals.token}',
       });
       if (response.statusCode == 200) {
+        final responseJson = json.decode(utf8.decode(response.bodyBytes));
         setState(() {
-          _routines = json.decode(utf8.decode(response.bodyBytes));
+          _routines = responseJson.isNotEmpty ? responseJson : [];
           _selectedDateRange = _formatDateRange(date);
+          _isLoading = false;
         });
         print('루틴 불러오기 성공');
         print(formattedDate);
@@ -86,6 +103,10 @@ class _RoutineScreenState extends State<RoutineScreen> {
       }
     } catch (e) {
       print('루틴 불러오기 실패 error: $e, $formattedDate');
+      setState(() {
+        _routines = [];
+        _isLoading = false;
+      });
     }
   }
 
@@ -97,20 +118,22 @@ class _RoutineScreenState extends State<RoutineScreen> {
   }
 
   void _selectDate() async {
-    DateTime? pickedDate = await showDatePicker(
+    showModalBottomSheet(
       context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      builder: (BuildContext context) {
+        return WidgetCalendarMonth(
+          onDateSelected: (selectedDate) {
+            fetchWeekRoutines(selectedDate).then((_) {
+              setState(() {
+                _selectedDate = selectedDate;
+                _selectedDateRange = _formatDateRange(selectedDate);
+              });
+            });
+            Navigator.pop(context);
+          },
+        );
+      },
     );
-    if (pickedDate != null && (_selectedDate == null || pickedDate != _selectedDate)) {
-      fetchWeekRoutines(pickedDate).then((_) {
-        setState(() {
-          _selectedDate = pickedDate;
-          _selectedDateRange = _formatDateRange(pickedDate);
-        });
-      });
-    }
   }
 
   void _handleTap(int index, Map routine) async {
@@ -180,21 +203,23 @@ class _RoutineScreenState extends State<RoutineScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
-  return Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: Text(_selectedDateRange.isEmpty
-            ? '습관 만들기'
-            : '습관 만들기 ($_selectedDateRange)' ,style: TextStyle(fontSize: 15),),
+        title: Text(
+          _selectedDateRange.isEmpty
+              ? '습관 만들기'
+              : '습관 만들기 ($_selectedDateRange)',
+          style: TextStyle(fontSize: 15),
+        ),
         actions: [
           IconButton(icon: Icon(Icons.add), onPressed: _presentRoutineAddSheet),
           IconButton(icon: Icon(Icons.calendar_today), onPressed: _selectDate),
         ],
       ),
-      body: _routines.isEmpty
+      body: _isLoading
           ? Center(child: CircularProgressIndicator())
-
+          : _routines.isEmpty
+          ? Center(child: Text('루틴 없음'))
           : ListView.builder(
         itemCount: _routines.length,
         itemBuilder: (context, index) {
@@ -236,12 +261,12 @@ class RoutineItem extends StatelessWidget {
         motion: const DrawerMotion(),
         children: [
           SlidableAction(
-          flex: 1,
+            flex: 1,
             onPressed: (context) => onDelete(routine['id']),
             backgroundColor: Color(0xFFFF5050),
             foregroundColor: Colors.white,
             icon: Iconsax.trash,
-            borderRadius:BorderRadius.all(Radius.circular(20)),
+            borderRadius: BorderRadius.all(Radius.circular(20)),
           ),
         ],
       ),
@@ -255,7 +280,7 @@ class RoutineItem extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          tileColor: Color(0xFFF2F2F2),
+          tileColor: Color(0xFFF6F6F6),
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -292,6 +317,80 @@ class RoutineItem extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class WidgetCalendarMonth extends StatefulWidget {
+  final Function(DateTime) onDateSelected;
+
+  WidgetCalendarMonth({required this.onDateSelected});
+
+  @override
+  _WidgetCalendarMonthState createState() => _WidgetCalendarMonthState();
+}
+
+class _WidgetCalendarMonthState extends State<WidgetCalendarMonth> {
+  DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
+  String datetime = 'today';
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TableCalendar(
+          locale: 'ko_KR',
+          firstDay: DateTime.utc(2000, 1, 1),
+          lastDay: DateTime.utc(2101, 12, 31),
+          focusedDay: _focusedDay,
+          headerStyle: const HeaderStyle(
+            formatButtonVisible: false,
+            titleCentered: true,
+            rightChevronIcon: Icon(
+              Icons.keyboard_arrow_right,
+              size: 20.0,
+              color: Colors.black,
+            ),
+            leftChevronIcon: Icon(
+              Icons.keyboard_arrow_left,
+              size: 20.0,
+              color: Colors.black,
+            ),
+          ),
+          calendarStyle: const CalendarStyle(
+            selectedDecoration: BoxDecoration(
+              color: AppTheme.pastelBlue,
+              shape: BoxShape.circle,
+            ),
+            todayDecoration: BoxDecoration(
+              color: AppTheme.pastelYellow,
+              shape: BoxShape.circle,
+            ),
+            selectedTextStyle: TextStyle(color: Colors.white),
+            todayTextStyle: TextStyle(color: Colors.black),
+            canMarkersOverflow: false,
+            markersAutoAligned: true,
+            markerSize: 5.0,
+            markersMaxCount: 4,
+            markerDecoration: BoxDecoration(
+              color: AppTheme.pastelPink,
+              shape: BoxShape.circle,
+            ),
+          ),
+          selectedDayPredicate: (day) {
+            return isSameDay(_selectedDay, day);
+          },
+          onDaySelected: (selectedDay, focusedDay) {
+            setState(() {
+              _selectedDay = selectedDay;
+              _focusedDay = focusedDay;
+            });
+            widget.onDateSelected(selectedDay);
+          },
+          calendarFormat: CalendarFormat.month,
+        ),
+      ],
     );
   }
 }
