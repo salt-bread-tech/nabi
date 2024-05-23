@@ -1,4 +1,5 @@
 import 'package:doctor_nyang/assets/theme.dart';
+import 'package:doctor_nyang/screen/screen_prescription_info.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -211,105 +212,12 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: GestureDetector(
                           onTap: () {
-                            getPrescription(
-                                prescriptions[index]['prescriptionId']);
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    width: double.infinity,
-                                    height: 300 + prescriptions.length * 50.0,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 30, vertical: 30),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Text(
-                                              '${prescriptions[index]['name']}',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 20,
-                                              ),
-                                            ),
-                                            Text(
-                                              '${prescriptions[index]['date']}',
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 20),
-                                        Column(
-                                          children: List<Widget>.generate(
-                                              prescription.length, (index) {
-                                            String medicineName = prescription
-                                                .keys
-                                                .elementAt(index);
-                                            Prescription medicine =
-                                            prescription[medicineName]!;
-                                            return Slidable(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                  BorderRadius.circular(10),
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                                  children: <Widget>[
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
-                                                      children: <Widget>[
-                                                        Text(
-                                                          '$medicineName',
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          '${medicine.totalDosage}일 ${medicine.dailyDosage}회 ${medicine.onceDosage}정(포) 복용',
-                                                          style: TextStyle(
-                                                            color: Colors.grey,
-                                                            fontSize: 14,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      '${medicine.medicineDosage}',
-                                                      style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          }),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PrescriptionInfoScreen(id: prescriptions[index]['prescriptionId']),
+                              ),
+                            );
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
