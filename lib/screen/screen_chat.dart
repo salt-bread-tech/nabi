@@ -21,7 +21,6 @@ class _ChatScreenState extends State<ChatScreen> {
   List<types.Message> _messages = [];
   final _user = const types.User(id: '1');
   late int page = 0;
-  int feedresult = 0;
   bool _isPressed = false;
   bool _isLoading = false;
 
@@ -70,19 +69,49 @@ class _ChatScreenState extends State<ChatScreen> {
     if (response.statusCode == 200) {
       final int feedData = json.decode(utf8.decode(response.bodyBytes));
       if (feedData == 200) {
-        setState(() {
-          feedresult = 200;
-        });
         print('Feed success');
+        showCupertinoDialog(
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: Text('고맙다냥!'),
+              content: Text('나비에게 먹이를 주었습니다.'),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        showPhoto();
       } else if (feedData == 300) {
-        setState(() {
-          feedresult = 300;
-        });
         print('Already fed');
+        showCupertinoDialog(
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: Text('이미 먹었다냥!'),
+              content: Text('이미 먹이를 주었습니다.'),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
       }
     } else {
       print('Failed to load feed from server');
     }
+
   }
 
   Future<void> getChats() async {
@@ -194,25 +223,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void showFedResult() {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: feedresult == 200 ? Text('고맙다냥!') : Text('이미 먹었다냥!'),
-          content: feedresult == 200
-              ? Text('나비에게 먹이를 주었습니다.')
-              : Text('이미 먹이를 주었습니다.'),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('확인'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
+
   }
 
   @override
@@ -288,7 +299,6 @@ class _ChatScreenState extends State<ChatScreen> {
                             size: 30, color: AppTheme.pastelBlue),
                         onPressed: () {
                           feed();
-                          feedresult == 200 ? showPhoto() : showFedResult();
                         },
                       ),
                     ],
