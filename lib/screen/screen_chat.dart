@@ -251,6 +251,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 messages: _messages,
                 onSendPressed: _handleSendPressed,
                 user: _user,
+                l10n: ChatL10nEn(
+                  inputPlaceholder: '나비와 대화하기',
+                ),
                 // scrollController: _scrollController,
               ) : Container(),
               Positioned(
