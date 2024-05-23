@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 
 import '../services/urls.dart';
 import '../services/globals.dart' as globals;
@@ -19,9 +20,14 @@ class RoutineListWidget extends StatefulWidget {
 class _RoutineListWidgetState extends State<RoutineListWidget> {
   List<dynamic> _routines = [];
 
+  late DateTime selectedDate;
+  String _selectedDateRange = '';
+
   @override
   void initState() {
     super.initState();
+    selectedDate = DateTime.parse(widget.datetime);
+    _selectedDateRange = _formatDateRange(selectedDate);
     _fetchRoutines();
   }
 
@@ -115,22 +121,45 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
     final itemHeight = screenSize.height * 0.1; // 화면 높이에 비례하여 항목 높이 설정
     final listHeight = _routines.length * itemHeight;
 
+    final fontSize = screenSize.width * 0.036; // 화면 너비에 비례하여 폰트 크기 설정
     return Container(
       height: listHeight,
-      child: ListView.builder(
-        physics: NeverScrollableScrollPhysics(), // 스크롤 방지
-        itemCount: _routines.length,
-        itemBuilder: (context, index) {
-          final routine = _routines[index];
-          return RoutineItem(
-            routine: routine,
-            onDelete: (id) => _deleteRoutine(id),
-            onCountChange: (circleIndex) => _handleTap(circleIndex, routine),
-          );
-        },
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                '습관 만들기 ($_selectedDateRange)',
+                style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+          Expanded(
+            child: ListView.builder(
+              physics: NeverScrollableScrollPhysics(), // 스크롤 방지
+              itemCount: _routines.length,
+              itemBuilder: (context, index) {
+                final routine = _routines[index];
+                return RoutineItem(
+                  routine: routine,
+                  onDelete: (id) => _deleteRoutine(id),
+                  onCountChange: (circleIndex) => _handleTap(circleIndex, routine),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+String _formatDateRange(DateTime date) {
+  int weekday = date.weekday;
+  DateTime startOfWeek = date.subtract(Duration(days: weekday - 1));
+  DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+  return '${DateFormat('M.dd').format(startOfWeek)}~${DateFormat('M.dd').format(endOfWeek)}';
 }
 
 class RoutineItem extends StatelessWidget {

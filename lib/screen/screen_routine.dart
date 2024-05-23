@@ -20,6 +20,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
   List<dynamic> _routines = [];
   String _selectedDateRange = '';
 
+
   @override
   void initState() {
     super.initState();
@@ -179,7 +180,9 @@ class _RoutineScreenState extends State<RoutineScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+
+  return Scaffold(
       appBar: AppBar(
         title: Text(_selectedDateRange.isEmpty
             ? '습관 만들기'
@@ -191,6 +194,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
       ),
       body: _routines.isEmpty
           ? Center(child: CircularProgressIndicator())
+
           : ListView.builder(
         itemCount: _routines.length,
         itemBuilder: (context, index) {
