@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
@@ -367,15 +368,16 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                           motion: const DrawerMotion(),
                           children: [
                             SlidableAction(
+                              flex: 1,
                               onPressed: (context) => {
                                 deleteSchedule(int.parse(
                                     getEventForDay(_selectedDay)[index]
                                         .split(' ')[0])),
                               },
-                              backgroundColor: Colors.red,
+                              backgroundColor: Color(0xFFFF5050),
                               foregroundColor: Colors.white,
-                              icon: Icons.delete,
-                              label: '삭제',
+                              icon: Iconsax.trash,
+                              borderRadius:BorderRadius.all(Radius.circular(20)),
                             ),
                           ],
                         ),
