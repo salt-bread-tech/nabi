@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(backgroundColor: Colors.white, scrolledUnderElevation: 0),
         cardColor: Colors.white,
         cupertinoOverrideTheme: CupertinoThemeData(barBackgroundColor: Colors.white),
+        bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white, elevation: 0),
         dialogBackgroundColor: Colors.white,
         brightness: Brightness.light,
         visualDensity: VisualDensity.adaptivePlatformDensity,

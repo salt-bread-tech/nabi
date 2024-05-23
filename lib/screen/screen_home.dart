@@ -13,6 +13,7 @@ import '../services/globals.dart';
 import '../services/globals.dart' as globals;
 import '../services/service_auth.dart';
 import '../services/urls.dart';
+import '../widgets/widget_calendar.dart';
 import '../widgets/widget_diet.dart';
 import '../widgets/widget_routineList.dart';
 import '../widgets/widget_weekly_calendar.dart';
