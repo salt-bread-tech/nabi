@@ -110,6 +110,11 @@ class _UserScreenState extends State<UserScreen> {
                   onTap: () {
                     OCRModal.show(context);
                   },
+                ),ListTile(
+                  title: Text('처방전 화면'),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/Prescription');
+                  },
                 ),
                 ListTile(
                   title: Text('루틴 화면'),
