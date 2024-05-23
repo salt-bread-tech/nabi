@@ -52,7 +52,7 @@ class _WidgetDietState extends State<WidgetDiet> {
     String totalFatToStr = widget.totalFat.toStringAsFixed(0);
 
     if (remainCalories < 0) {
-      remainColor = Colors.red;
+      remainColor = Color(0xFFFF5050);
     }
 
     List<PieChartSectionData> sections = [

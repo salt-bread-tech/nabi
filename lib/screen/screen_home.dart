@@ -38,6 +38,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void refreshData() {
+    setState(() {
+      selectedDate = selectedDate;
+      fetchIngestion();
+      _fetchRoutines();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -143,11 +151,12 @@ class _HomeScreenState extends State<HomeScreen> {
               WidgetCalendar(onDateSelected: _handleDateChange),
               SizedBox(height: 10),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ScheduleCalendar()));
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ScheduleCalendar()),
+                  );
+                  refreshData();
                 },
                 child: WidgetSchedule(
                   datetime: selectedDate.toString(),
@@ -156,9 +165,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 20),
               WidgetDiet(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => DietSchedule()));
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DietSchedule()),
+                  );
+                  refreshData();
                 },
                 isWidget: true,
                 userCalories: bmr ?? 2000,
@@ -198,7 +210,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: screenSize.height * 0.25,
                   alignment: Alignment.topCenter,
                   child: RoutineListWidget(
-                    key: ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
+                    key:
+                        ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
                     datetime: DateFormat('yyyy-MM-dd').format(selectedDate),
                   ),
                 ),
