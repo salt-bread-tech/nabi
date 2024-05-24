@@ -103,7 +103,6 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
   @override
   void initState() {
     super.initState();
-
     _selectedMeal = _meals[0];
     _selectedGram = _grams[0];
     setState(() {
