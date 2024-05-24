@@ -193,7 +193,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   SizedBox(
-                    width: 130,
+                    width: 180,
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: '처방전 이름',
@@ -229,7 +229,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.of(context).pop();
+                                      Navigator.pop(context);
                                     },
                                     child: Text('확인'),
                                   ),
