@@ -32,6 +32,7 @@ class _PrescriptionEditModalState extends State<PrescriptionEditModal> {
       await editPrescription(
         id: widget.id,
         name: _prescriptionNameController.text,
+        date: DateFormat('yyyy-MM-dd').format(_selectedDay),
       );
       Navigator.of(context).pop();
     } catch (e) {
@@ -41,7 +42,7 @@ class _PrescriptionEditModalState extends State<PrescriptionEditModal> {
     }
   }
 
-  Future<void> editPrescription({required int id, required String name}) async {
+  Future<void> editPrescription({required int id, required String name, required String date}) async {
     final String url = '$baseUrl/prescription';
 
     try {
@@ -52,7 +53,7 @@ class _PrescriptionEditModalState extends State<PrescriptionEditModal> {
           'Authorization': 'Bearer $token',
         },
         body: json.encode(
-          {'prescriptionId': id, 'name': name},
+          {'prescriptionId': id, 'name': name, 'date': date},
         ),
       );
 
@@ -110,8 +111,44 @@ class _PrescriptionEditModalState extends State<PrescriptionEditModal> {
 
                     ),
                   ),
-                  Text('${DateFormat('yyyy년 MM월 dd일').format(_selectedDay)}',
-                      style: TextStyle(color: Colors.black, fontSize: 16)),
+                  TextButton(
+                    onPressed: () {
+                      showCupertinoModalPopup(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Container(
+                              height: 300,
+                              color: Colors.white,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 200,
+                                    child: CupertinoDatePicker(
+                                      mode: CupertinoDatePickerMode.date,
+                                      initialDateTime: _selectedDay,
+                                      onDateTimeChanged: (DateTime newDateTime) {
+                                        setState(() {
+                                          _selectedDay = newDateTime;
+                                        });
+                                      },
+                                      use24hFormat: true,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text('확인', style: TextStyle(color: Colors.black)),
+                                  ),
+                                ],
+                              ),
+                            );
+                          });
+                    },
+                    child: Text(
+                        '${DateFormat('yyyy년 MM월 dd일').format(_selectedDay)}',
+                        style: TextStyle(color: Colors.black, fontSize: 16)),
+                  ),
                 ]),
             Column(
               children: <Widget>[
@@ -128,7 +165,10 @@ class _PrescriptionEditModalState extends State<PrescriptionEditModal> {
                       ),
                     ),
                     onPressed: _editPrescription,
-                    child: Text('완료', style: TextStyle(color: Colors.black)),
+                    child: Text(
+                      '확인',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
                 ),
               ],

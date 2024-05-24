@@ -231,7 +231,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Text('확인'),
+                                    child: Text('확인' , style: TextStyle(color: Colors.black)),
                                   ),
                                 ],
                               ),
