@@ -98,7 +98,8 @@ class _FoodSearchState extends State<FoodSearch> {
   Future<void> addIngestion({
     required int times,
     required String foodName,
-    required double quantity,
+    required double servingSize,
+    required double totalIngestionSize,
     required double calories,
     required double carbohydrate,
     required double protein,
@@ -120,7 +121,8 @@ class _FoodSearchState extends State<FoodSearch> {
       body: jsonEncode(<String, dynamic>{
         'times': times,
         'foodName': foodName,
-        'servingSize': quantity,
+        'servingSize': servingSize,
+        'totalIngestionSize': totalIngestionSize,
         'calories': calories,
         'carbohydrate': carbohydrate,
         'protein': protein,
@@ -138,7 +140,8 @@ class _FoodSearchState extends State<FoodSearch> {
       print(jsonEncode(<String, dynamic>{
         'times': times,
         'foodName': foodName,
-        'quantity': quantity,
+        'servingSize': servingSize,
+        'totalIngestionSize': totalIngestionSize,
         'calories': calories,
         'carbohydrate': carbohydrate,
         'protein': protein,
@@ -486,7 +489,8 @@ class _FoodSearchState extends State<FoodSearch> {
                           addIngestion(
                             times: _meals.indexOf(_selectedMeal),
                             foodName: food.name,
-                            quantity:
+                            servingSize: food.servingSize,
+                            totalIngestionSize:
                             _selectedGram == '인분'
                                 ? food.servingSize * _selectedQuantity
                                 : _selectedQuantity,

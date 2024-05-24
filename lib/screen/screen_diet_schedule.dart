@@ -82,6 +82,8 @@ class _DietScheduleState extends State<DietSchedule> {
 
         dietSchedule.sort((a, b) =>
             times.indexOf(a['times']).compareTo(times.indexOf(b['times'])));
+
+        print(dietSchedule);
       } else {
         print('일정 조회 실패');
       }
@@ -118,27 +120,36 @@ class _DietScheduleState extends State<DietSchedule> {
     }
   }
 
-  Future<void> updateIngestion(
-      {required ingestionId,
-      required servingSize,
-      required calories,
-      required carbohydrate,
-      required protein,
-      required fat,
-      required sugars,
-      required salt,
-      required cholesterol,
-      required saturatedFattyAcid,
-      required transFattyAcid}) async {
-    final String url = '$baseUrl/ingestion/update';
+  Future<void> updateIngestion({
+    required int ingestionId,
+    required String date,
+    required int times,
+    required double servingSize,
+    required double totalIngestionSize,
+    required double calories,
+    required double carbohydrate,
+    required double protein,
+    required double fat,
+    required double sugars,
+    required double salt,
+    required double cholesterol,
+    required double saturatedFattyAcid,
+    required double transFattyAcid,
+  }) async {
+    final String url = '$baseUrl/ingestion';
 
     try {
-      final response = await http.post(Uri.parse(url), headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      }, body: json.encode({
+      final response = await http.put(Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: json.encode({
             'ingestionId': ingestionId,
+            'date': date,
+            'times': times,
             'servingSize': servingSize,
+            'totalIngestionSize': totalIngestionSize,
             'calories': calories,
             'carbohydrate': carbohydrate,
             'protein': protein,
@@ -213,6 +224,7 @@ class _DietScheduleState extends State<DietSchedule> {
           ? _selectedQuantity.toString()
           : _selectedQuantity.toStringAsFixed(0);
     });
+    print(_selectedQuantity);
   }
 
   void _decrementQuantity() {
@@ -224,9 +236,11 @@ class _DietScheduleState extends State<DietSchedule> {
             : _selectedQuantity.toStringAsFixed(0);
       });
     }
+    print(_selectedQuantity);
   }
 
-  void showCustomModalBottomSheet(BuildContext context, int id, Food food) {
+  void showCustomModalBottomSheet(BuildContext context, int id, Food food,
+      {required totalIngestionSize}) {
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -251,7 +265,9 @@ class _DietScheduleState extends State<DietSchedule> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          food.name.length > 12 ? '${food.name.substring(0, 12)}···' : food.name,
+                          food.name.length > 12
+                              ? '${food.name.substring(0, 12)}···'
+                              : food.name,
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -259,7 +275,7 @@ class _DietScheduleState extends State<DietSchedule> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${food.servingSize.toStringAsFixed(0)}g',
+                          '${totalIngestionSize.toStringAsFixed(0)}g',
                           style: const TextStyle(fontSize: 12),
                         ),
                         Expanded(
@@ -298,8 +314,9 @@ class _DietScheduleState extends State<DietSchedule> {
                                     });
                                   },
                                   items: _meals
-                                      .map((e) => DropdownMenuItem(
-                                      child: Text(e), value: e))
+                                      .map((e) =>
+                                      DropdownMenuItem(
+                                          child: Text(e), value: e))
                                       .toList(),
                                   borderRadius: BorderRadius.circular(8),
                                 ))),
@@ -367,15 +384,18 @@ class _DietScheduleState extends State<DietSchedule> {
                                         _controller.text =
                                             _selectedQuantity.toString();
                                       } else {
+                                        print(food.servingSize);
                                         _selectedQuantity = food.servingSize;
                                         _controller.text =
-                                            _selectedQuantity.toStringAsFixed(0);
+                                            _selectedQuantity.toStringAsFixed(
+                                                0);
                                       }
                                     });
                                   },
                                   items: _grams
-                                      .map((e) => DropdownMenuItem(
-                                      child: Text(e), value: e))
+                                      .map((e) =>
+                                      DropdownMenuItem(
+                                          child: Text(e), value: e))
                                       .toList(),
                                   borderRadius: BorderRadius.circular(8),
                                 ))),
@@ -455,7 +475,8 @@ class _DietScheduleState extends State<DietSchedule> {
                           child: Text(
                               food.saturatedFattyAcid == 9999999
                                   ? '정보없음'
-                                  : '${food.saturatedFattyAcid.toStringAsFixed(0)}g',
+                                  : '${food.saturatedFattyAcid.toStringAsFixed(
+                                  0)}g',
                               style: TextStyle(
                                   fontSize: 16,
                                   color: AppTheme.subTitleTextColor),
@@ -478,7 +499,8 @@ class _DietScheduleState extends State<DietSchedule> {
                           child: Text(
                               food.transFattyAcid == 9999999
                                   ? '정보없음'
-                                  : '${food.transFattyAcid.toStringAsFixed(0)}g',
+                                  : '${food.transFattyAcid.toStringAsFixed(
+                                  0)}g',
                               style: TextStyle(
                                   fontSize: 16,
                                   color: AppTheme.subTitleTextColor),
@@ -509,20 +531,94 @@ class _DietScheduleState extends State<DietSchedule> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () {
-                          updateIngestion(
-                            ingestionId: id.toString(),
-                            servingSize: (food.servingSize * _selectedQuantity).toString(),
-                            calories:food.calories == 9999999 ? "9999999" : (food.calories * _selectedQuantity).toString(),
-                            carbohydrate: food.carbohydrate == 9999999 ? "9999999" : (food.carbohydrate * _selectedQuantity).toString(),
-                            protein: food.protein == 9999999 ? "9999999" : (food.protein * _selectedQuantity).toString(),
-                            fat: food.fat == 9999999 ? "9999999" : (food.fat * _selectedQuantity).toString(),
-                            sugars: food.sugars == 9999999 ? "9999999" : (food.sugars * _selectedQuantity).toString(),
-                            salt: food.salt == 9999999 ? "9999999" : (food.salt * _selectedQuantity).toString(),
-                            cholesterol: food.cholesterol == 9999999 ? "9999999" : (food.cholesterol * _selectedQuantity).toString(),
-                            saturatedFattyAcid: food.saturatedFattyAcid == 9999999 ? "9999999" : (food.saturatedFattyAcid * _selectedQuantity).toString(),
-                            transFattyAcid: food.transFattyAcid == 9999999 ? "9999999" : (food.transFattyAcid * _selectedQuantity).toString(),
+                        onPressed: () async {
+                          double calculate = _selectedGram == '인분'
+                              ? _selectedQuantity * food.servingSize / totalIngestionSize
+                              : _selectedQuantity / totalIngestionSize;
+                          await updateIngestion(
+                            ingestionId: id,
+                            date: DateFormat('yyyy-MM-dd')
+                                .format(selectedDate)
+                                .toString(),
+                            times: _selectedMeal == '아침'
+                                ? 0
+                                : _selectedMeal == '점심'
+                                ? 1
+                                : _selectedMeal == '저녁'
+                                ? 2
+                                : 3,
+                            servingSize: food.servingSize,
+                            totalIngestionSize: _selectedGram == '인분'
+                                ? food.servingSize * _selectedQuantity
+                                : _selectedQuantity,
+                            calories: food.calories >= 9999999
+                                ? 9999999
+                                : food.calories * calculate,
+                            carbohydrate: food.carbohydrate >= 9999999
+                                ? 9999999
+                                : food.carbohydrate * calculate,
+                            protein: food.protein >= 9999999
+                                ? 9999999
+                                : food.protein * calculate,
+                            fat: food.fat >= 9999999
+                                ? 9999999
+                                : food.fat * calculate,
+                            sugars: food.sugars >= 9999999
+                                ? 9999999
+                                : food.sugars * calculate,
+                            salt: food.salt >= 9999999
+                                ? 9999999
+                                : food.salt * calculate,
+                            cholesterol: food.cholesterol >= 9999999
+                                ? 9999999
+                                : food.cholesterol * calculate,
+                            saturatedFattyAcid: food.saturatedFattyAcid >= 9999999
+                                ? 9999999
+                                : food.saturatedFattyAcid * calculate,
+                            transFattyAcid: food.transFattyAcid >= 9999999
+                                ? 9999999
+                                : food.transFattyAcid * calculate,
                           );
+                          print(
+                              'ingedtionId: $id, date: $selectedDate, times: ${_selectedMeal ==
+                                  '아침' ? 0 : _selectedMeal == '점심'
+                                  ? 1
+                                  : _selectedMeal == '저녁'
+                                  ? 2
+                                  : 3}, servingSize: ${food
+                                  .servingSize}, totalIngestionSize: ${_selectedGram == '인분' ? food.servingSize * _selectedQuantity : _selectedQuantity}, calories: ${_selectedGram ==
+                                  '인분'
+                                  ? food.calories * _selectedQuantity
+                                  : food.calories * _selectedQuantity / food
+                                  .servingSize}, carbohydrate: ${_selectedGram ==
+                                  '인분'
+                                  ? food.carbohydrate * _selectedQuantity
+                                  : food.carbohydrate * _selectedQuantity /
+                                  food.servingSize}, protein: ${_selectedGram ==
+                                  '인분' ? food.protein * _selectedQuantity : food
+                                  .protein * _selectedQuantity /
+                                  food.servingSize}, fat: ${_selectedGram ==
+                                  '인분' ? food.fat * _selectedQuantity : food
+                                  .fat * _selectedQuantity /
+                                  food.servingSize}, sugars: ${_selectedGram ==
+                                  '인분' ? food.sugars * _selectedQuantity : food
+                                  .sugars * _selectedQuantity /
+                                  food.servingSize}, salt: ${_selectedGram ==
+                                  '인분' ? food.salt * _selectedQuantity : food
+                                  .salt * _selectedQuantity / food
+                                  .servingSize}, cholesterol: ${_selectedGram ==
+                                  '인분'
+                                  ? food.cholesterol * _selectedQuantity
+                                  : food.cholesterol * _selectedQuantity / food
+                                  .servingSize}, saturatedFattyAcid: ${_selectedGram ==
+                                  '인분' ? food.saturatedFattyAcid *
+                                  _selectedQuantity : food.saturatedFattyAcid *
+                                  _selectedQuantity / food
+                                  .servingSize}, transFattyAcid: ${_selectedGram ==
+                                  '인분'
+                                  ? food.transFattyAcid * _selectedQuantity
+                                  : food.transFattyAcid * _selectedQuantity /
+                                  food.servingSize}');
                           Navigator.pop(context);
                         },
                         child: Text(
@@ -611,38 +707,46 @@ class _DietScheduleState extends State<DietSchedule> {
                           children: [
                             SlidableAction(
                               flex: 1,
-                              onPressed: (context) => {
-                                showCustomModalBottomSheet(context, diet['dietId'], Food(
-                                  name: diet['name'],
-                                  servingSize: diet['servingSize'],
-                                  calories: diet['calories'],
-                                  carbohydrate: diet['carbohydrate'],
-                                  protein: diet['protein'],
-                                  fat: diet['fat'],
-                                  sugars: diet['sugars'],
-                                  salt: diet['salt'],
-                                  cholesterol: diet['cholesterol'],
-                                  saturatedFattyAcid: diet['saturatedFattyAcid'],
-                                  transFattyAcid: diet['transFattyAcid'],
-                                )),
+                              onPressed: (context) =>
+                              {
+                                showCustomModalBottomSheet(
+                                  context,
+                                  diet['ingestionId'],
+                                  totalIngestionSize:
+                                  diet['totalIngestionSize'],
+                                  Food(
+                                      name: diet['name'],
+                                      servingSize: diet['servingSize'],
+                                      calories: diet['calories'],
+                                      carbohydrate: diet['carbohydrate'],
+                                      protein: diet['protein'],
+                                      fat: diet['fat'],
+                                      sugars: diet['sugars'],
+                                      salt: diet['salt'],
+                                      cholesterol: diet['cholesterol'],
+                                      saturatedFattyAcid:
+                                      diet['saturatedFattyAcid'],
+                                      transFattyAcid: diet['transFattyAcid']),
+                                ),
                               },
                               backgroundColor: Colors.black12,
                               foregroundColor: Colors.white,
                               icon: Iconsax.edit,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
+                              BorderRadius.all(Radius.circular(20)),
                             ),
                             SlidableAction(
                               flex: 1,
-                              onPressed: (context) => {
-                                deleteIngestion(diet['dietId']),
+                              onPressed: (context) =>
+                              {
+                                deleteIngestion(diet['ingestionId']),
                                 selectedDate = selectedDate
                               },
                               backgroundColor: Color(0xFFFF5050),
                               foregroundColor: Colors.white,
                               icon: Iconsax.trash,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
+                              BorderRadius.all(Radius.circular(20)),
                             ),
                           ],
                         ),
@@ -664,12 +768,21 @@ class _DietScheduleState extends State<DietSchedule> {
                                         fontWeight: FontWeight.bold)),
                                 SizedBox(width: 5),
                                 Text(
-                                    '${diet['servingSize'].toStringAsFixed(0)}g',
+                                    '${diet['totalIngestionSize'].toStringAsFixed(
+                                        0)}g',
                                     style: TextStyle(fontSize: 10)),
                               ],
                             ),
                             subtitle: Text(
-                                '탄수화물 ${diet['carbohydrate'] >= 9999999.0 ? "-g" : "${diet['carbohydrate'].toStringAsFixed(0)}g"} 단백질 ${diet['protein'] >= 9999999.0 ? "-g" : "${diet['protein'].toStringAsFixed(0)}g"} 지방 ${diet['fat'] >= 9999999.0 ? "-g" : "${diet['fat'].toStringAsFixed(0)}g"}',
+                                '탄수화물 ${diet['carbohydrate'] >= 9999999.0
+                                    ? "-g"
+                                    : "${diet['carbohydrate'].toStringAsFixed(
+                                    0)}g"} 단백질 ${diet['protein'] >= 9999999.0
+                                    ? "-g"
+                                    : "${diet['protein'].toStringAsFixed(
+                                    0)}g"} 지방 ${diet['fat'] >= 9999999.0
+                                    ? "-g"
+                                    : "${diet['fat'].toStringAsFixed(0)}g"}',
                                 style: TextStyle(fontSize: 11)),
                             trailing: Text(
                                 '${diet['calories'].toStringAsFixed(0)}kcal',
