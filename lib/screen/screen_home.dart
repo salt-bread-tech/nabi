@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
+import 'package:doctor_nyang/screen/screen_prescription.dart';
 import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
@@ -18,6 +20,7 @@ import '../widgets/widget_diet.dart';
 import '../widgets/widget_routineList.dart';
 import '../widgets/widget_weekly_calendar.dart';
 import '../widgets/widget_weekly_routine.dart';
+import '../widgets/widget_prescription.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -198,13 +201,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 20),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
+                onTap: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => RoutineScreen(),
                     ),
                   );
+                  refreshData();
                 },
                 child: Container(
                   height: screenSize.height * 0.25,
@@ -216,6 +220,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              SizedBox(height: 20),
+              GestureDetector(
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PrescriptionScreen(),
+                      ),
+                    );
+                    refreshData();
+                  },
+                  child: WidgetPrescription(datetime: selectedDate.toString())),
             ],
           ),
         ),

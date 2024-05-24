@@ -56,6 +56,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
         date: DateFormat('yyyy-MM-dd').format(_selectedDay),
       );
       widget.onAdd(widgets);
+      Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("처방전 등록 실패: $e")),
@@ -228,7 +229,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.of(context).pop();
+                                      Navigator.pop(context);
                                     },
                                     child: Text('확인'),
                                   ),

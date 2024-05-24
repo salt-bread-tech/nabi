@@ -189,7 +189,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: prescription['medicineTakings'] == null ||
                   prescription['medicineTakings'].isEmpty
-              ? Center(child: Text('처방전이 없습니다. 처방전을 추가해주세요.'))
+              ? Center(child: Text('처방전 내용이 없습니다.${'\n'}+ 버튼을 눌러 추가해주세요.', textAlign: TextAlign.center))
               : ListView(
                   children: [
                     Container(
