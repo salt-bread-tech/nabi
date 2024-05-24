@@ -5,13 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../services/urls.dart';
 import '../widgets/widget_addPrescription.dart';
-
+import '../widgets/widget_editPrescription.dart';
 
 class Prescription {
   final String medicineName;
@@ -126,6 +127,29 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
     }
   }
 
+  Future<void> deletePrescription(int id) async {
+    final String url = '$baseUrl/prescription/$id';
+
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('처방전 삭제 성공');
+        getPrescriptionList();
+      } else {
+        print('처방전 삭제 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
+  }
+
   void showPrescriptionAddModal() {
     showModalBottomSheet(
         context: context,
@@ -135,11 +159,32 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
             onAdd: (List<Widget> addedWidgets) {
               setState(() {
                 widgets = addedWidgets;
-                getPrescriptionList(); // 처방전 목록 새로고침
+                getPrescriptionList();
               });
             },
           );
         });
+  }
+
+  void showPrescriptionEditModal(DateTime initialDate, int id, String name) {
+    getPrescription(id);
+    String name = prescriptions
+        .firstWhere((element) => element['prescriptionId'] == id)['name'];
+    print(name);
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return PrescriptionEditModal(
+            initialDate: initialDate,
+            id: id,
+            name: name,
+            onAdd: (List<Widget> addedWidgets) {
+              setState(() {
+                widgets = addedWidgets;
+              });
+            },
+          );
+        }).then((_) => getPrescriptionList());
   }
 
   @override
@@ -215,39 +260,75 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => PrescriptionInfoScreen(id: prescriptions[index]['prescriptionId']),
+                                builder: (context) => PrescriptionInfoScreen(
+                                    id: prescriptions[index]['prescriptionId']),
                               ),
                             );
                           },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: AppTheme.pastelYellow,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              children: <Widget>[
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      '${prescriptions[index]['name']}',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${prescriptions[index]['date']}',
-                                      style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
+                          child: Slidable(
+                            endActionPane: ActionPane(
+                              motion: const DrawerMotion(),
+                              children: [
+                                SlidableAction(
+                                  flex: 1,
+                                  onPressed: (context) => {
+                                    showPrescriptionEditModal(
+                                        DateTime.parse(
+                                            prescriptions[index]['date']),
+                                        prescriptions[index]['prescriptionId'],
+                                        prescriptions[index]['name'])
+                                  },
+                                  backgroundColor: Colors.black12,
+                                  foregroundColor: Colors.white,
+                                  icon: Iconsax.edit,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30)),
+                                ),
+                                SlidableAction(
+                                  flex: 1,
+                                  onPressed: (context) => {
+                                    deletePrescription(
+                                        prescriptions[index]['prescriptionId'])
+                                  },
+                                  backgroundColor: Color(0xFFFF5050),
+                                  foregroundColor: Colors.white,
+                                  icon: Iconsax.trash,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30)),
                                 ),
                               ],
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.pastelYellow,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                children: <Widget>[
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        '${prescriptions[index]['name']}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${prescriptions[index]['date']}',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

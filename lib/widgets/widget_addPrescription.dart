@@ -56,7 +56,6 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
         date: DateFormat('yyyy-MM-dd').format(_selectedDay),
       );
       widget.onAdd(widgets);
-      Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("처방전 등록 실패: $e")),
@@ -193,7 +192,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   SizedBox(
-                    width: 130,
+                    width: 180,
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: '처방전 이름',
