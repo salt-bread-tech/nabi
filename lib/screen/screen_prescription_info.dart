@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:doctor_nyang/assets/theme.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/cupertino.dart';
@@ -165,6 +167,80 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
     }
   }
 
+  Future<void> addMedicine(
+      {required int medicineId,
+      required String medicineName,
+      required int once,
+      required int days,
+      required List<int> time,
+      required int dosage}) async {
+    final String url = '$baseUrl/medicine';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'medicineId': medicineId,
+          'medicineName': medicineName,
+          'once': once,
+          'days': days,
+          'time': time,
+          'dosage': dosage,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('처방전 추가 성공');
+        getPrescription(widget.id);
+      } else {
+        print('처방전 추가 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
+  }
+
+  Future<void> editMedicine(
+      {required int medicineId,
+      required String medicineName,
+      required int once,
+      required int days,
+      required List<int> time,
+      required int dosage}) async {
+    final String url = '$baseUrl/medicine';
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'medicineId': medicineId,
+          'medicineName': medicineName,
+          'once': once,
+          'days': days,
+          'time': time,
+          'dosage': dosage,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('처방전 수정 성공');
+        getPrescription(widget.id);
+      } else {
+        print('처방전 수정 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
+  }
+
   Future<void> deleteMedicine(int id) async {
     final String url = '$baseUrl/medicine/$id';
 
@@ -187,7 +263,6 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
       print('네트워크 오류 $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +288,9 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: prescription['medicineTakings'] == null ||
                   prescription['medicineTakings'].isEmpty
-              ? Center(child: Text('처방전 내용이 없습니다.${'\n'}+ 버튼을 눌러 추가해주세요.', textAlign: TextAlign.center))
+              ? Center(
+                  child: Text('처방전 내용이 없습니다.${'\n'}+ 버튼을 눌러 추가해주세요.',
+                      textAlign: TextAlign.center))
               : ListView(
                   children: [
                     Container(
