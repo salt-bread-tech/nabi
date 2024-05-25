@@ -165,6 +165,30 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
     }
   }
 
+  Future<void> deleteMedicine(int id) async {
+    final String url = '$baseUrl/medicine/$id';
+
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('처방전 삭제 성공');
+        getPrescription(widget.id);
+      } else {
+        print('처방전 삭제 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -228,7 +252,10 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                               ),
                               SlidableAction(
                                 flex: 1,
-                                onPressed: (context) => {},
+                                onPressed: (context) => {
+                                  deleteMedicine(medicineTaking['medicineId']),
+                                  print(medicineTaking['medicineId'])
+                                },
                                 backgroundColor: Color(0xFFFF5050),
                                 foregroundColor: Colors.white,
                                 icon: Iconsax.trash,
