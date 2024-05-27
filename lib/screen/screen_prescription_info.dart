@@ -305,6 +305,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
   }
 
   void showAddMedicineModal(BuildContext context) {
+    medicineNameController.clear();
     selectedTime = [];
     selectedMedicineTakingTimes = 0;
 
