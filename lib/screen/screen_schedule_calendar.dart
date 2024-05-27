@@ -118,6 +118,34 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
     }
   }
 
+  Future<void> updateSchedule({required int scheduleId}) async {
+    final String url = '$baseUrl/schedule';
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'scheduleId': scheduleId,
+          'text': content,
+          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Schedule updated');
+        getSchedule();
+      } else {
+        throw Exception('Failed to update schedule');
+      }
+    } catch (e) {
+      print('error: $e');
+    }
+  }
+
   Future<void> deleteSchedule(int scheduleId) async {
     final String url = '$baseUrl/schedule/$scheduleId';
 
@@ -141,7 +169,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
     }
   }
 
-  void showScheduleModal(BuildContext context, DateTime initialDate) {
+  void showAddScheduleModal(BuildContext context, DateTime initialDate) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext buildContext) {
@@ -257,6 +285,121 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
         });
   }
 
+  void showEditScheduleModal(BuildContext context, int scheduleId) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setModalState) {
+                return Padding(
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom),
+                    child: Container(
+                        width: double.infinity,
+                        height: 240,
+                        decoration: BoxDecoration(
+                          color: AppTheme.appbackgroundColor,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            TextField(
+                              controller: _controller,
+                              decoration: InputDecoration(
+                                hintText: '새로운 일정',
+                                labelStyle: TextStyle(color: Colors.black),
+                                border: InputBorder.none,
+                              ),
+                              onChanged: (value) {
+                                content = value;
+                              },
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text('날짜', style: TextStyle(color: Colors.black)),
+                                TextButton(
+                                  onPressed: () {
+                                    showCupertinoModalPopup(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Container(
+                                            height: 300,
+                                            color: Colors.white,
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  height: 200,
+                                                  child: CupertinoDatePicker(
+                                                    initialDateTime: selectedDate,
+                                                    onDateTimeChanged:
+                                                        (DateTime newDateTime) {
+                                                      setState(() {
+                                                        selectedDate = newDateTime;
+                                                      });
+                                                    },
+                                                    use24hFormat: true,
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context)
+                                                        .pop(selectedDate);
+                                                  },
+                                                  child: Text('확인',
+                                                      style: TextStyle(
+                                                          color: Colors.black)),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }).then((newDate) {
+                                      if (newDate != null) {
+                                        setModalState(() {
+                                          selectedDate = newDate;
+                                        });
+                                      }
+                                    });
+                                    ;
+                                  },
+                                  child: Text(
+                                      '${selectedDate.year}년 ${selectedDate.month}월 ${selectedDate.day}일 ${selectedDate.hour}시 ${selectedDate.minute}분',
+                                      style: TextStyle(color: Colors.black)),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 20),
+                            Container(
+                                width: double.infinity,
+                                height: 55,
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Color(0xFFEBEBEB),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    updateSchedule(scheduleId: scheduleId);
+                                    getSchedule();
+                                    Navigator.of(context).pop();
+                                    _controller.clear();
+                                  },
+                                  child: Text('일정 추가',
+                                      style: TextStyle(color: Colors.black)),
+                                )),
+                          ],
+                        )));
+              });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final _events = LinkedHashMap<DateTime, List>(
@@ -285,7 +428,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              showScheduleModal(context, _selectedDay);
+              showAddScheduleModal(context, _selectedDay);
             },
           ),
         ],
@@ -364,6 +507,25 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                         endActionPane: ActionPane(
                           motion: const DrawerMotion(),
                           children: [
+                            SlidableAction(
+                              flex: 1,
+                              onPressed: (context) => {
+                                showEditScheduleModal(context ,int.parse(
+                                    getEventForDay(_selectedDay)[index]
+                                        .split(' ')[0])),
+                                _controller.text = getEventForDay(_selectedDay)[index]
+                                    .split(' ')
+                                    .skip(2)
+                                    .join(' '),
+                                selectedDate = DateTime.parse(DateFormat('yyyy-MM-dd').format(_selectedDay) + " " + getEventForDay(_selectedDay)[index]
+                                    .split(' ')[1]),
+                              },
+                              backgroundColor: Colors.black12,
+                              foregroundColor: Colors.white,
+                              icon: Iconsax.edit,
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(30)),
+                            ),
                             SlidableAction(
                               flex: 1,
                               onPressed: (context) => {
