@@ -130,7 +130,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
         },
         body: json.encode({
           'scheduleId': scheduleId,
-          'text': content,
+          'text': _controller.text,
           'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate),
         }),
       );
@@ -391,7 +391,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                     Navigator.of(context).pop();
                                     _controller.clear();
                                   },
-                                  child: Text('일정 추가',
+                                  child: Text('일정 수정',
                                       style: TextStyle(color: Colors.black)),
                                 )),
                           ],
