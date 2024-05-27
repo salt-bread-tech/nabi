@@ -1,6 +1,8 @@
 import 'dart:collection';
 
 import 'package:doctor_nyang/assets/theme.dart';
+import 'package:doctor_nyang/screen/screen_medicine_info.dart';
+import 'package:doctor_nyang/screen/screen_medicine_search.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -93,9 +95,11 @@ class MedicineTaking {
 
 class PrescriptionInfoScreen extends StatefulWidget {
   final int id;
+  final String? fromRoute;
 
   PrescriptionInfoScreen({
     required this.id,
+    this.fromRoute,
   });
 
   @override
@@ -116,12 +120,20 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
     AppTheme.pastelBlue.withOpacity(0.5),
   ];
   List<String> registeredDosingScheduleText = ['일정 추가 하기', '일정 추가 완료'];
+  String medicineName = '';
+  TextEditingController medicineNameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     selectedMonth = DateTime.now();
     getPrescription(widget.id);
+  }
+
+  @override
+  void dispose() {
+    medicineNameController.dispose();
+    super.dispose();
   }
 
   Future<void> getPrescription(int id) async {
@@ -315,19 +327,29 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                       Container(
                         width: 300,
                         child: TextField(
+                          controller: medicineNameController,
                           decoration: InputDecoration(
                             hintText: '약 이름',
                             hintStyle: TextStyle(color: Colors.grey),
                             border: InputBorder.none,
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              medicineTaking['medicineName'] = value;
-                            });
-                          },
                         ),
                       ),
-                      IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                      IconButton(
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MedicineSearch(fromRoute: widget.fromRoute),
+                              ),
+                            );
+                            setState(() {
+                              medicineName = searchText!;
+                              medicineNameController
+                                ..text = medicineName;
+                            });
+                          },
+                          icon: Icon(Icons.search)),
                     ],
                   ),
                   SizedBox(height: 10),
@@ -458,7 +480,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                         onPressed: () {
                           addMedicine(
                             prescriptionId: widget.id,
-                            medicineName: medicineTaking['medicineName'],
+                            medicineName: medicineNameController.text,
                             once: medicineTaking['once'].toString(),
                             days: medicineTaking['days'],
                             time: selectedTime
@@ -487,6 +509,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
         .toList();
     selectedMedicineTakingTimes =
         medicineTakingTimes.indexOf(medicineTaking['dosage']);
+    medicineNameController.text = medicineTaking['medicineName'];
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -506,21 +529,29 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                       Container(
                         width: 300,
                         child: TextField(
-                          controller: TextEditingController()
-                            ..text = medicineTaking['medicineName'],
+                          controller: medicineNameController,
                           decoration: InputDecoration(
                             hintText: '약 이름',
                             hintStyle: TextStyle(color: Colors.grey),
                             border: InputBorder.none,
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              medicineTaking['medicineName'] = value;
-                            });
-                          },
                         ),
                       ),
-                      IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                      IconButton(
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MedicineSearch(fromRoute: widget.fromRoute),
+                              ),
+                            );
+                            setState(() {
+                              medicineName = searchText!;
+                              medicineNameController
+                                ..text = medicineName;
+                            });
+                          },
+                          icon: Icon(Icons.search)),
                     ],
                   ),
                   SizedBox(height: 10),
@@ -655,7 +686,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                         onPressed: () {
                           editMedicine(
                             medicineId: medicineTaking['medicineId'],
-                            medicineName: medicineTaking['medicineName'],
+                            medicineName: medicineNameController.text,
                             once: medicineTaking['once'].toString(),
                             days: medicineTaking['days'],
                             time: selectedTime

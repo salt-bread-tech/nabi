@@ -7,6 +7,9 @@ import '../services/globals.dart';
 import '../services/urls.dart';
 
 class MedicineSearch extends StatefulWidget {
+  final String? fromRoute;
+
+  MedicineSearch({this.fromRoute});
   @override
   _MedicineSearchState createState() => _MedicineSearchState();
 }
@@ -94,7 +97,7 @@ class _MedicineSearchState extends State<MedicineSearch> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MedicineInfo(name: itemName),
+                    builder: (context) => MedicineInfo(name: itemName, fromRoute: widget.fromRoute),
                   ),
                 );
               },

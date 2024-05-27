@@ -261,7 +261,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PrescriptionInfoScreen(
-                                    id: prescriptions[index]['prescriptionId']),
+                                    id: prescriptions[index]['prescriptionId'], fromRoute: 'prescription'),
                               ),
                             );
                           },
