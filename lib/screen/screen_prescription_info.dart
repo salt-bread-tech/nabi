@@ -4,6 +4,7 @@ import 'package:doctor_nyang/assets/theme.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:iconsax/iconsax.dart';
@@ -107,10 +108,12 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
   List<dynamic> medicineTakings = [];
   Map<String, dynamic> medicineTaking = {};
   List<String> time = ['아침', '점심', '저녁', '취침 전'];
+  List<String> medicineTakingTimes = ['식전', '식중', '식후', '상관 없음'];
   List<String> selectedTime = [];
+  int selectedMedicineTakingTimes = 0;
   List<Color> registeredDosingScheduleColor = [
-    AppTheme.pastelBlue.withOpacity(0.5),
     AppTheme.pastelPink.withOpacity(0.5),
+    AppTheme.pastelBlue.withOpacity(0.5),
   ];
   List<String> registeredDosingScheduleText = ['일정 추가 하기', '일정 추가 완료'];
 
@@ -135,6 +138,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
 
       if (response.statusCode == 200) {
         String responseBody = utf8.decode(response.bodyBytes);
+        print(responseBody);
 
         final Map<String, dynamic> _data = jsonDecode(responseBody);
         final _prescription = Prescription.fromJson(_data);
@@ -168,9 +172,9 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
   }
 
   Future<void> addMedicine(
-      {required int medicineId,
+      {required int prescriptionId,
       required String medicineName,
-      required int once,
+      required String once,
       required int days,
       required List<int> time,
       required int dosage}) async {
@@ -184,7 +188,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
           'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
-          'medicineId': medicineId,
+          'prescriptionId': prescriptionId,
           'medicineName': medicineName,
           'once': once,
           'days': days,
@@ -264,6 +268,216 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
     }
   }
 
+  Future<void> addDosage(int medicineId) async {
+    final String url = '$baseUrl/dosage';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'medicineId': medicineId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('복용일정 추가 성공');
+      } else {
+        print('복용일정 추가 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
+  }
+
+  void showAddMedicineModal(BuildContext context) {
+    selectedTime = [];
+    selectedMedicineTakingTimes = 0;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return Container(
+              height: 400,
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 300,
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: '약 이름',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              medicineTaking['medicineName'] = value;
+                            });
+                          },
+                        ),
+                      ),
+                      IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Text('복용 시간'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: time
+                        .map((e) => ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (selectedTime.contains(e)) {
+                                    selectedTime.remove(e);
+                                  } else {
+                                    selectedTime.add(e);
+                                  }
+                                });
+                              },
+                              child: Text(e,
+                                  style: TextStyle(color: Colors.black)),
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: selectedTime.contains(e)
+                                    ? AppTheme.pastelBlue
+                                    : Colors.grey[200],
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                  SizedBox(height: 10),
+                  Text('복용 방법'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: medicineTakingTimes
+                        .map((e) => ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedMedicineTakingTimes =
+                                      medicineTakingTimes.indexOf(e);
+                                });
+                              },
+                              child: Text(e,
+                                  style: TextStyle(color: Colors.black)),
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: medicineTaking['dosage'] ==
+                                        medicineTakingTimes.indexOf(e)
+                                    ? AppTheme.pastelBlue
+                                    : Colors.grey[200],
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                  SizedBox(height: 10),
+                  Text('복용량'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text('총'),
+                      Container(
+                        width: 50,
+                        child: TextField(
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: 14),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: InputDecoration(
+                            hintText: '1',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              medicineTaking['days'] = int.parse(value);
+                            });
+                          },
+                        ),
+                      ),
+                      Text('일'),
+                      Text('하루'),
+                      Container(
+                        alignment: Alignment.center,
+                        width: 50,
+                        child: Text('${selectedTime.length}'),
+                      ),
+                      Text('번'),
+                      Container(
+                        width: 50,
+                        child: TextField(
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: 14),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: InputDecoration(
+                            hintText: '1',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                            alignLabelWithHint: true,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              medicineTaking['once'] = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Text('정(포)'),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    height: 55,
+                    child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Color(0xFFEBEBEB),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          addMedicine(
+                            prescriptionId: widget.id,
+                            medicineName: medicineTaking['medicineName'],
+                            once: medicineTaking['once'].toString(),
+                            days: medicineTaking['days'],
+                            time: selectedTime
+                                .map((e) => time.indexOf(e))
+                                .toList(),
+                            dosage: selectedMedicineTakingTimes,
+                          );
+                          Navigator.pop(context);
+                        },
+                        child: Text('등록하기',
+                            style: TextStyle(color: Colors.black))),
+                  ),
+                ],
+              ));
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -280,7 +494,9 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () {
+              showAddMedicineModal(context);
+            },
           ),
         ],
       ),
@@ -308,137 +524,155 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                             ),
                           ]),
                     ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: prescription['medicineTakings'].length,
-                      itemBuilder: (context, index) {
+                    Column(
+                      children: List.generate(
+                          prescription['medicineTakings'].length, (index) {
                         final medicineTaking =
                             prescription['medicineTakings'][index];
-                        return Slidable(
-                          endActionPane: ActionPane(
-                            motion: const DrawerMotion(),
-                            children: [
-                              SlidableAction(
-                                flex: 1,
-                                onPressed: (context) => {},
-                                backgroundColor: Colors.black12,
-                                foregroundColor: Colors.white,
-                                icon: Iconsax.edit,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
+                        return Container(
+                            margin: EdgeInsets.only(bottom: 20),
+                            child: Slidable(
+                              endActionPane: ActionPane(
+                                motion: const DrawerMotion(),
+                                children: [
+                                  SlidableAction(
+                                    flex: 1,
+                                    onPressed: (context) => {},
+                                    backgroundColor: Colors.black12,
+                                    foregroundColor: Colors.white,
+                                    icon: Iconsax.edit,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30)),
+                                  ),
+                                  SlidableAction(
+                                    flex: 1,
+                                    onPressed: (context) => {
+                                      deleteMedicine(
+                                          medicineTaking['medicineId']),
+                                      print(medicineTaking['medicineId'])
+                                    },
+                                    backgroundColor: Color(0xFFFF5050),
+                                    foregroundColor: Colors.white,
+                                    icon: Iconsax.trash,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30)),
+                                  ),
+                                ],
                               ),
-                              SlidableAction(
-                                flex: 1,
-                                onPressed: (context) => {
-                                  deleteMedicine(medicineTaking['medicineId']),
-                                  print(medicineTaking['medicineId'])
-                                },
-                                backgroundColor: Color(0xFFFF5050),
-                                foregroundColor: Colors.white,
-                                icon: Iconsax.trash,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
-                              ),
-                            ],
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 1,
-                                  offset: Offset(0, 5),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 1,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 20, horizontal: 20),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(30),
-                                        bottomLeft: Radius.circular(30),
-                                      ),
-                                      color: medicineTaking[
-                                              'registeredDosingSchedule']
-                                          ? registeredDosingScheduleColor[0]
-                                          : registeredDosingScheduleColor[1],
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${medicineTaking['medicineName']}',
-                                          style: TextStyle(
-                                            color: Colors.black,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 20, horizontal: 20),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(30),
+                                            bottomLeft: Radius.circular(30),
                                           ),
+                                          color: medicineTaking[
+                                                  'registeredDosingSchedule']
+                                              ? registeredDosingScheduleColor[1]
+                                              : registeredDosingScheduleColor[
+                                                  0],
                                         ),
-                                        Text(
-                                          '${selectedTime.join(' ')}',
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        Row(children: [
-                                          Text(
-                                              '${medicineTaking['days']}일 동안 하루에 ${medicineTaking['once']}번 ',
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${medicineTaking['medicineName']}',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${selectedTime.join(' ')}',
                                               style: TextStyle(
                                                 color: Colors.grey,
-                                              )),
-                                          Text(
-                                              '${medicineTaking['dosage'] == '상관없음' ? ' ' : '${medicineTaking['dosage']}'}',
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                              )),
-                                        ]),
-                                      ],
-                                    )),
-                                Container(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 20, horizontal: 20),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(30),
-                                        bottomRight: Radius.circular(30),
-                                      ),
-                                      color: Colors.white,
-                                    ),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          GestureDetector(
-                                              onTap: () {},
-                                              child: Text(
-                                                  '${medicineTaking['registeredDosingSchedule'] ? registeredDosingScheduleText[0] : registeredDosingScheduleText[1]}',
+                                              ),
+                                            ),
+                                            Row(children: [
+                                              Text(
+                                                  '${medicineTaking['days']}일 동안 하루에 ${medicineTaking['once']}번 ',
                                                   style: TextStyle(
-                                                    color: Colors.black,
-                                                  ))),
-                                          Text(
-                                            ' ',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                            ),
+                                                    color: Colors.grey,
+                                                  )),
+                                              Text(
+                                                  '${medicineTaking['dosage'] == '상관없음' ? ' ' : '${medicineTaking['dosage']}'}',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                  )),
+                                            ]),
+                                          ],
+                                        )),
+                                    Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 20, horizontal: 20),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(30),
+                                            bottomRight: Radius.circular(30),
                                           ),
-                                          Text(
-                                            '${medicineTaking['dosage']}',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                            ),
-                                          )
-                                        ])),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                                          color: Colors.white,
+                                        ),
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              GestureDetector(
+                                                  onTap: () {
+                                                    medicineTaking[
+                                                                'registeredDosingSchedule'] ==
+                                                            false
+                                                        ? addDosage(
+                                                            medicineTaking[
+                                                                'medicineId'])
+                                                        : {};
+                                                    setState(() {
+                                                      medicineTaking[
+                                                              'registeredDosingSchedule'] =
+                                                          !medicineTaking[
+                                                              'registeredDosingSchedule'];
+                                                    });
+                                                  },
+                                                  child: Text(
+                                                      '${medicineTaking['registeredDosingSchedule'] ? registeredDosingScheduleText[1] : registeredDosingScheduleText[0]}',
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                      ))),
+                                              Text(
+                                                ' ',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${medicineTaking['dosage']}',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                ),
+                                              )
+                                            ])),
+                                  ],
+                                ),
+                              ),
+                            ));
+                      }),
                     ),
                   ],
                 )),
