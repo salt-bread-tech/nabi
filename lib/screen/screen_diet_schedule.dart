@@ -473,6 +473,9 @@ class _DietScheduleState extends State<DietSchedule> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final fontSize = screenSize.width * 0.032;
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -501,9 +504,8 @@ class _DietScheduleState extends State<DietSchedule> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20) ,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 WidgetCalendar(onDateSelected: _handleDateChange),
                 SizedBox(height: 20),
@@ -605,21 +607,21 @@ class _DietScheduleState extends State<DietSchedule> {
                                         ? '${diet['name'].substring(0, 14)}···'
                                         : diet['name'],
                                     style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: fontSize,
                                         fontWeight: FontWeight.bold)),
                                 SizedBox(width: 5),
                                 Text(
                                     '${diet['totalIngestionSize'].toStringAsFixed(0)}g',
-                                    style: TextStyle(fontSize: 10)),
+                                    style: TextStyle(fontSize: fontSize)),
                               ],
                             ),
                             subtitle: Text(
                                 '탄수화물 ${diet['carbohydrate'] >= 9999999.0 ? "-g" : "${diet['carbohydrate'].toStringAsFixed(0)}g"} 단백질 ${diet['protein'] >= 9999999.0 ? "-g" : "${diet['protein'].toStringAsFixed(0)}g"} 지방 ${diet['fat'] >= 9999999.0 ? "-g" : "${diet['fat'].toStringAsFixed(0)}g"}',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                             trailing: Text(
                                 '${diet['calories'].toStringAsFixed(0)}kcal',
                                 style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.bold)),
+                                    fontSize: fontSize, fontWeight: FontWeight.bold)),
                           ),
                         ));
                   }),
