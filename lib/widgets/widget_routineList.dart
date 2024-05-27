@@ -118,7 +118,7 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final itemHeight = screenSize.height * 0.1; // 화면 높이에 비례하여 항목 높이 설정
+    final itemHeight = screenSize.height * 0.05; // 화면 높이에 비례하여 항목 높이 설정
     final listHeight = _routines.length * itemHeight;
 
     final fontSize = screenSize.width * 0.036; // 화면 너비에 비례하여 폰트 크기 설정

@@ -37,6 +37,7 @@ Future<void> fetchUserInfo() async {
         globals.weight = userInfo['weight'];
         globals.gender = userInfo['gender'];
         globals.age = userInfo['age'];
+        globals.bmi = userInfo['bmiRangeName'];
         globals.bmr = userInfo['bmr'];
         print({globals.nickName});
       };

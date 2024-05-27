@@ -3,6 +3,7 @@ String? birth;
 double? height;
 double? weight;
 double? bmr;
+String? bmi;
 String? gender;
 int? age;
 String? id;
