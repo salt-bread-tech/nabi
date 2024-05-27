@@ -47,7 +47,6 @@ class Prescription {
   }
 }
 
-
 class MedicineTaking {
   final int medicineId;
   final String medicineName;
@@ -486,7 +485,8 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
         .toList()
         .cast<String>()
         .toList();
-    selectedMedicineTakingTimes = medicineTakingTimes.indexOf(medicineTaking['dosage']);
+    selectedMedicineTakingTimes =
+        medicineTakingTimes.indexOf(medicineTaking['dosage']);
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -805,18 +805,11 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                                 color: Colors.grey,
                                               ),
                                             ),
-                                            Row(children: [
-                                              Text(
-                                                  '${medicineTaking['days']}일 동안 하루에 ${medicineTaking['once']}번 ',
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                  )),
-                                              Text(
-                                                  '${medicineTaking['dosage'] == '상관없음' ? ' ' : '${medicineTaking['dosage']}'}',
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                  )),
-                                            ]),
+                                            Text(
+                                                '${medicineTaking['days']}일 동안 하루에 ${medicineTaking['time'].length}번 ${medicineTaking['once']}정(포) ',
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                )),
                                           ],
                                         )),
                                     Container(
@@ -861,7 +854,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                '${medicineTaking['dosage']}',
+                                                '${medicineTaking['dosage'] == '상관 없음' ? ' ' : '${medicineTaking['dosage']}'}',
                                                 style: TextStyle(
                                                   color: Colors.black,
                                                 ),
