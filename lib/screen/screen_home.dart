@@ -211,7 +211,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   refreshData();
                 },
                 child: Container(
-                  height: screenSize.height * 0.25,
                   alignment: Alignment.topCenter,
                   child: RoutineListWidget(
                     key:

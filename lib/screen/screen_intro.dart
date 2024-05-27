@@ -9,31 +9,29 @@ class IntroPage extends StatefulWidget {
 
 class _IntroPageState extends State<IntroPage> {
   int activeIndex = 0;
-  final List<String> images = ['images/image1.png', 'images/image2.png', 'images/image3.png'];
-  final List<String> texts = ['복용 일정 놓치지 않고 간편하게', '쉽고 빠른 위젯 관리하기', '건강을 위한 식단 관리하기'];
-  final List<String> texts2 = ['처방전을 등록해 내 약물 일정을 관리할 수 있어요', '다양한 위젯과 함께 건강한 일상생활 만들기', '식단 추가를 통해 건강 관리하기'];
+  final List<String> images = ['images/intro_chat.png', 'images/intro_widget.png', 'images/image3.png'];
+  final List<String> texts = ['나비와 대화하기', '건강한 일상생활 만들기', '의약품 복용 관리'];
+  final List<String> texts2 = ['귀여운 고양이 나비와 일상적인 대화를 통해 \n 심리 상태를 공유하고 상담 가능해요', '일정 관리, 식단 관리, 습관 만들기를 통해 \n 건강한 일상생활 만들기', '원하는 의약품 추가하여 건강한 생활습관 만들기'];
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(),
       body: Padding(
         padding: EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: <Widget>[
+            SizedBox(height: 90),
             Text(texts[activeIndex],textAlign: TextAlign.center,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             Text(texts2[activeIndex],textAlign: TextAlign.center,style: TextStyle(color: Colors.black,fontSize: 13),),
-            SizedBox(height: 30),
+            SizedBox(height: 10),
             Expanded(
               child: introslider(images, screenHeight),
             ),
             indicator(images),
-            //SizedBox(height: 20),
             startButton(),
-            SizedBox(height: 20),
             registerButton(),
           ],
         ),
@@ -42,13 +40,14 @@ class _IntroPageState extends State<IntroPage> {
   }
 
   Widget startButton() => Container(
-    margin: EdgeInsets.all(20),
+    margin: EdgeInsets.symmetric(horizontal: 30),
     child: SizedBox(
       width: double.infinity,
       height: 40,
       child: TextButton(
         style: TextButton.styleFrom(
-          backgroundColor: Color(0xFFACD7FF),
+          backgroundColor: Color(0xFFD3EAFF),
+          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

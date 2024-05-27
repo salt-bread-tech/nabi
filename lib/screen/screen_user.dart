@@ -51,7 +51,7 @@ class _UserScreenState extends State<UserScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -75,9 +75,18 @@ class _UserScreenState extends State<UserScreen> {
                         Text('${globals.weight?.toString() ?? '몸무게'}kg', style: TextStyle(fontSize: 12)),
                       ],
                     ),
+                    Row(
+                      children: [
+                        Text('BMI : ${globals.bmi?.toString() ?? 'bmi'}', style: TextStyle(fontSize: 12)),
+                        SizedBox(width: 5),
+                      ],
+                    ),
+                    Text(
+                      'BMR : ${globals.bmr?.truncate().toString() ?? 'bmr'}',
+                      style: TextStyle(fontSize: 12),
+                    ),
                   ],
                 ),
-
               ],
             ),
             SizedBox(height: 20),

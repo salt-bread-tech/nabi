@@ -36,6 +36,9 @@ class WidgetDiet extends StatefulWidget {
 class _WidgetDietState extends State<WidgetDiet> {
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
+    final fontSize = screenSize.width * 0.032; // 화면 너비에 비례하여 폰트 크기 설정
 
     Color remainColor = Colors.white;
     double totalCalories =
@@ -87,7 +90,7 @@ class _WidgetDietState extends State<WidgetDiet> {
           children: [
             Align(
               child: Container(
-                width: MediaQuery.of(context).size.width - 50,
+                width: MediaQuery.of(context).size.width,
                 height: 150,
                 decoration: BoxDecoration(
                   color: AppTheme.widgetbackgroundColor,
@@ -111,39 +114,39 @@ class _WidgetDietState extends State<WidgetDiet> {
                       child: Table(
                         columnWidths: const {
                           0: FlexColumnWidth(),
-                          1: FixedColumnWidth(70),
+                          1: FixedColumnWidth(50),
                         },
                         children: [
                           TableRow(children: [
                             Text('아침',
                                 style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
                             Text('$breakfastCaloriesToStr kcal',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                           ]),
                           TableRow(children: [SizedBox(height: 5), SizedBox()]),
                           TableRow(children: [
                             Text('점심',
                                 style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
                             Text('$lunchCaloriesToStr kcal',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                           ]),
                           TableRow(children: [SizedBox(height: 5), SizedBox()]),
                           TableRow(children: [
                             Text('저녁',
                                 style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
                             Text('$dinnerCaloriesToStr kcal',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                           ]),
                           TableRow(children: [SizedBox(height: 5), SizedBox()]),
                           TableRow(children: [
                             Text('간식',
                                 style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
                             Text('$snackCaloriesToStr kcal',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                           ]),
                         ],
                       ),
@@ -165,33 +168,33 @@ class _WidgetDietState extends State<WidgetDiet> {
                       child: Table(
                         columnWidths: const {
                           0: FlexColumnWidth(),
-                          1: FixedColumnWidth(50),
+                          1: FixedColumnWidth(30),
                         },
                         children: [
                           TableRow(children: [
                             Text('탄수화물',
                                 style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
                             Text('$totalCarbToStr g',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                           ]),
                           TableRow(
                               children: [SizedBox(height: 10), SizedBox()]),
                           TableRow(children: [
                             Text('단백질',
                                 style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
                             Text('$totalProteinToStr g',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                           ]),
                           TableRow(
                               children: [SizedBox(height: 10), SizedBox()]),
                           TableRow(children: [
                             Text('지방',
                                 style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w600)),
+                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
                             Text('$totalFatToStr g',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                           ]),
                         ],
                       ),
@@ -204,18 +207,18 @@ class _WidgetDietState extends State<WidgetDiet> {
               TableRow(children: [
                 Text(
                   '총',
-                  style: TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: fontSize),
                   textAlign: TextAlign.center,
                 ),
               ]),
               TableRow(children: [
                 Text('$totalCaloriesToStr',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: fontSize * 1.5, fontWeight: FontWeight.w700),
                     textAlign: TextAlign.center),
               ]),
               TableRow(children: [
                 Text('kcal',
-                    style: TextStyle(fontSize: 12),
+                    style: TextStyle(fontSize: fontSize),
                     textAlign: TextAlign.center),
               ])
             ]),

@@ -66,7 +66,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
 
   //일정 토글
   Future<void> toggleDosage(int medicineId, String date, int times) async {
-    final String url = '$baseUrl/dosage';
+    final String url = '$baseUrl/dosage/toggle';
 
     try {
       final response = await http.put(
