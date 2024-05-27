@@ -98,6 +98,9 @@ flutter:
     - images/webtoon2.jpeg
     - images/webtoon3.jpeg
     - images/webtoon4.jpeg
+    - images/intro_chat.png
+    - images/intro_schedule.png
+    - images/intro_widget.png
 
 
   # To add assets to your application, add an assets section, like this:
