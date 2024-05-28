@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../assets/theme.dart';
@@ -37,12 +38,15 @@ class _WidgetDietState extends State<WidgetDiet> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-
-    final fontSize = screenSize.width * 0.032; // 화면 너비에 비례하여 폰트 크기 설정
+    final fontSize = screenSize.width * 0.032;
+    double screenWidth = screenSize.width;
+    double columnWidth = screenWidth * 0.1;
 
     Color remainColor = Colors.white;
-    double totalCalories =
-        widget.breakfastCalories + widget.lunchCalories + widget.dinnerCalories + widget.snackCalories;
+    double totalCalories = widget.breakfastCalories +
+        widget.lunchCalories +
+        widget.dinnerCalories +
+        widget.snackCalories;
     double remainCalories = widget.userCalories - totalCalories;
 
     String breakfastCaloriesToStr = widget.breakfastCalories.toStringAsFixed(0);
@@ -85,144 +89,148 @@ class _WidgetDietState extends State<WidgetDiet> {
 
     return GestureDetector(
         onTap: widget.onTap,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: AppTheme.widgetbackgroundColor,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.isWidget
-                          ? Colors.transparent
-                          : Colors.grey.withOpacity(0.3),
-                      spreadRadius: 1,
-                      blurRadius: 1,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(width: 20),
-                    Expanded(
-                      flex: 1,
-                      child: Table(
-                        columnWidths: const {
-                          0: FlexColumnWidth(),
-                          1: FixedColumnWidth(50),
-                        },
-                        children: [
-                          TableRow(children: [
-                            Text('아침',
-                                style: TextStyle(
-                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
-                            Text('$breakfastCaloriesToStr kcal',
-                                style: TextStyle(fontSize: fontSize)),
-                          ]),
-                          TableRow(children: [SizedBox(height: 5), SizedBox()]),
-                          TableRow(children: [
-                            Text('점심',
-                                style: TextStyle(
-                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
-                            Text('$lunchCaloriesToStr kcal',
-                                style: TextStyle(fontSize: fontSize)),
-                          ]),
-                          TableRow(children: [SizedBox(height: 5), SizedBox()]),
-                          TableRow(children: [
-                            Text('저녁',
-                                style: TextStyle(
-                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
-                            Text('$dinnerCaloriesToStr kcal',
-                                style: TextStyle(fontSize: fontSize)),
-                          ]),
-                          TableRow(children: [SizedBox(height: 5), SizedBox()]),
-                          TableRow(children: [
-                            Text('간식',
-                                style: TextStyle(
-                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
-                            Text('$snackCaloriesToStr kcal',
-                                style: TextStyle(fontSize: fontSize)),
-                          ]),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: PieChart(
-                        PieChartData(
-                          startDegreeOffset: -90,
-                          sections: sections,
-                          centerSpaceRadius: 40,
-                          sectionsSpace: totalCalories == 0 ? 0 : 3,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20),
-                    Expanded(
-                      flex: 1,
-                      child: Table(
-                        columnWidths: const {
-                          0: FlexColumnWidth(),
-                          1: FixedColumnWidth(30),
-                        },
-                        children: [
-                          TableRow(children: [
-                            Text('탄수화물',
-                                style: TextStyle(
-                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
-                            Text('$totalCarbToStr g',
-                                style: TextStyle(fontSize: fontSize)),
-                          ]),
-                          TableRow(
-                              children: [SizedBox(height: 10), SizedBox()]),
-                          TableRow(children: [
-                            Text('단백질',
-                                style: TextStyle(
-                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
-                            Text('$totalProteinToStr g',
-                                style: TextStyle(fontSize: fontSize)),
-                          ]),
-                          TableRow(
-                              children: [SizedBox(height: 10), SizedBox()]),
-                          TableRow(children: [
-                            Text('지방',
-                                style: TextStyle(
-                                    fontSize: fontSize, fontWeight: FontWeight.w600)),
-                            Text('$totalFatToStr g',
-                                style: TextStyle(fontSize: fontSize)),
-                          ]),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+        child: Container(
+          width: screenWidth - 50,
+          height: screenSize.height * 0.19,
+          decoration: BoxDecoration(
+            color: AppTheme.widgetbackgroundColor,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: widget.isWidget
+                    ? Colors.transparent
+                    : Colors.grey.withOpacity(0.3),
+                spreadRadius: 1,
+                blurRadius: 1,
+                offset: Offset(0, 1),
               ),
-            ),
-            Table(children: [
-              TableRow(children: [
-                Text(
-                  '총',
-                  style: TextStyle(fontSize: fontSize),
-                  textAlign: TextAlign.center,
-                ),
-              ]),
-              TableRow(children: [
-                Text('$totalCaloriesToStr',
-                    style: TextStyle(fontSize: fontSize * 1.5, fontWeight: FontWeight.w700),
-                    textAlign: TextAlign.center),
-              ]),
-              TableRow(children: [
-                Text('kcal',
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Spacer(flex: 8),
+                      Text('아침',
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.w600)),
+                      Spacer(),
+                      Text('점심',
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.w600)),
+                      Spacer(),
+                      Text('저녁',
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.w600)),
+                      Spacer(),
+                      Text('간식',
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.w600)),
+                      Spacer(flex: 8),
+                    ],
+                  ),
+                  SizedBox(width: screenWidth * 0.02),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Spacer(flex: 8),
+                      Text('$breakfastCaloriesToStr kcal',
+                          style: TextStyle(fontSize: fontSize) ),
+                      Spacer(),
+                      Text('$lunchCaloriesToStr kcal',
+                          style: TextStyle(fontSize: fontSize)),
+                      Spacer(),
+                      Text('$dinnerCaloriesToStr kcal',
+                          style: TextStyle(fontSize: fontSize)),
+                      Spacer(),
+                      Text('$snackCaloriesToStr kcal',
+                          style: TextStyle(fontSize: fontSize)),
+                      Spacer(flex: 8),
+                    ],
+                  )
+                ],
+              ),
+              Stack(alignment: Alignment.center, children: [
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                  Spacer(),
+                  Text(
+                    '총',
                     style: TextStyle(fontSize: fontSize),
-                    textAlign: TextAlign.center),
-              ])
-            ]),
-          ],
+                    textAlign: TextAlign.center,
+                  ),
+                  Text('$totalCaloriesToStr',
+                      style: TextStyle(
+                          fontSize: fontSize * 1.5,
+                          fontWeight: FontWeight.w700),
+                      textAlign: TextAlign.center),
+                  Text('kcal',
+                      style: TextStyle(fontSize: fontSize),
+                      textAlign: TextAlign.center),
+                  Spacer(),
+                ]),
+                Container(
+                    width: screenWidth * 0.01,
+                    height: screenWidth * 0.01,
+                    child: PieChart(
+                      PieChartData(
+                        startDegreeOffset: -90,
+                        sections: sections,
+                        centerSpaceRadius: screenWidth * 0.1,
+                        sectionsSpace: totalCalories == 0 ? 0 : 3,
+                      ),
+                    ))
+              ]),
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Spacer(flex: 8),
+                      Text('탄수화물',
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.w600)),
+                      Spacer(),
+                      Text('단백질',
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.w600)),
+                      Spacer(),
+                      Text('지방',
+                          style: TextStyle(
+                              fontSize: fontSize, fontWeight: FontWeight.w600)),
+                      Spacer(flex: 8),
+                    ],
+                  ),
+                  SizedBox(width: screenWidth * 0.02),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Spacer(flex: 8),
+                      Text('$totalCarbToStr g',
+                          style: TextStyle(fontSize: fontSize)),
+                      Spacer(),
+                      Text('$totalProteinToStr g',
+                          style: TextStyle(fontSize: fontSize)),
+                      Spacer(),
+                      Text('$totalFatToStr g',
+                          style: TextStyle(fontSize: fontSize)),
+                      Spacer(flex: 8),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          ),
         ));
   }
 }

@@ -8,8 +8,9 @@ import '../services/urls.dart';
 
 class MedicineInfo extends StatefulWidget {
   final String name;
+  final String? fromRoute;
 
-  MedicineInfo({required this.name});
+  MedicineInfo({required this.name, this.fromRoute});
 
   @override
   _MedicineInfoState createState() => _MedicineInfoState();
@@ -100,12 +101,19 @@ class _MedicineInfoState extends State<MedicineInfo> {
               ),
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MedicineRegist(name: widget.name),
-                ),
-              );
+              if (widget.fromRoute == 'prescription'){
+                Navigator.pop(context);
+                Navigator.pop(context);
+                searchText = widget.name;
+              }
+              else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MedicineRegist(name: widget.name),
+                  ),
+                );
+              }
             },
             child: Text(
               '등록하기',

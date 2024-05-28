@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:doctor_nyang/assets/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:timelines/timelines.dart';
 
 import 'package:http/http.dart' as http;
 import '../services/globals.dart';
@@ -10,8 +9,8 @@ import '../services/urls.dart';
 
 List<dynamic> prescriptions = [];
 
-Future<void> getPrescriptionList(DateTime date) async {
-  final String url = '$baseUrl/prescriptions';
+Future<void> getPrescriptionList(String date) async {
+  final String url = '$baseUrl/prescriptions/date/$date';
 
   try {
     final response = await http.get(
@@ -25,24 +24,8 @@ Future<void> getPrescriptionList(DateTime date) async {
     if (response.statusCode == 200) {
       String responseBody = utf8.decode(response.bodyBytes);
       List<dynamic> _prescriptions = json.decode(responseBody);
+      prescriptions = _prescriptions;
 
-      prescriptions = [];
-
-      _prescriptions.removeWhere(
-          (prescription) => DateTime.parse(prescription['date']).isAfter(date));
-      _prescriptions.sort((a, b) => (DateTime.parse(a['date']).difference(date))
-          .abs()
-          .compareTo((DateTime.parse(b['date']).difference(date)).abs()));
-
-      if (_prescriptions.length < 3) {
-        for (int i = 0; i < _prescriptions.length; i++) {
-          prescriptions.add(_prescriptions[i]);
-        }
-      } else {
-        for (int i = 0; i < 3; i++) {
-          prescriptions.add(_prescriptions[i]);
-        }
-      }
       print('처방전 목록 조회 성공!');
     } else {
       print('처방전 목록 조회 실패');
@@ -75,7 +58,7 @@ class _WidgetPrescriptionState extends State<WidgetPrescription> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: FutureBuilder(
-        future: getPrescriptionList(DateTime.parse(widget.datetime)),
+        future: getPrescriptionList(widget.datetime),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container(

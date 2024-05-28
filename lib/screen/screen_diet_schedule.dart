@@ -82,6 +82,8 @@ class _DietScheduleState extends State<DietSchedule> {
 
         dietSchedule.sort((a, b) =>
             times.indexOf(a['times']).compareTo(times.indexOf(b['times'])));
+
+        print(dietSchedule);
       } else {
         print('일정 조회 실패');
       }
@@ -118,27 +120,36 @@ class _DietScheduleState extends State<DietSchedule> {
     }
   }
 
-  Future<void> updateIngestion(
-      {required ingestionId,
-      required servingSize,
-      required calories,
-      required carbohydrate,
-      required protein,
-      required fat,
-      required sugars,
-      required salt,
-      required cholesterol,
-      required saturatedFattyAcid,
-      required transFattyAcid}) async {
-    final String url = '$baseUrl/ingestion/update';
+  Future<void> updateIngestion({
+    required int ingestionId,
+    required String date,
+    required int times,
+    required double servingSize,
+    required double totalIngestionSize,
+    required double calories,
+    required double carbohydrate,
+    required double protein,
+    required double fat,
+    required double sugars,
+    required double salt,
+    required double cholesterol,
+    required double saturatedFattyAcid,
+    required double transFattyAcid,
+  }) async {
+    final String url = '$baseUrl/ingestion';
 
     try {
-      final response = await http.post(Uri.parse(url), headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      }, body: json.encode({
+      final response = await http.put(Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: json.encode({
             'ingestionId': ingestionId,
+            'date': date,
+            'times': times,
             'servingSize': servingSize,
+            'totalIngestionSize': totalIngestionSize,
             'calories': calories,
             'carbohydrate': carbohydrate,
             'protein': protein,
@@ -226,314 +237,235 @@ class _DietScheduleState extends State<DietSchedule> {
     }
   }
 
-  void showCustomModalBottomSheet(BuildContext context, int id, Food food) {
+  void showCustomModalBottomSheet(BuildContext context, int id, Food food,
+      {required totalIngestionSize}) {
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         builder: (BuildContext context) {
           return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-              return Container(
-                height: 530,
-                padding: const EdgeInsets.all(30.0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          food.name.length > 12 ? '${food.name.substring(0, 12)}···' : food.name,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${food.servingSize.toStringAsFixed(0)}g',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        Expanded(
-                          child: Text(
-                            '${food.calories.toStringAsFixed(0)} kcal',
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.end,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Container(
-                            alignment: Alignment.center,
-                            width: 85,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: const Color(0xFFD9D9D9),
-                                width: 1,
-                              ),
-                              color: Colors.white,
-                            ),
-                            child: DropdownButtonHideUnderline(
-                                child: DropdownButton(
-                                  value: _selectedMeal,
-                                  dropdownColor: Colors.white,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedMeal = value!;
-                                    });
-                                  },
-                                  items: _meals
-                                      .map((e) => DropdownMenuItem(
-                                      child: Text(e), value: e))
-                                      .toList(),
-                                  borderRadius: BorderRadius.circular(8),
-                                ))),
-                        SizedBox(width: 5),
-                        Container(
-                          alignment: Alignment.center,
-                          width: 135,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Color(0xFFD9D9D9),
-                              width: 1,
-                            ),
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.remove,
-                                    size: 20, color: Color(0xFFD9D9D9)),
-                                onPressed: _decrementQuantity,
-                              ),
-                              Container(
-                                width: 35,
-                                child: TextField(
-                                  controller: _controller,
-                                  textAlign: TextAlign.center,
-                                  keyboardType: TextInputType.numberWithOptions(
-                                      decimal: true),
-                                  decoration:
-                                  InputDecoration(border: InputBorder.none),
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.add,
-                                    size: 20, color: Color(0xFFD9D9D9)),
-                                onPressed: _incrementQuantity,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 5),
-                        Container(
-                            alignment: Alignment.center,
-                            width: 85,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Color(0xFFD9D9D9),
-                                width: 1,
-                              ),
-                              color: Colors.white,
-                            ),
-                            child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: _selectedGram,
-                                  dropdownColor: Colors.white,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      _selectedGram = newValue!;
-                                      if (_selectedGram == '인분') {
-                                        _selectedQuantity = 1.0;
-                                        _controller.text =
-                                            _selectedQuantity.toString();
-                                      } else {
-                                        _selectedQuantity = food.servingSize;
-                                        _controller.text =
-                                            _selectedQuantity.toStringAsFixed(0);
-                                      }
-                                    });
-                                  },
-                                  items: _grams
-                                      .map((e) => DropdownMenuItem(
-                                      child: Text(e), value: e))
-                                      .toList(),
-                                  borderRadius: BorderRadius.circular(8),
-                                ))),
-                      ],
-                    ),
-                    SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('탄수화물', style: TextStyle(fontSize: 16)),
-                        Text(
-                            food.carbohydrate == 9999999
-                                ? '정보없음'
-                                : '${food.carbohydrate.toStringAsFixed(0)}g',
-                            style: TextStyle(fontSize: 16)),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(FontAwesomeIcons.caretRight,
-                            size: 16, color: AppTheme.subTitleTextColor),
-                        SizedBox(width: 5),
-                        Text('당류',
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: AppTheme.subTitleTextColor)),
-                        Expanded(
-                          child: Text(
-                              food.sugars == 9999999
-                                  ? '정보없음'
-                                  : '${food.sugars.toStringAsFixed(0)}g',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppTheme.subTitleTextColor),
-                              textAlign: TextAlign.end),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('단백질', style: TextStyle(fontSize: 16)),
-                        Text(
-                            food.protein == 9999999
-                                ? '정보없음'
-                                : '${food.protein.toStringAsFixed(0)}g',
-                            style: TextStyle(fontSize: 16)),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('지방', style: TextStyle(fontSize: 16)),
-                        Text(
-                            food.fat == 9999999
-                                ? '정보없음'
-                                : '${food.fat.toStringAsFixed(0)}g',
-                            style: TextStyle(fontSize: 16)),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(FontAwesomeIcons.caretRight,
-                            size: 16, color: AppTheme.subTitleTextColor),
-                        SizedBox(width: 5),
-                        Text('포화지방',
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: AppTheme.subTitleTextColor)),
-                        Expanded(
-                          child: Text(
-                              food.saturatedFattyAcid == 9999999
-                                  ? '정보없음'
-                                  : '${food.saturatedFattyAcid.toStringAsFixed(0)}g',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppTheme.subTitleTextColor),
-                              textAlign: TextAlign.end),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(FontAwesomeIcons.caretRight,
-                            size: 16, color: AppTheme.subTitleTextColor),
-                        SizedBox(width: 5),
-                        Text('트랜스지방',
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: AppTheme.subTitleTextColor)),
-                        Expanded(
-                          child: Text(
-                              food.transFattyAcid == 9999999
-                                  ? '정보없음'
-                                  : '${food.transFattyAcid.toStringAsFixed(0)}g',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: AppTheme.subTitleTextColor),
-                              textAlign: TextAlign.end),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('나트륨', style: TextStyle(fontSize: 16)),
-                        Text(
-                            food.salt == 9999999
-                                ? '정보없음'
-                                : '${food.salt.toStringAsFixed(0)}mg',
-                            style: TextStyle(fontSize: 16)),
-                      ],
-                    ),
-                    SizedBox(height: 24),
-                    Container(
-                      width: double.infinity,
-                      height: 55,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: Color(0xFFEBEBEB),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
-                          updateIngestion(
-                            ingestionId: id.toString(),
-                            servingSize: (food.servingSize * _selectedQuantity).toString(),
-                            calories:food.calories == 9999999 ? "9999999" : (food.calories * _selectedQuantity).toString(),
-                            carbohydrate: food.carbohydrate == 9999999 ? "9999999" : (food.carbohydrate * _selectedQuantity).toString(),
-                            protein: food.protein == 9999999 ? "9999999" : (food.protein * _selectedQuantity).toString(),
-                            fat: food.fat == 9999999 ? "9999999" : (food.fat * _selectedQuantity).toString(),
-                            sugars: food.sugars == 9999999 ? "9999999" : (food.sugars * _selectedQuantity).toString(),
-                            salt: food.salt == 9999999 ? "9999999" : (food.salt * _selectedQuantity).toString(),
-                            cholesterol: food.cholesterol == 9999999 ? "9999999" : (food.cholesterol * _selectedQuantity).toString(),
-                            saturatedFattyAcid: food.saturatedFattyAcid == 9999999 ? "9999999" : (food.saturatedFattyAcid * _selectedQuantity).toString(),
-                            transFattyAcid: food.transFattyAcid == 9999999 ? "9999999" : (food.transFattyAcid * _selectedQuantity).toString(),
-                          );
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          '기록하기',
-                          style: TextStyle(color: Colors.black),
-                        ),
+              return Padding(
+                  padding: MediaQuery.of(context).viewInsets,
+                  child: Container(
+                    height: 250,
+                    padding: const EdgeInsets.all(30.0),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
                       ),
                     ),
-                  ],
-                ),
-              );
+                    child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                food.name.length > 12
+                                    ? '${food.name.substring(0, 12)}···'
+                                    : food.name,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${food.servingSize.toStringAsFixed(0)}g',
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              SizedBox(width: 5),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Container(
+                                  alignment: Alignment.center,
+                                  width: 85,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: const Color(0xFFD9D9D9),
+                                      width: 1,
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                    value: _selectedMeal,
+                                    dropdownColor: Colors.white,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedMeal = value!;
+                                      });
+                                    },
+                                    items: _meals
+                                        .map((e) => DropdownMenuItem(
+                                            child: Text(e), value: e))
+                                        .toList(),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ))),
+                              SizedBox(width: 5),
+                              Container(
+                                alignment: Alignment.center,
+                                width: 135,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Color(0xFFD9D9D9),
+                                    width: 1,
+                                  ),
+                                  color: Colors.white,
+                                ),
+                                child: Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.remove,
+                                          size: 20, color: Color(0xFFD9D9D9)),
+                                      onPressed: _decrementQuantity,
+                                    ),
+                                    Container(
+                                      width: 35,
+                                      child: TextField(
+                                        controller: _controller,
+                                        textAlign: TextAlign.center,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true),
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.add,
+                                          size: 20, color: Color(0xFFD9D9D9)),
+                                      onPressed: _incrementQuantity,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 5),
+                              Container(
+                                  alignment: Alignment.center,
+                                  width: 85,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Color(0xFFD9D9D9),
+                                      width: 1,
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                    value: _selectedGram,
+                                    dropdownColor: Colors.white,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        _selectedGram = newValue!;
+                                        if (_selectedGram == '인분') {
+                                          _selectedQuantity = 1.0;
+                                          _controller.text =
+                                              _selectedQuantity.toString();
+                                        } else {
+                                          print(food.servingSize);
+                                          _selectedQuantity = food.servingSize;
+                                          _controller.text = _selectedQuantity
+                                              .toStringAsFixed(0);
+                                        }
+                                      });
+                                    },
+                                    items: _grams
+                                        .map((e) => DropdownMenuItem(
+                                            child: Text(e), value: e))
+                                        .toList(),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ))),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Container(
+                            width: double.infinity,
+                            height: 55,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Color(0xFFEBEBEB),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed: () async {
+                                double calculate = _selectedGram == '인분'
+                                    ? _selectedQuantity *
+                                        food.servingSize /
+                                        totalIngestionSize
+                                    : _selectedQuantity / totalIngestionSize;
+                                await updateIngestion(
+                                  ingestionId: id,
+                                  date: DateFormat('yyyy-MM-dd')
+                                      .format(selectedDate)
+                                      .toString(),
+                                  times: _selectedMeal == '아침'
+                                      ? 0
+                                      : _selectedMeal == '점심'
+                                          ? 1
+                                          : _selectedMeal == '저녁'
+                                              ? 2
+                                              : 3,
+                                  servingSize: food.servingSize,
+                                  totalIngestionSize: _selectedGram == '인분'
+                                      ? food.servingSize * _selectedQuantity
+                                      : _selectedQuantity,
+                                  calories: food.calories >= 9999999
+                                      ? 9999999
+                                      : food.calories * calculate,
+                                  carbohydrate: food.carbohydrate >= 9999999
+                                      ? 9999999
+                                      : food.carbohydrate * calculate,
+                                  protein: food.protein >= 9999999
+                                      ? 9999999
+                                      : food.protein * calculate,
+                                  fat: food.fat >= 9999999
+                                      ? 9999999
+                                      : food.fat * calculate,
+                                  sugars: food.sugars >= 9999999
+                                      ? 9999999
+                                      : food.sugars * calculate,
+                                  salt: food.salt >= 9999999
+                                      ? 9999999
+                                      : food.salt * calculate,
+                                  cholesterol: food.cholesterol >= 9999999
+                                      ? 9999999
+                                      : food.cholesterol * calculate,
+                                  saturatedFattyAcid:
+                                      food.saturatedFattyAcid >= 9999999
+                                          ? 9999999
+                                          : food.saturatedFattyAcid * calculate,
+                                  transFattyAcid: food.transFattyAcid >= 9999999
+                                      ? 9999999
+                                      : food.transFattyAcid * calculate,
+                                );
+                                print(
+                                    'ingedtionId: $id, date: $selectedDate, times: ${_selectedMeal == '아침' ? 0 : _selectedMeal == '점심' ? 1 : _selectedMeal == '저녁' ? 2 : 3}, servingSize: ${food.servingSize}, totalIngestionSize: ${_selectedGram == '인분' ? food.servingSize * _selectedQuantity : _selectedQuantity}, calories: ${_selectedGram == '인분' ? food.calories * _selectedQuantity : food.calories * _selectedQuantity / food.servingSize}, carbohydrate: ${_selectedGram == '인분' ? food.carbohydrate * _selectedQuantity : food.carbohydrate * _selectedQuantity / food.servingSize}, protein: ${_selectedGram == '인분' ? food.protein * _selectedQuantity : food.protein * _selectedQuantity / food.servingSize}, fat: ${_selectedGram == '인분' ? food.fat * _selectedQuantity : food.fat * _selectedQuantity / food.servingSize}, sugars: ${_selectedGram == '인분' ? food.sugars * _selectedQuantity : food.sugars * _selectedQuantity / food.servingSize}, salt: ${_selectedGram == '인분' ? food.salt * _selectedQuantity : food.salt * _selectedQuantity / food.servingSize}, cholesterol: ${_selectedGram == '인분' ? food.cholesterol * _selectedQuantity : food.cholesterol * _selectedQuantity / food.servingSize}, saturatedFattyAcid: ${_selectedGram == '인분' ? food.saturatedFattyAcid * _selectedQuantity : food.saturatedFattyAcid * _selectedQuantity / food.servingSize}, transFattyAcid: ${_selectedGram == '인분' ? food.transFattyAcid * _selectedQuantity : food.transFattyAcid * _selectedQuantity / food.servingSize}');
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                '기록하기',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ]),
+                  ));
             },
           );
         });
@@ -541,6 +473,9 @@ class _DietScheduleState extends State<DietSchedule> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final fontSize = screenSize.width * 0.032;
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -569,9 +504,8 @@ class _DietScheduleState extends State<DietSchedule> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20) ,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 WidgetCalendar(onDateSelected: _handleDateChange),
                 SizedBox(height: 20),
@@ -612,19 +546,32 @@ class _DietScheduleState extends State<DietSchedule> {
                             SlidableAction(
                               flex: 1,
                               onPressed: (context) => {
-                                showCustomModalBottomSheet(context, diet['dietId'], Food(
-                                  name: diet['name'],
-                                  servingSize: diet['servingSize'],
-                                  calories: diet['calories'],
-                                  carbohydrate: diet['carbohydrate'],
-                                  protein: diet['protein'],
-                                  fat: diet['fat'],
-                                  sugars: diet['sugars'],
-                                  salt: diet['salt'],
-                                  cholesterol: diet['cholesterol'],
-                                  saturatedFattyAcid: diet['saturatedFattyAcid'],
-                                  transFattyAcid: diet['transFattyAcid'],
-                                )),
+                                _selectedMeal = _meals[0],
+                                _selectedGram = _grams[0],
+                                setState(() {
+                                  _controller.text = _selectedGram == '인분'
+                                      ? _selectedQuantity.toString()
+                                      : _selectedQuantity.toStringAsFixed(0);
+                                }),
+                                showCustomModalBottomSheet(
+                                  context,
+                                  diet['ingestionId'],
+                                  totalIngestionSize:
+                                      diet['totalIngestionSize'],
+                                  Food(
+                                      name: diet['name'],
+                                      servingSize: diet['servingSize'],
+                                      calories: diet['calories'],
+                                      carbohydrate: diet['carbohydrate'],
+                                      protein: diet['protein'],
+                                      fat: diet['fat'],
+                                      sugars: diet['sugars'],
+                                      salt: diet['salt'],
+                                      cholesterol: diet['cholesterol'],
+                                      saturatedFattyAcid:
+                                          diet['saturatedFattyAcid'],
+                                      transFattyAcid: diet['transFattyAcid']),
+                                ),
                               },
                               backgroundColor: Colors.black12,
                               foregroundColor: Colors.white,
@@ -635,7 +582,7 @@ class _DietScheduleState extends State<DietSchedule> {
                             SlidableAction(
                               flex: 1,
                               onPressed: (context) => {
-                                deleteIngestion(diet['dietId']),
+                                deleteIngestion(diet['ingestionId']),
                                 selectedDate = selectedDate
                               },
                               backgroundColor: Color(0xFFFF5050),
@@ -660,21 +607,21 @@ class _DietScheduleState extends State<DietSchedule> {
                                         ? '${diet['name'].substring(0, 14)}···'
                                         : diet['name'],
                                     style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: fontSize,
                                         fontWeight: FontWeight.bold)),
                                 SizedBox(width: 5),
                                 Text(
-                                    '${diet['servingSize'].toStringAsFixed(0)}g',
-                                    style: TextStyle(fontSize: 10)),
+                                    '${diet['totalIngestionSize'].toStringAsFixed(0)}g',
+                                    style: TextStyle(fontSize: fontSize)),
                               ],
                             ),
                             subtitle: Text(
                                 '탄수화물 ${diet['carbohydrate'] >= 9999999.0 ? "-g" : "${diet['carbohydrate'].toStringAsFixed(0)}g"} 단백질 ${diet['protein'] >= 9999999.0 ? "-g" : "${diet['protein'].toStringAsFixed(0)}g"} 지방 ${diet['fat'] >= 9999999.0 ? "-g" : "${diet['fat'].toStringAsFixed(0)}g"}',
-                                style: TextStyle(fontSize: 11)),
+                                style: TextStyle(fontSize: fontSize)),
                             trailing: Text(
                                 '${diet['calories'].toStringAsFixed(0)}kcal',
                                 style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.bold)),
+                                    fontSize: fontSize, fontWeight: FontWeight.bold)),
                           ),
                         ));
                   }),
