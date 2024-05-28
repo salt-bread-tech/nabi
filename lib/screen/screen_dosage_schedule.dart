@@ -1,3 +1,5 @@
+import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
+import 'package:doctor_nyang/screen/screen_pre_forDosage.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +9,11 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../assets/theme.dart';
 import '../services/urls.dart';
+import '../widgets/widget_calendar.dart';
 import '../widgets/widget_weeklyCalendar2.dart';
 import '../widgets/widget_weekly_calendar.dart';
-
 
 class DosageSchedule extends StatefulWidget {
   @override
@@ -28,7 +31,6 @@ class _DosageScheduleState extends State<DosageSchedule> {
     fetchDosageSchedule();
   }
 
-  //일정 가져오기
   Future<void> fetchDosageSchedule() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
     final String url = '$baseUrl/dosage';
@@ -50,21 +52,19 @@ class _DosageScheduleState extends State<DosageSchedule> {
           String scheduleDate = schedule['date'];
           return scheduleDate == formattedDate;
         }).toList();
-
+        //print(allSchedule);
+        print(todaySchedule);
         setState(() {
           dosageSchedule = todaySchedule;
         });
       } else {
-        print('복용 일정 조회 실패');
+        print('Failed to fetch dosage schedule');
       }
     } catch (e) {
-      print('네트워크 오류 $e');
-      print('Token: $token');
-      print('Formatted Date: $formattedDate');
+      print('Network error: $e');
     }
   }
 
-  //일정 토글
   Future<void> toggleDosage(int medicineId, String date, int times) async {
     final String url = '$baseUrl/dosage/toggle';
 
@@ -85,15 +85,43 @@ class _DosageScheduleState extends State<DosageSchedule> {
       if (response.statusCode == 200) {
         fetchDosageSchedule();
         print('복용 일정 완료(미완료) 토글링 성공');
-        print('$medicineId $times');
       } else {
         print('복용 일정 변경 실패');
       }
     } catch (e) {
-      print('네트워크 오류 $e');
+      print('Network error: $e');
     }
   }
 
+  Future<void> editMedicine({required int dosageId, required DateTime date, required int times, required int dosage}) async {
+    final url = Uri.parse('$baseUrl/dosage');
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: json.encode({
+          'dosageId': dosageId,
+          'date': formattedDate,
+          'times': times,
+          'dosage': dosage
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('복용 일정 수정 성공');
+        fetchDosageSchedule();
+      } else {
+        print('복용 일정 수정 실패');
+      }
+    } catch (e) {
+      print('Network error: $e');
+    }
+  }
 
   Future<void> deleteMedicine(int dosageId) async {
     final url = Uri.parse('$baseUrl/dosage/$dosageId');
@@ -108,111 +136,25 @@ class _DosageScheduleState extends State<DosageSchedule> {
       );
 
       if (response.statusCode == 200) {
-        print('약물 일정 삭제 성공');
+        print('복용 일정 삭제 성공');
         fetchDosageSchedule();
       } else {
-        print('약물 일정 삭제 실패');
+        print('복용 일정 삭제 실패');
       }
     } catch (e) {
-      print('네트워크 오류: $e');
+      print('Network error: $e');
     }
   }
 
-
-//날짜 선택
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-        fetchDosageSchedule();
-      });
-    }
-  }
-
-  void _showDialog() {
-    showDialog(
+  void _selectDate() async {
+    showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return SimpleDialog(
-          backgroundColor: Colors.white,
-          contentPadding: EdgeInsets.all(20),
-          elevation: 0,
-          title: Text('의약품 복용 일정 추가하기',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-            textAlign: TextAlign.center,),
-          children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 130,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    //color: Color(0xFFE0F0FF),
-                    border: Border.all(
-                      color: Colors.grey,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: SimpleDialogOption(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(context, '/MedicineRegister');
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Icon(Iconsax.edit, size: 20),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: EdgeInsets.only(top: 8),
-                          child: Text('직접 작성하기'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(width: 10),
-                Container(
-                  width: 130,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: SimpleDialogOption(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(context, '/MedicineSearch');
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Icon(Iconsax.search_normal, size: 20),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: EdgeInsets.only(top: 8),
-                          child: Text('검색하기'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+        return WidgetCalendarMonth(
+          onDateSelected: (selectedDate) {
+            Navigator.pop(context);
+            _handleDateChange(selectedDate);
+          },
         );
       },
     );
@@ -227,41 +169,151 @@ class _DosageScheduleState extends State<DosageSchedule> {
 
   Map<String, int> timesToInt = {
     '아침 식전': 0,
-    '아침 식후': 1,
-    '점심 식전': 2,
-    '점심 식후': 3,
-    '저녁 식전': 4,
-    '저녁 식후': 5,
-    '자기 전': 6,
-    '공복': 7,
-    '아침 식사': 8,
-    '점심 식사': 9,
-    '저녁 식사': 10,
-    '간식': 11,
+    '아침 식중': 1,
+    '아침 식후': 2,
+    '점심 식전': 3,
+    '점심 식중': 4,
+    '점심 식후': 5,
+    '저녁 식전': 6,
+    '저녁 식중': 7,
+    '저녁 식후': 8,
+    '자기 전': 9,
   };
 
+  Map<String, int> medicineTakingTimesToInt = {
+    '식전': 0,
+    '식중': 1,
+    '식후': 2,
+    '상관 없음': 3,
+  };
 
   Map<String, List<dynamic>> categorizeDosage() {
     Map<String, List<dynamic>> categorizedSchedule = {
       '아침': [],
       '점심': [],
       '저녁': [],
+      '자기 전': [],
     };
 
     for (var dosage in dosageSchedule) {
       int timeValue = timesToInt[dosage['times']] ?? -1;
-      if ([0, 1].contains(timeValue)) {
+      if ([0, 1, 2].contains(timeValue)) {
         categorizedSchedule['아침']?.add(dosage);
-      } else if ([2, 3].contains(timeValue)) {
+      } else if ([3, 4, 5].contains(timeValue)) {
         categorizedSchedule['점심']?.add(dosage);
-      } else if ([4, 5].contains(timeValue)) {
+      } else if ([6, 7, 8].contains(timeValue)) {
         categorizedSchedule['저녁']?.add(dosage);
+      } else if (timeValue == 9) {
+        categorizedSchedule['자기 전']?.add(dosage);
       }
     }
 
     return categorizedSchedule;
   }
 
+  void editDosageModal(BuildContext context, dynamic dosage) {
+    List<String> time = ['아침', '점심', '저녁', '자기 전'];
+    List<String> medicineTakingTimes = ['식전', '식중', '식후', '상관 없음'];
+
+    int selectedTime = -1;
+    int selectedDosage = -1;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text('복용 일정 수정', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 20),
+                  Text('약 이름: ${dosage['medicineName']}'),
+                  SizedBox(height: 20),
+                  Text('복용 시간'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: time.map((e) {
+                      int timeValue = timesToInt[e] ?? -1;
+                      return ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedTime = timeValue;
+                            if (selectedTime == 9) {
+                              selectedDosage = 3; // 상관 없음
+                            } else {
+                              selectedDosage = -1; // Reset dosage if other time selected
+                            }
+                          });
+                        },
+                        child: Text(e, style: TextStyle(color: Colors.black)),
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: selectedTime == timeValue ? AppTheme.pastelBlue : Colors.grey[200],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  if (selectedTime != 9) ...[
+                    SizedBox(height: 20),
+                    Text('복용 방법'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: medicineTakingTimes.map((e) {
+                        int dosageValue = medicineTakingTimesToInt[e] ?? -1;
+                        return ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              selectedDosage = dosageValue;
+                            });
+                          },
+                          child: Text(e, style: TextStyle(color: Colors.black)),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: selectedDosage == dosageValue ? AppTheme.pastelBlue : Colors.grey[200],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      print('Selected Date: $selectedDate');
+                      print('Selected Time: $selectedTime');
+                      print('Selected Dosage: $selectedDosage');
+
+                      if (selectedTime != -1 && selectedDosage != -1) {
+                        editMedicine(
+                          dosageId: dosage['dosageId'],
+                          date: selectedDate,
+                          times: selectedTime,
+                          dosage: selectedDosage,
+                        );
+                        Navigator.pop(context);
+                      } else {
+                        print('Please select both time and dosage.');
+                      }
+                    },
+                    child: Text('저장하기'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -281,7 +333,12 @@ class _DosageScheduleState extends State<DosageSchedule> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: _showDialog,
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PrescriptionDosageScreen()),
+              );
+            },
           ),
         ],
       ),
@@ -301,6 +358,9 @@ class _DosageScheduleState extends State<DosageSchedule> {
                   SizedBox(height: 10),
                   if (categorizedSchedule['저녁']!.isNotEmpty)
                     timeSection('저녁', categorizedSchedule['저녁']!),
+                  SizedBox(height: 10),
+                  if (categorizedSchedule['자기 전']!.isNotEmpty)
+                    timeSection('자기 전', categorizedSchedule['자기 전']!),
                 ],
               ),
             ),
@@ -309,7 +369,6 @@ class _DosageScheduleState extends State<DosageSchedule> {
       ),
     );
   }
-
 
   Widget timeSection(String title, List<dynamic> schedule) {
     if (schedule.isEmpty) {
@@ -320,49 +379,52 @@ class _DosageScheduleState extends State<DosageSchedule> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-              title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ),
-        ...schedule.map((dosage) =>
-            Slidable(
-              key: Key(dosage['dosageId'].toString()),
-              endActionPane: ActionPane(
-                motion: const DrawerMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: (context) => deleteMedicine(dosage['dosageId']),
-                    backgroundColor: Color(0xFFFF5050),
-                    foregroundColor: Colors.white,
-                    icon: Iconsax.trash,
-                  ),
-                ],
+        ...schedule.map((dosage) => Slidable(
+          key: Key(dosage['dosageId'].toString()),
+          endActionPane: ActionPane(
+            motion: const DrawerMotion(),
+            children: [
+              SlidableAction(
+                flex: 1,
+                onPressed: (context) => editDosageModal(context, dosage),
+                backgroundColor: Colors.black12,
+                foregroundColor: Colors.white,
+                icon: Iconsax.edit,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
               ),
-              child: Card(
-                shadowColor: Colors.black,
-                elevation: 0,
-                color: dosage['medicineTaken'] ? Color(0xFFE3F2FF) : Color(
-                    0xFFF1F1F1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ListTile(
-                  title: Text('${dosage['medicineName']}'),
-                  subtitle: Text(dosage['times']),
-                  trailing: Icon(
-                    dosage['medicineTaken'] ? Icons.check : Icons.check,
-                    color: dosage['medicineTaken'] ? Color(0xFF6696DE) : Colors
-                        .grey,
-                  ),
-                  onTap: () async {
-                    int timeValue = timesToInt[dosage['times']] ?? -1;
-                    await toggleDosage(
-                        dosage['medicineId'], dosage['date'], timeValue);
-                    print('medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
-                  },
-                ),
+              SlidableAction(
+                onPressed: (context) => deleteMedicine(dosage['dosageId']),
+                backgroundColor: Color(0xFFFF5050),
+                foregroundColor: Colors.white,
+                icon: Iconsax.trash,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
               ),
-            )).toList(),
+            ],
+          ),
+          child: Card(
+            shadowColor: Colors.black,
+            elevation: 0,
+            color: dosage['medicineTaken'] ? Color(0xFFE3F2FF) : Color(0xFFF1F1F1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: ListTile(
+              title: Text('${dosage['medicineName']}'),
+              subtitle: Text(dosage['times']),
+              trailing: Icon(
+                dosage['medicineTaken'] ? Icons.check : Icons.check,
+                color: dosage['medicineTaken'] ? Color(0xFF6696DE) : Colors.grey,
+              ),
+              onTap: () async {
+                int timeValue = timesToInt[dosage['times']] ?? -1;
+                await toggleDosage(dosage['medicineId'], dosage['date'], timeValue);
+                print('medicineId: ${dosage['medicineId']}, date: ${dosage['date']}, times: $timeValue');
+              },
+            ),
+          ),
+        )).toList(),
       ],
     );
   }

@@ -76,12 +76,6 @@ class _WidgetCalendarMonthState extends State<WidgetCalendarMonth> {
           },
           calendarFormat: CalendarFormat.month,
         ),
-        ElevatedButton(
-          onPressed: () {
-            _showDatePickerPopup(context);
-          },
-          child: Text('날짜 선택'),
-        ),
       ],
     );
   }
