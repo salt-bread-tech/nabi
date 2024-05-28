@@ -81,7 +81,6 @@ class _WidgetScheduleState extends State<WidgetSchedule> {
         color: widget.isWidget ? AppTheme.pastelBlue.withOpacity(0.5) : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
       ),
-      margin: EdgeInsets.all(10),
       padding: EdgeInsets.all(10),
       child: FutureBuilder<List<Schedule>>(
         future: fetchSchedule(widget.datetime.toString().substring(0, 10)),

@@ -50,7 +50,6 @@ class _WidgetPrescriptionState extends State<WidgetPrescription> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(10),
       padding: EdgeInsets.all(10),
       width: double.infinity,
       decoration: BoxDecoration(

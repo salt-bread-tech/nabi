@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
@@ -23,12 +25,14 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
 
   late DateTime selectedDate;
   String _selectedDateRange = '';
+  int _weekNumber = 0;
 
   @override
   void initState() {
     super.initState();
     selectedDate = DateTime.parse(widget.datetime);
     _selectedDateRange = _formatDateRange(selectedDate);
+    _weekNumber = getWeekNumber(selectedDate);
     _routinesFuture = _fetchRoutines();
   }
 
@@ -46,6 +50,7 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
         setState(() {
           _routines = json.decode(decodedResponse);
         });
+        print('루틴 조회 성공: ${_routines.length}개');
       } else {
         throw Exception('루틴 조회 실패: ${response.statusCode}');
       }
@@ -78,13 +83,13 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
     if (updated) {
       setState(() {
         routine['counts'] =
-        index < routine['counts'] ? index : routine['counts'] + 1;
+            index < routine['counts'] ? index : routine['counts'] + 1;
       });
     }
   }
 
-  Future<bool> _updateRoutineCount(int routineId, int indexClicked,
-      int currentCount, int maxCount) async {
+  Future<bool> _updateRoutineCount(
+      int routineId, int indexClicked, int currentCount, int maxCount) async {
     int newCount = currentCount;
     if (indexClicked < currentCount) {
       newCount = indexClicked;
@@ -119,36 +124,35 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
   @override
   Widget build(BuildContext context) {
     // Set a dynamic font size based on the screen width
-    final fontSize = MediaQuery
-        .of(context)
-        .size
-        .width * 0.034;
+    final fontSize = MediaQuery.of(context).size.width * 0.034;
 
     return Container(
-      margin: _routines.isNotEmpty ? EdgeInsets.all(0) : EdgeInsets.all(10),
-      padding: _routines.isNotEmpty ? EdgeInsets.all(0) : EdgeInsets.all(10),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: _routines.isNotEmpty ? Colors.white : Color(0xFFF4F9FF),
         borderRadius: BorderRadius.circular(10),
       ),
       child: FutureBuilder(
         future: _routinesFuture,
         builder: (context, snapshot) {
           List<Widget> children = [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                Text(
-                '습관 만들기 ($_selectedDateRange)',
-                style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),textAlign: TextAlign.start,
-              )
-                ]
-              )
-            ),
+            Container(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                  Container(
+                      padding: EdgeInsets.only(left: 5),
+                      margin: EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        '습관 만들기',
+                      )),
+                  Container(
+                      padding: EdgeInsets.only(right: 5),
+                      margin: EdgeInsets.only(bottom: 10),
+                      child: Text(
+                        '${selectedDate.month}월 ${_weekNumber}주차',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      )),
+                ])),
           ];
 
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -197,11 +201,19 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
   }
 }
 
-  String _formatDateRange(DateTime date) {
+String _formatDateRange(DateTime date) {
   int weekday = date.weekday;
   DateTime startOfWeek = date.subtract(Duration(days: weekday - 1));
   DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
   return '${DateFormat('M.dd').format(startOfWeek)}~${DateFormat('M.dd').format(endOfWeek)}';
+}
+
+int getWeekNumber(DateTime date) {
+  DateTime firstOfMonth = DateTime(date.year, date.month, 1);
+  int dayOfWeek = firstOfMonth.weekday;
+  DateTime firstDayOfFirstWeek = firstOfMonth.subtract(Duration(days: dayOfWeek - 1));
+  int weekNumber = ((date.difference(firstDayOfFirstWeek).inDays) ~/ 7) + 1;
+  return weekNumber;
 }
 
 class RoutineItem extends StatelessWidget {
@@ -229,14 +241,13 @@ class RoutineItem extends StatelessWidget {
     return Slidable(
       key: Key(routine['id'].toString()),
       child: Card(
-        margin: EdgeInsets.symmetric(horizontal: 10 ,vertical: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
         color: Color(0xFFF6F6F6),
         elevation: 0,
         child: Padding(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

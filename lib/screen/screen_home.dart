@@ -19,7 +19,6 @@ import '../widgets/widget_calendar.dart';
 import '../widgets/widget_diet.dart';
 import '../widgets/widget_routineList.dart';
 import '../widgets/widget_weekly_calendar.dart';
-import '../widgets/widget_weekly_routine.dart';
 import '../widgets/widget_prescription.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -37,15 +36,14 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       selectedDate = newDate;
       fetchIngestion();
-      _fetchRoutines();
     });
   }
 
   void refreshData() {
     setState(() {
       selectedDate = selectedDate;
+      _selectedDateRange = _formatDateRange(selectedDate);
       fetchIngestion();
-      _fetchRoutines();
     });
   }
 
@@ -83,29 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       print('error: $e');
-    }
-  }
-
-  Future<void> _fetchRoutines() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final url = Uri.parse('$baseUrl/routine/$formattedDate');
-    try {
-      final response = await http.get(url, headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer ${globals.token}',
-      });
-
-      final decodedResponse = utf8.decode(response.bodyBytes);
-
-      if (response.statusCode == 200) {
-        setState(() {
-          _selectedDateRange = _formatDateRange(selectedDate);
-        });
-      } else {
-        throw Exception('루틴 조회 실패: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('루틴 조회 실패: $e');
     }
   }
 
@@ -161,44 +136,89 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                   refreshData();
                 },
-                child: WidgetSchedule(
-                  datetime: selectedDate.toString(),
-                  isWidget: true,
-                ),
+                child: Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                              padding: EdgeInsets.only(left: 5),
+                              margin: EdgeInsets.only(bottom: 10),
+                              child: Text('일정')),
+                          WidgetSchedule(
+                            datetime: selectedDate.toString(),
+                            isWidget: true,
+                          )
+                        ])),
               ),
               SizedBox(height: 20),
-              WidgetDiet(
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => DietSchedule()),
-                  );
-                  refreshData();
-                },
-                isWidget: true,
-                userCalories: bmr ?? 2000,
-                breakfastCalories: ingestionSchedule.isNotEmpty
-                    ? ingestionSchedule[0]['breakfastKcal']
-                    : 0,
-                lunchCalories: ingestionSchedule.isNotEmpty
-                    ? ingestionSchedule[0]['lunchKcal']
-                    : 0,
-                dinnerCalories: ingestionSchedule.isNotEmpty
-                    ? ingestionSchedule[0]['dinnerKcal']
-                    : 0,
-                snackCalories: ingestionSchedule.isNotEmpty
-                    ? ingestionSchedule[0]['snackKcal']
-                    : 0,
-                totalProtein: ingestionSchedule.isNotEmpty
-                    ? ingestionSchedule[0]['totalProtein']
-                    : 0,
-                totalCarb: ingestionSchedule.isNotEmpty
-                    ? ingestionSchedule[0]['totalCarbohydrate']
-                    : 0,
-                totalFat: ingestionSchedule.isNotEmpty
-                    ? ingestionSchedule[0]['totalFat']
-                    : 0,
-              ),
+              Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            padding: EdgeInsets.only(left: 5),
+                            margin: EdgeInsets.only(bottom: 10),
+                            child: Text('식단')),
+                        WidgetDiet(
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DietSchedule()),
+                            );
+                            refreshData();
+                          },
+                          isWidget: true,
+                          userCalories: bmr ?? 2000,
+                          breakfastCalories: ingestionSchedule.isNotEmpty
+                              ? ingestionSchedule[0]['breakfastKcal']
+                              : 0,
+                          lunchCalories: ingestionSchedule.isNotEmpty
+                              ? ingestionSchedule[0]['lunchKcal']
+                              : 0,
+                          dinnerCalories: ingestionSchedule.isNotEmpty
+                              ? ingestionSchedule[0]['dinnerKcal']
+                              : 0,
+                          snackCalories: ingestionSchedule.isNotEmpty
+                              ? ingestionSchedule[0]['snackKcal']
+                              : 0,
+                          totalProtein: ingestionSchedule.isNotEmpty
+                              ? ingestionSchedule[0]['totalProtein']
+                              : 0,
+                          totalCarb: ingestionSchedule.isNotEmpty
+                              ? ingestionSchedule[0]['totalCarbohydrate']
+                              : 0,
+                          totalFat: ingestionSchedule.isNotEmpty
+                              ? ingestionSchedule[0]['totalFat']
+                              : 0,
+                        )
+                      ])),
               SizedBox(height: 20),
               GestureDetector(
                 onTap: () async {
@@ -211,13 +231,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   refreshData();
                 },
                 child: Container(
-                  alignment: Alignment.topCenter,
-                  child: RoutineListWidget(
-                    key:
-                        ValueKey(DateFormat('yyyy-MM-dd').format(selectedDate)),
-                    datetime: DateFormat('yyyy-MM-dd').format(selectedDate),
-                  ),
-                ),
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            alignment: Alignment.topCenter,
+                            child: RoutineListWidget(
+                              key: ValueKey(DateFormat('yyyy-MM-dd')
+                                  .format(selectedDate)),
+                              datetime:
+                                  DateFormat('yyyy-MM-dd').format(selectedDate),
+                            ),
+                          )
+                        ])),
               ),
               SizedBox(height: 20),
               GestureDetector(
@@ -230,7 +269,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                     refreshData();
                   },
-                  child: WidgetPrescription(datetime: DateFormat('yyyy-MM-dd').format(selectedDate))),
+                  child: Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                padding: EdgeInsets.only(left: 5),
+                                margin: EdgeInsets.only(bottom: 10),
+                                child: Text('처방전')),
+                            WidgetPrescription(
+                                datetime: DateFormat('yyyy-MM-dd')
+                                    .format(selectedDate))
+                          ]))),
             ],
           ),
         ),
