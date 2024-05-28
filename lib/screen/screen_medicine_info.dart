@@ -28,10 +28,10 @@ class _MedicineInfoState extends State<MedicineInfo> {
 
   Future<void> fetchMedicineInfo() async {
     final type = '0';
-    final response = await http.get(Uri.parse('$baseUrl/medicine/${widget.name}/$type'),headers: {
+    final response = await http.get(Uri.parse('$baseUrl/medicine/${widget.name}/$type'), headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
-    },);
+    });
 
     if (response.statusCode == 200) {
       final data = json.decode(utf8.decode(response.bodyBytes));
@@ -48,18 +48,19 @@ class _MedicineInfoState extends State<MedicineInfo> {
           'depositMethodQesitm': data['depositMethodQesitm'] ?? '보관법 정보 없음',
         };
       });
-
     } else {
       throw Exception('Failed to load medicine info');
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name,style: TextStyle(fontSize: 16),),
+        title: Text(
+          widget.name,
+          style: TextStyle(fontSize: 16),
+        ),
       ),
       body: medicineInfo.isNotEmpty
           ? SingleChildScrollView(
@@ -83,7 +84,11 @@ class _MedicineInfoState extends State<MedicineInfo> {
                     showMoreInfo = !showMoreInfo;
                   });
                 },
-                child: Text('추가 정보 더 보기',style: TextStyle(color: Color(0xFF969696)),textAlign: TextAlign.center,),
+                child: Text(
+                  showMoreInfo ? '닫기' : '추가 정보 더 보기',
+                  style: TextStyle(color: Color(0xFF969696)),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ],
           ),
@@ -92,7 +97,7 @@ class _MedicineInfoState extends State<MedicineInfo> {
           : Center(child: CircularProgressIndicator()),
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
           child: TextButton(
             style: TextButton.styleFrom(
               backgroundColor: Color(0xFFDCF4FF),
@@ -101,12 +106,11 @@ class _MedicineInfoState extends State<MedicineInfo> {
               ),
             ),
             onPressed: () {
-              if (widget.fromRoute == 'prescription'){
+              if (widget.fromRoute == 'prescription') {
                 Navigator.pop(context);
                 Navigator.pop(context);
                 searchText = widget.name;
-              }
-              else {
+              } else {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -125,7 +129,6 @@ class _MedicineInfoState extends State<MedicineInfo> {
     );
   }
 }
-
 
 class InfoTextWidget extends StatelessWidget {
   final String MedicineName;
