@@ -27,7 +27,6 @@ class DietSchedule extends StatefulWidget {
 class _DietScheduleState extends State<DietSchedule> {
   List<dynamic> dietSchedule = [];
   List<dynamic> ingestionSchedule = [];
-  List<String> times = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
   void _handleDateChange(DateTime newDate) {
     setState(() {
@@ -82,7 +81,7 @@ class _DietScheduleState extends State<DietSchedule> {
         });
 
         dietSchedule.sort((a, b) =>
-            times.indexOf(a['times']).compareTo(times.indexOf(b['times'])));
+            a['ingestionTimes'].compareTo(b['ingestionTimes']));
 
         print(dietSchedule);
       } else {
@@ -199,12 +198,12 @@ class _DietScheduleState extends State<DietSchedule> {
     }
   }
 
-  Color cardColor(String times) {
-    if (times == 'BREAKFAST') {
+  Color cardColor(int times) {
+    if (times == 0) {
       return AppTheme.pastelPink;
-    } else if (times == 'LUNCH') {
+    } else if (times == 1) {
       return AppTheme.pastelBlue;
-    } else if (times == 'DINNER') {
+    } else if (times == 2) {
       return AppTheme.pastelGreen;
     } else {
       return AppTheme.pastelYellow;
@@ -607,7 +606,7 @@ class _DietScheduleState extends State<DietSchedule> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          color: cardColor(diet['times']).withOpacity(0.4),
+                          color: cardColor(diet['ingestionTimes']).withOpacity(0.4),
                           elevation: 0,
                           child: ListTile(
                             title: Row(
