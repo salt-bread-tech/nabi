@@ -231,7 +231,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
                   ),
                   Spacer(),
                   IconButton(
-                      onPressed: _registerRoutine, icon: Icon(Iconsax.send_15))
+                      onPressed: (){_registerRoutine(); Navigator.of(context).pop();},  icon: Icon(Iconsax.send_15))
                 ],
               ),
             ],
