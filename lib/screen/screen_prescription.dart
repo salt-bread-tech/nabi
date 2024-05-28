@@ -1,6 +1,7 @@
 import 'package:doctor_nyang/assets/theme.dart';
 import 'package:doctor_nyang/screen/screen_prescription_info.dart';
 import 'package:doctor_nyang/services/globals.dart';
+import 'package:doctor_nyang/widgets/widget_delete.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -261,7 +262,8 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PrescriptionInfoScreen(
-                                    id: prescriptions[index]['prescriptionId'], fromRoute: 'prescription'),
+                                    id: prescriptions[index]['prescriptionId'],
+                                    fromRoute: 'prescription'),
                               ),
                             );
                           },
@@ -287,8 +289,18 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                 SlidableAction(
                                   flex: 1,
                                   onPressed: (context) => {
-                                    deletePrescription(
-                                        prescriptions[index]['prescriptionId'])
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return DeleteConfirmDialog(
+                                              title: '처방전 삭제',
+                                              content: '이 처방전을 정말 삭제하시겠습니까?',
+                                              onConfirm: () {
+                                                deletePrescription(
+                                                    prescriptions[index]
+                                                        ['prescriptionId']);
+                                              });
+                                        })
                                   },
                                   backgroundColor: Color(0xFFFF5050),
                                   foregroundColor: Colors.white,

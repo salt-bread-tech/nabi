@@ -15,6 +15,7 @@ import 'dart:convert';
 
 import '../models/model_diet.dart';
 import '../services/urls.dart';
+import '../widgets/widget_delete.dart';
 import '../widgets/widget_diet.dart';
 import '../widgets/widget_weekly_calendar.dart';
 
@@ -504,7 +505,7 @@ class _DietScheduleState extends State<DietSchedule> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20) ,
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
             child: Column(
               children: <Widget>[
                 WidgetCalendar(onDateSelected: _handleDateChange),
@@ -582,8 +583,17 @@ class _DietScheduleState extends State<DietSchedule> {
                             SlidableAction(
                               flex: 1,
                               onPressed: (context) => {
-                                deleteIngestion(diet['ingestionId']),
-                                selectedDate = selectedDate
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return DeleteConfirmDialog(
+                                          title: '식단 삭제',
+                                          content: '이 식단을 정말 삭제하시겠습니까?',
+                                          onConfirm: () {
+                                            deleteIngestion(
+                                                diet['ingestionId']);
+                                          });
+                                    })
                               },
                               backgroundColor: Color(0xFFFF5050),
                               foregroundColor: Colors.white,
@@ -621,7 +631,8 @@ class _DietScheduleState extends State<DietSchedule> {
                             trailing: Text(
                                 '${diet['calories'].toStringAsFixed(0)}kcal',
                                 style: TextStyle(
-                                    fontSize: fontSize, fontWeight: FontWeight.bold)),
+                                    fontSize: fontSize,
+                                    fontWeight: FontWeight.bold)),
                           ),
                         ));
                   }),
