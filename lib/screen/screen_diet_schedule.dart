@@ -414,13 +414,13 @@ class _DietScheduleState extends State<DietSchedule> {
                                   date: DateFormat('yyyy-MM-dd')
                                       .format(selectedDate)
                                       .toString(),
-                                  times: _selectedMeal == '아침'
+                                  times: _selectedMeal== '아침'
                                       ? 0
                                       : _selectedMeal == '점심'
-                                          ? 1
-                                          : _selectedMeal == '저녁'
-                                              ? 2
-                                              : 3,
+                                      ? 1
+                                      : _selectedMeal == '저녁'
+                                      ? 2
+                                      : 3,
                                   servingSize: food.servingSize,
                                   totalIngestionSize: _selectedGram == '인분'
                                       ? food.servingSize * _selectedQuantity

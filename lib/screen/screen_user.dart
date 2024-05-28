@@ -23,7 +23,6 @@ class _UserScreenState extends State<UserScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -40,13 +39,20 @@ class _UserScreenState extends State<UserScreen> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Iconsax.setting_2),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
                   builder: (context) => SettingsScreen(),
-              ),
+                ),
               );
+              setState(() {
+                fetchUserInfo().then((_) {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                });
+              });
             },
           ),
         ],
@@ -65,19 +71,24 @@ class _UserScreenState extends State<UserScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(globals.nickName ?? '이름', style: TextStyle(fontSize: 20)),
+                    Text(globals.nickName ?? '이름',
+                        style: TextStyle(fontSize: 20)),
                     SizedBox(height: 5),
-                    Text(globals.birth ?? '생년월일', style: TextStyle(fontSize: 12)),
+                    Text(globals.birth ?? '생년월일',
+                        style: TextStyle(fontSize: 12)),
                     Row(
                       children: [
-                        Text('${globals.height?.toString() ?? '키'}cm', style: TextStyle(fontSize: 12)),
+                        Text('${globals.height?.toString() ?? '키'}cm',
+                            style: TextStyle(fontSize: 12)),
                         SizedBox(width: 5),
-                        Text('${globals.weight?.toString() ?? '몸무게'}kg', style: TextStyle(fontSize: 12)),
+                        Text('${globals.weight?.toString() ?? '몸무게'}kg',
+                            style: TextStyle(fontSize: 12)),
                       ],
                     ),
                     Row(
                       children: [
-                        Text('BMI : ${globals.bmi?.toString() ?? 'bmi'}', style: TextStyle(fontSize: 12)),
+                        Text('BMI : ${globals.bmi?.toString() ?? 'bmi'}',
+                            style: TextStyle(fontSize: 12)),
                         SizedBox(width: 5),
                       ],
                     ),
@@ -95,7 +106,7 @@ class _UserScreenState extends State<UserScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 20),
-                Text('기능 목록',style: TextStyle(fontSize: 16)),
+                Text('기능 목록', style: TextStyle(fontSize: 16)),
                 Divider(),
                 ListTile(
                   title: Text('약 복용 루틴'),
@@ -114,12 +125,14 @@ class _UserScreenState extends State<UserScreen> {
                   onTap: () {
                     Navigator.pushNamed(context, '/DietSchedule');
                   },
-                ),ListTile(
+                ),
+                ListTile(
                   title: Text('처방전 추가'),
                   onTap: () {
                     OCRModal.show(context);
                   },
-                ),ListTile(
+                ),
+                ListTile(
                   title: Text('처방전 화면'),
                   onTap: () {
                     Navigator.pushNamed(context, '/Prescription');
