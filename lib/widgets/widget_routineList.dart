@@ -196,6 +196,7 @@ class RoutineItem extends StatelessWidget {
     return Slidable(
       key: Key(routine['id'].toString()),
       child: Card(
+        margin: EdgeInsets.symmetric(horizontal: 10 ,vertical: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
