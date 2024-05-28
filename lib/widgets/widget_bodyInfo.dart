@@ -238,7 +238,10 @@ class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
 
   Widget _buildUpdateButton() {
     return ElevatedButton(
-      onPressed: _updateBodyInfo,
+      onPressed: () async {
+        await _updateBodyInfo();
+        Navigator.pop(context);
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Color(0xFFE0F0FF),
         minimumSize: Size.fromHeight(45),

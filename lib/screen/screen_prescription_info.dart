@@ -174,6 +174,8 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
           });
         });
 
+        print(prescription);
+
         print('처방전 조회 성공');
       } else {
         print('처방전 조회 실패');
@@ -299,6 +301,28 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
         print('복용일정 추가 성공');
       } else {
         print('복용일정 추가 실패');
+      }
+    } catch (e) {
+      print('네트워크 오류 $e');
+    }
+  }
+
+  Future<void> deleteDosage(int medicineId) async {
+    final String url = '$baseUrl/dosage/medicine/$medicineId';
+
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('복용일정 삭제 성공');
+      } else {
+        print('복용일정 삭제 실패');
       }
     } catch (e) {
       print('네트워크 오류 $e');
@@ -861,29 +885,31 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                             children: [
                                               GestureDetector(
                                                   onTap: () {
-
+                                                    print(medicineTaking[
+                                                        'registeredDosingSchedule']);
                                                     if (medicineTaking[
                                                         'registeredDosingSchedule']) {
-                                                          (context) {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext context) {
-                                                            return DeleteConfirmDialog(
-                                                              title: '복용 일정 삭제',
-                                                              content: '이 복용 일정을 삭제하시겠습니까?',
-                                                              onConfirm: () {
-                                                                deleteMedicine(
-                                                                    medicineTaking[
-                                                                        'medicineId']);
-                                                              },
-                                                            );
-                                                          },
-                                                        );
-                                                        setState(() {
-                                                          medicineTaking[
-                                                              'registeredDosingSchedule'] = false;
-                                                        });
-                                                      };
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return DeleteConfirmDialog(
+                                                            title: '복용 일정 삭제',
+                                                            content:
+                                                                '이 복용 일정을 삭제하시겠습니까?',
+                                                            onConfirm: () {
+                                                              deleteDosage(
+                                                                  medicineTaking[
+                                                                      'medicineId']);
+                                                              setState(() {
+                                                                medicineTaking[
+                                                                        'registeredDosingSchedule'] =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          );
+                                                        },
+                                                      );
                                                     } else {
                                                       addDosage(medicineTaking[
                                                           'medicineId']);
