@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import '../services/globals.dart';
@@ -111,6 +112,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
           SizedBox(
             width: 30,
             child: TextField(
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 hintStyle: TextStyle(color: Colors.grey),
                 hintText: '1',

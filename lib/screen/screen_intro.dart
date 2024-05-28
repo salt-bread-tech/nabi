@@ -9,9 +9,9 @@ class IntroPage extends StatefulWidget {
 
 class _IntroPageState extends State<IntroPage> {
   int activeIndex = 0;
-  final List<String> images = ['images/intro_chat.png', 'images/intro_widget.png', 'images/image3.png'];
-  final List<String> texts = ['나비와 대화하기', '건강한 일상생활 만들기', '의약품 복용 관리'];
-  final List<String> texts2 = ['귀여운 고양이 나비와 일상적인 대화를 통해 \n 심리 상태를 공유하고 상담 가능해요', '일정 관리, 식단 관리, 습관 만들기를 통해 \n 건강한 일상생활 만들기', '원하는 의약품 추가하여 건강한 생활습관 만들기'];
+  final List<String> images = ['images/intro_chat.png', 'images/intro_widget.png'];
+  final List<String> texts = ['나비와 행복한 시간 보내기', '건강한 일상생활 만들기'];
+  final List<String> texts2 = ['귀여운 고양이 나비와 일상적인 대화를 통해 \n 심리 상태를 공유하고 상담 가능해요', '일정, 식단, 의약품 복용 일정 관리 \n 습관 만들기, 나만의 처방전 만들기 등 \n 다양한 기능을 통해  건강한 일상생활 만들기'];
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +23,10 @@ class _IntroPageState extends State<IntroPage> {
         child: Column(
           children: <Widget>[
             SizedBox(height: 90),
-            Text(texts[activeIndex],textAlign: TextAlign.center,style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold),),
+            Text(texts[activeIndex],textAlign: TextAlign.center,style: TextStyle(color: Colors.black,fontSize: 23,fontWeight: FontWeight.bold),),
             SizedBox(height: 20),
             Text(texts2[activeIndex],textAlign: TextAlign.center,style: TextStyle(color: Colors.black,fontSize: 13),),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             Expanded(
               child: introslider(images, screenHeight),
             ),
