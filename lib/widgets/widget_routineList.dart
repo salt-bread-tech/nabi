@@ -83,8 +83,8 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
     }
   }
 
-  Future<bool> _updateRoutineCount(
-      int routineId, int indexClicked, int currentCount, int maxCount) async {
+  Future<bool> _updateRoutineCount(int routineId, int indexClicked,
+      int currentCount, int maxCount) async {
     int newCount = currentCount;
     if (indexClicked < currentCount) {
       newCount = indexClicked;
@@ -118,6 +118,12 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // Set a dynamic font size based on the screen width
+    final fontSize = MediaQuery
+        .of(context)
+        .size
+        .width * 0.034;
+
     return Container(
       margin: _routines.isNotEmpty ? EdgeInsets.all(0) : EdgeInsets.all(10),
       padding: _routines.isNotEmpty ? EdgeInsets.all(0) : EdgeInsets.all(10),
@@ -129,42 +135,69 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
       child: FutureBuilder(
         future: _routinesFuture,
         builder: (context, snapshot) {
+          List<Widget> children = [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                Text(
+                '습관 만들기 ($_selectedDateRange)',
+                style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),textAlign: TextAlign.start,
+              )
+                ]
+              )
+            ),
+          ];
+
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-              margin: EdgeInsets.all(5),
-              width: double.infinity,
-              child: Text('루틴을 불러오는 중입니다...'),
+            children.add(
+              Container(
+                margin: EdgeInsets.all(5),
+                width: double.infinity,
+                child: Text('루틴을 불러오는 중입니다...'),
+              ),
             );
           } else if (!snapshot.hasData && _routines.isEmpty) {
-            return Container(
-              margin: EdgeInsets.all(5),
-              width: double.infinity,
-              child: Text('등록된 루틴이 없습니다.'),
+            children.add(
+              Container(
+                margin: EdgeInsets.all(5),
+                width: double.infinity,
+                child: Text('등록된 루틴이 없습니다.'),
+              ),
             );
           } else if (snapshot.connectionState == ConnectionState.done) {
-            return Column(
-              children: _routines.map((routine) {
+            children.addAll(
+              _routines.map((routine) {
                 return RoutineItem(
                   routine: routine,
                   onDelete: (id) => _deleteRoutine(id),
-                  onCountChange: (circleIndex) => _handleTap(circleIndex, routine),
+                  onCountChange: (circleIndex) =>
+                      _handleTap(circleIndex, routine),
                 );
               }).toList(),
             );
           } else {
-            return Container(
-              margin: EdgeInsets.all(5),
-              width: double.infinity,
-              child: Text('루틴을 불러오는 중 오류가 발생했습니다.'),
+            children.add(
+              Container(
+                margin: EdgeInsets.all(5),
+                width: double.infinity,
+                child: Text('루틴을 불러오는 중 오류가 발생했습니다.'),
+              ),
             );
           }
+
+          return Column(
+            children: children,
+          );
         },
       ),
     );
   }
 }
 
-String _formatDateRange(DateTime date) {
+  String _formatDateRange(DateTime date) {
   int weekday = date.weekday;
   DateTime startOfWeek = date.subtract(Duration(days: weekday - 1));
   DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
