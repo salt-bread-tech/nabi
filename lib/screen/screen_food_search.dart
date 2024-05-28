@@ -180,7 +180,6 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -218,7 +217,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                 ),
                 Expanded(
                   child: Text(
-                    '${(widget.food.calories * _selectedQuantity).toStringAsFixed(0)} kcal',
+                    '${(_selectedGram == '인분' ? widget.food.calories * _selectedQuantity : widget.food.calories * _selectedQuantity / widget.food.servingSize).toStringAsFixed(0)} kcal',
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.end,
@@ -244,19 +243,19 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                     ),
                     child: DropdownButtonHideUnderline(
                         child: DropdownButton(
-                          value: _selectedMeal,
-                          dropdownColor: Colors.white,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedMeal = value!;
-                            });
-                          },
-                          items: _meals
-                              .map((e) => DropdownMenuItem(
-                              child: Text(e), value: e))
-                              .toList(),
-                          borderRadius: BorderRadius.circular(8),
-                        ))),
+                      value: _selectedMeal,
+                      dropdownColor: Colors.white,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedMeal = value!;
+                        });
+                      },
+                      items: _meals
+                          .map(
+                              (e) => DropdownMenuItem(child: Text(e), value: e))
+                          .toList(),
+                      borderRadius: BorderRadius.circular(8),
+                    ))),
                 SizedBox(width: 5),
                 Container(
                   alignment: Alignment.center,
@@ -275,20 +274,18 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                       IconButton(
                         icon: Icon(Icons.remove,
                             size: 20, color: Color(0xFFD9D9D9)),
-                        onPressed:() {
+                        onPressed: () {
                           _decrementQuantity();
-                        }
-                        ,
+                        },
                       ),
                       Container(
                         width: 35,
                         child: TextField(
                           controller: _controller,
                           textAlign: TextAlign.center,
-                          keyboardType: TextInputType.numberWithOptions(
-                              decimal: true),
-                          decoration:
-                          InputDecoration(border: InputBorder.none),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
+                          decoration: InputDecoration(border: InputBorder.none),
                         ),
                       ),
                       IconButton(
@@ -315,28 +312,27 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                     ),
                     child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
-                          value: _selectedGram,
-                          dropdownColor: Colors.white,
-                          onChanged: (newValue) {
-                            setState(() {
-                              _selectedGram = newValue!;
-                              if (_selectedGram == '인분') {
-                                _selectedQuantity = 1.0;
-                                _controller.text =
-                                    _selectedQuantity.toString();
-                              } else {
-                                _selectedQuantity = widget.food.servingSize;
-                                _controller.text =
-                                    _selectedQuantity.toStringAsFixed(0);
-                              }
-                            });
-                          },
-                          items: _grams
-                              .map((e) => DropdownMenuItem(
-                              child: Text(e), value: e))
-                              .toList(),
-                          borderRadius: BorderRadius.circular(8),
-                        ))),
+                      value: _selectedGram,
+                      dropdownColor: Colors.white,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedGram = newValue!;
+                          if (_selectedGram == '인분') {
+                            _selectedQuantity = 1.0;
+                            _controller.text = _selectedQuantity.toString();
+                          } else {
+                            _selectedQuantity = widget.food.servingSize;
+                            _controller.text =
+                                _selectedQuantity.toStringAsFixed(0);
+                          }
+                        });
+                      },
+                      items: _grams
+                          .map(
+                              (e) => DropdownMenuItem(child: Text(e), value: e))
+                          .toList(),
+                      borderRadius: BorderRadius.circular(8),
+                    ))),
               ],
             ),
             SizedBox(height: 24),
@@ -347,7 +343,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                 Text(
                     widget.food.carbohydrate == 9999999
                         ? '정보없음'
-                        : '${(widget.food.carbohydrate * _selectedQuantity).toStringAsFixed(0)}g',
+                        : '${(_selectedGram == '인분' ? widget.food.carbohydrate * _selectedQuantity : widget.food.carbohydrate * _selectedQuantity / widget.food.servingSize).toStringAsFixed(0)}g',
                     style: TextStyle(fontSize: 16)),
               ],
             ),
@@ -360,16 +356,14 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                 SizedBox(width: 5),
                 Text('당류',
                     style: TextStyle(
-                        fontSize: 16,
-                        color: AppTheme.subTitleTextColor)),
+                        fontSize: 16, color: AppTheme.subTitleTextColor)),
                 Expanded(
                   child: Text(
-    widget.food.sugars == 9999999
+                      widget.food.sugars == 9999999
                           ? '정보없음'
-                          : '${(widget.food.sugars*_selectedQuantity).toStringAsFixed(0)}g',
+                          : '${(_selectedGram == '인분' ? widget.food.sugars * _selectedQuantity : widget.food.sugars * _selectedQuantity / widget.food.servingSize).toStringAsFixed(0)}g',
                       style: TextStyle(
-                          fontSize: 16,
-                          color: AppTheme.subTitleTextColor),
+                          fontSize: 16, color: AppTheme.subTitleTextColor),
                       textAlign: TextAlign.end),
                 ),
               ],
@@ -380,9 +374,9 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
               children: [
                 Text('단백질', style: TextStyle(fontSize: 16)),
                 Text(
-    widget.food.protein == 9999999
+                    widget.food.protein == 9999999
                         ? '정보없음'
-                        : '${(widget.food.protein * _selectedQuantity).toStringAsFixed(0)}g',
+                        : '${(_selectedGram == '인분' ? widget.food.protein * _selectedQuantity : widget.food.protein * _selectedQuantity / widget.food.servingSize).toStringAsFixed(0)}g',
                     style: TextStyle(fontSize: 16)),
               ],
             ),
@@ -392,9 +386,9 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
               children: [
                 Text('지방', style: TextStyle(fontSize: 16)),
                 Text(
-    widget.food.fat == 9999999
+                    widget.food.fat == 9999999
                         ? '정보없음'
-                        : '${(widget.food.fat * _selectedQuantity).toStringAsFixed(0)}g',
+                        : '${(_selectedGram == '인분' ? widget.food.fat * _selectedQuantity : widget.food.fat * _selectedQuantity / widget.food.servingSize).toStringAsFixed(0)}g',
                     style: TextStyle(fontSize: 16)),
               ],
             ),
@@ -407,16 +401,14 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                 SizedBox(width: 5),
                 Text('포화지방',
                     style: TextStyle(
-                        fontSize: 16,
-                        color: AppTheme.subTitleTextColor)),
+                        fontSize: 16, color: AppTheme.subTitleTextColor)),
                 Expanded(
                   child: Text(
-                  widget.food.saturatedFattyAcid == 9999999
+                      widget.food.saturatedFattyAcid == 9999999
                           ? '정보없음'
-                          : '${(widget.food.saturatedFattyAcid * _selectedQuantity).toStringAsFixed(0)}g',
+                          : '${(_selectedGram == '인분' ? widget.food.saturatedFattyAcid * _selectedQuantity : widget.food.saturatedFattyAcid * _selectedQuantity / widget.food.servingSize).toStringAsFixed(0)}g',
                       style: TextStyle(
-                          fontSize: 16,
-                          color: AppTheme.subTitleTextColor),
+                          fontSize: 16, color: AppTheme.subTitleTextColor),
                       textAlign: TextAlign.end),
                 ),
               ],
@@ -430,16 +422,14 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                 SizedBox(width: 5),
                 Text('트랜스지방',
                     style: TextStyle(
-                        fontSize: 16,
-                        color: AppTheme.subTitleTextColor)),
+                        fontSize: 16, color: AppTheme.subTitleTextColor)),
                 Expanded(
                   child: Text(
-                  widget.food.transFattyAcid == 9999999
+                      widget.food.transFattyAcid == 9999999
                           ? '정보없음'
-                          : '${(widget.food.transFattyAcid * _selectedQuantity).toStringAsFixed(0)}g',
+                          : '${(_selectedGram == '인분' ? widget.food.transFattyAcid * _selectedQuantity : widget.food.transFattyAcid * _selectedQuantity / widget.food.servingSize).toStringAsFixed(0)}g',
                       style: TextStyle(
-                          fontSize: 16,
-                          color: AppTheme.subTitleTextColor),
+                          fontSize: 16, color: AppTheme.subTitleTextColor),
                       textAlign: TextAlign.end),
                 ),
               ],
@@ -450,9 +440,9 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
               children: [
                 Text('나트륨', style: TextStyle(fontSize: 16)),
                 Text(
-    widget.food.salt == 9999999
+                    widget.food.salt == 9999999
                         ? '정보없음'
-                        : '${(widget.food.salt * _selectedQuantity).toStringAsFixed(0)}g',
+                        : '${(_selectedGram == '인분' ? widget.food.salt * _selectedQuantity : widget.food.salt * _selectedQuantity / widget.food.servingSize).toStringAsFixed(0)}g',
                     style: TextStyle(fontSize: 16)),
               ],
             ),
@@ -478,66 +468,65 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                     calories: _selectedGram == '인분'
                         ? widget.food.calories * _selectedQuantity
                         : widget.food.calories *
-                        _selectedQuantity /
-    widget.food.servingSize,
+                            _selectedQuantity /
+                            widget.food.servingSize,
                     carbohydrate: widget.food.carbohydrate >= 9999999
                         ? 9999999
                         : _selectedGram == '인분'
-                        ? widget.food.carbohydrate * _selectedQuantity
-                        : widget.food.carbohydrate *
-                        _selectedQuantity /
-    widget.food.servingSize,
+                            ? widget.food.carbohydrate * _selectedQuantity
+                            : widget.food.carbohydrate *
+                                _selectedQuantity /
+                                widget.food.servingSize,
                     protein: widget.food.protein >= 9999999
                         ? 9999999
                         : _selectedGram == '인분'
-                        ? widget.food.protein * _selectedQuantity
-                        : widget.food.protein *
-                        _selectedQuantity /
-    widget.food.servingSize,
+                            ? widget.food.protein * _selectedQuantity
+                            : widget.food.protein *
+                                _selectedQuantity /
+                                widget.food.servingSize,
                     fat: widget.food.fat >= 9999999
                         ? 9999999
                         : _selectedGram == '인분'
-                        ? widget.food.fat * _selectedQuantity
-                        : widget.food.fat *
-                        _selectedQuantity /
-                        widget.food.servingSize,
+                            ? widget.food.fat * _selectedQuantity
+                            : widget.food.fat *
+                                _selectedQuantity /
+                                widget.food.servingSize,
                     sugars: widget.food.sugars >= 9999999
                         ? 9999999
                         : _selectedGram == '인분'
-                        ? widget.food.sugars * _selectedQuantity
-                        : widget.food.sugars *
-                        _selectedQuantity /
-    widget.food.servingSize,
+                            ? widget.food.sugars * _selectedQuantity
+                            : widget.food.sugars *
+                                _selectedQuantity /
+                                widget.food.servingSize,
                     salt: widget.food.salt >= 9999999
                         ? 9999999
                         : _selectedGram == '인분'
-                        ? widget.food.salt * _selectedQuantity
-                        : widget.food.salt *
-                        _selectedQuantity /
-    widget.food.servingSize,
+                            ? widget.food.salt * _selectedQuantity
+                            : widget.food.salt *
+                                _selectedQuantity /
+                                widget.food.servingSize,
                     cholesterol: widget.food.cholesterol >= 9999999
                         ? 9999999
                         : _selectedGram == '인분'
-                        ? widget.food.cholesterol * _selectedQuantity
-                        : widget.food.cholesterol *
-                        _selectedQuantity /
-    widget.food.servingSize,
-                    saturatedFattyAcid:
-    widget.food.saturatedFattyAcid >= 9999999
+                            ? widget.food.cholesterol * _selectedQuantity
+                            : widget.food.cholesterol *
+                                _selectedQuantity /
+                                widget.food.servingSize,
+                    saturatedFattyAcid: widget.food.saturatedFattyAcid >=
+                            9999999
                         ? 9999999
                         : _selectedGram == '인분'
-                        ? widget.food.saturatedFattyAcid *
-                        _selectedQuantity
-                        : widget.food.saturatedFattyAcid *
-                        _selectedQuantity /
-    widget.food.servingSize,
+                            ? widget.food.saturatedFattyAcid * _selectedQuantity
+                            : widget.food.saturatedFattyAcid *
+                                _selectedQuantity /
+                                widget.food.servingSize,
                     transFattyAcid: widget.food.transFattyAcid >= 9999999
                         ? 9999999
                         : _selectedGram == '인분'
-                        ? widget.food.transFattyAcid * _selectedQuantity
-                        : widget.food.transFattyAcid *
-                        _selectedQuantity /
-    widget.food.servingSize,
+                            ? widget.food.transFattyAcid * _selectedQuantity
+                            : widget.food.transFattyAcid *
+                                _selectedQuantity /
+                                widget.food.servingSize,
                     date: selectedDate,
                   );
                   Navigator.pop(context);
