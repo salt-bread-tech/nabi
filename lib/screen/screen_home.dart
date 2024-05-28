@@ -230,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                     refreshData();
                   },
-                  child: WidgetPrescription(datetime: selectedDate.toString())),
+                  child: WidgetPrescription(datetime: DateFormat('yyyy-MM-dd').format(selectedDate))),
             ],
           ),
         ),
