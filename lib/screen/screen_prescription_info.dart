@@ -16,6 +16,7 @@ import 'dart:convert';
 
 import '../services/urls.dart';
 import '../widgets/widget_addPrescription.dart';
+import '../widgets/widget_delete.dart';
 
 class Prescription {
   final String prescriptionName;
@@ -111,7 +112,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
   Map<String, dynamic> prescription = {};
   List<dynamic> medicineTakings = [];
   Map<String, dynamic> medicineTaking = {};
-  List<String> time = ['아침', '점심', '저녁', '취침 전'];
+  List<String> time = ['아침', '점심', '저녁', '취침전'];
   List<String> medicineTakingTimes = ['식전', '식중', '식후', '상관 없음'];
   List<String> selectedTime = [];
   int selectedMedicineTakingTimes = 0;
@@ -119,7 +120,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
     AppTheme.pastelPink.withOpacity(0.5),
     AppTheme.pastelBlue.withOpacity(0.5),
   ];
-  List<String> registeredDosingScheduleText = ['일정 추가 하기', '일정 추가 완료'];
+  List<String> registeredDosingScheduleText = ['복용 일정 추가', '복용 일정 삭제'];
   String medicineName = '';
   TextEditingController medicineNameController = TextEditingController();
 
@@ -341,13 +342,13 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                             await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => MedicineSearch(fromRoute: widget.fromRoute),
+                                builder: (context) =>
+                                    MedicineSearch(fromRoute: widget.fromRoute),
                               ),
                             );
                             setState(() {
                               medicineName = searchText!;
-                              medicineNameController
-                                ..text = medicineName;
+                              medicineNameController..text = medicineName;
                             });
                           },
                           icon: Icon(Icons.search)),
@@ -543,13 +544,13 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                             await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => MedicineSearch(fromRoute: widget.fromRoute),
+                                builder: (context) =>
+                                    MedicineSearch(fromRoute: widget.fromRoute),
                               ),
                             );
                             setState(() {
                               medicineName = searchText!;
-                              medicineNameController
-                                ..text = medicineName;
+                              medicineNameController..text = medicineName;
                             });
                           },
                           icon: Icon(Icons.search)),
@@ -860,19 +861,38 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                             children: [
                                               GestureDetector(
                                                   onTap: () {
-                                                    medicineTaking[
-                                                                'registeredDosingSchedule'] ==
-                                                            false
-                                                        ? addDosage(
-                                                            medicineTaking[
-                                                                'medicineId'])
-                                                        : {};
-                                                    setState(() {
-                                                      medicineTaking[
-                                                              'registeredDosingSchedule'] =
-                                                          !medicineTaking[
-                                                              'registeredDosingSchedule'];
-                                                    });
+
+                                                    if (medicineTaking[
+                                                        'registeredDosingSchedule']) {
+                                                          (context) {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext context) {
+                                                            return DeleteConfirmDialog(
+                                                              title: '복용 일정 삭제',
+                                                              content: '이 복용 일정을 삭제하시겠습니까?',
+                                                              onConfirm: () {
+                                                                deleteMedicine(
+                                                                    medicineTaking[
+                                                                        'medicineId']);
+                                                              },
+                                                            );
+                                                          },
+                                                        );
+                                                        setState(() {
+                                                          medicineTaking[
+                                                              'registeredDosingSchedule'] = false;
+                                                        });
+                                                      };
+                                                    } else {
+                                                      addDosage(medicineTaking[
+                                                          'medicineId']);
+                                                      setState(() {
+                                                        medicineTaking[
+                                                                'registeredDosingSchedule'] =
+                                                            true;
+                                                      });
+                                                    }
                                                   },
                                                   child: Text(
                                                       '${medicineTaking['registeredDosingSchedule'] ? registeredDosingScheduleText[1] : registeredDosingScheduleText[0]}',

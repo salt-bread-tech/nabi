@@ -43,7 +43,6 @@ Future<List<Schedule>> fetchSchedule(String dateTime) async {
       throw Exception('조회 실패 ${response.statusCode}');
     }
 
-
     for (var jsonItem in data[dateTime]) {
       String text = jsonItem['text'];
       DateTime datetime = DateTime.parse(jsonItem['date']);
@@ -53,6 +52,7 @@ Future<List<Schedule>> fetchSchedule(String dateTime) async {
       schedules.add(schedule);
     }
     schedules.sort((a, b) => a.date.compareTo(b.date));
+
 
     return schedules;
   }
