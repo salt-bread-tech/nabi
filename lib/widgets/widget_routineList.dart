@@ -18,6 +18,7 @@ class RoutineListWidget extends StatefulWidget {
 }
 
 class _RoutineListWidgetState extends State<RoutineListWidget> {
+  late Future<void> _routinesFuture;
   List<dynamic> _routines = [];
 
   late DateTime selectedDate;
@@ -28,11 +29,11 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
     super.initState();
     selectedDate = DateTime.parse(widget.datetime);
     _selectedDateRange = _formatDateRange(selectedDate);
-    _fetchRoutines();
+    _routinesFuture = _fetchRoutines();
   }
 
   Future<void> _fetchRoutines() async {
-    final url = Uri.parse('$baseUrl/routine/${widget.datetime}');
+    final url = Uri.parse('$baseUrl/routine/date/${widget.datetime}');
     try {
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=UTF-8',
@@ -117,39 +118,47 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final itemHeight = screenSize.height * 0.05; // 화면 높이에 비례하여 항목 높이 설정
-    final listHeight = _routines.length * itemHeight;
-
-    final fontSize = screenSize.width * 0.036; // 화면 너비에 비례하여 폰트 크기 설정
     return Container(
-      height: listHeight,
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                '습관 만들기 ($_selectedDateRange)',
-                style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              physics: NeverScrollableScrollPhysics(), // 스크롤 방지
-              itemCount: _routines.length,
-              itemBuilder: (context, index) {
-                final routine = _routines[index];
+      margin: _routines.isNotEmpty ? EdgeInsets.all(0) : EdgeInsets.all(10),
+      padding: _routines.isNotEmpty ? EdgeInsets.all(0) : EdgeInsets.all(10),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: _routines.isNotEmpty ? Colors.white : Color(0xFFF4F9FF),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: FutureBuilder(
+        future: _routinesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(
+              margin: EdgeInsets.all(5),
+              width: double.infinity,
+              child: Text('루틴을 불러오는 중입니다...'),
+            );
+          } else if (!snapshot.hasData && _routines.isEmpty) {
+            return Container(
+              margin: EdgeInsets.all(5),
+              width: double.infinity,
+              child: Text('등록된 루틴이 없습니다.'),
+            );
+          } else if (snapshot.connectionState == ConnectionState.done) {
+            return Column(
+              children: _routines.map((routine) {
                 return RoutineItem(
                   routine: routine,
                   onDelete: (id) => _deleteRoutine(id),
                   onCountChange: (circleIndex) => _handleTap(circleIndex, routine),
                 );
-              },
-            ),
-          ),
-        ],
+              }).toList(),
+            );
+          } else {
+            return Container(
+              margin: EdgeInsets.all(5),
+              width: double.infinity,
+              child: Text('루틴을 불러오는 중 오류가 발생했습니다.'),
+            );
+          }
+        },
       ),
     );
   }
@@ -167,12 +176,12 @@ class RoutineItem extends StatelessWidget {
   final Function(int) onDelete;
   final Function(int) onCountChange;
 
-  const RoutineItem(
-      {Key? key,
-        required this.routine,
-        required this.onDelete,
-        required this.onCountChange})
-      : super(key: key);
+  const RoutineItem({
+    Key? key,
+    required this.routine,
+    required this.onDelete,
+    required this.onCountChange,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -187,17 +196,16 @@ class RoutineItem extends StatelessWidget {
     return Slidable(
       key: Key(routine['id'].toString()),
       child: Card(
+        margin: EdgeInsets.symmetric(horizontal: 10 ,vertical: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
+        color: Color(0xFFF6F6F6),
         elevation: 0,
-        child: ListTile(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          tileColor: Color(0xFFF6F6F6),
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
                 flex: 3,
