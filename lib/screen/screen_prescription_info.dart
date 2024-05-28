@@ -868,10 +868,8 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                                                 'medicineId'])
                                                         : {};
                                                     setState(() {
-                                                      medicineTaking[
-                                                              'registeredDosingSchedule'] =
-                                                          !medicineTaking[
-                                                              'registeredDosingSchedule'];
+                                                      if(medicineTaking[
+                                                              'registeredDosingSchedule'] == false) medicineTaking['registeredDosingSchedule'] = !medicineTaking['registeredDosingSchedule'];
                                                     });
                                                   },
                                                   child: Text(
