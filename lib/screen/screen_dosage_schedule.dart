@@ -12,6 +12,7 @@ import 'dart:convert';
 import '../assets/theme.dart';
 import '../services/urls.dart';
 import '../widgets/widget_calendar.dart';
+import '../widgets/widget_delete.dart';
 import '../widgets/widget_weeklyCalendar2.dart';
 import '../widgets/widget_weekly_calendar.dart';
 
@@ -395,7 +396,20 @@ class _DosageScheduleState extends State<DosageSchedule> {
                 borderRadius: BorderRadius.all(Radius.circular(20)),
               ),
               SlidableAction(
-                onPressed: (context) => deleteMedicine(dosage['dosageId']),
+                onPressed: (context) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return DeleteConfirmDialog(
+                        title: '삭제 확인',
+                        content: '이 항목을 삭제하시겠습니까?',
+                        onConfirm: () {
+                          deleteMedicine(dosage['dosageId']);
+                        },
+                      );
+                    },
+                  );
+                },
                 backgroundColor: Color(0xFFFF5050),
                 foregroundColor: Colors.white,
                 icon: Iconsax.trash,

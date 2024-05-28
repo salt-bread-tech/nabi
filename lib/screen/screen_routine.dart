@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:doctor_nyang/widgets/widget_delete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
@@ -262,7 +263,21 @@ class RoutineItem extends StatelessWidget {
         children: [
           SlidableAction(
             flex: 1,
-            onPressed: (context) => onDelete(routine['id']),
+            onPressed: (context) {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return DeleteConfirmDialog(
+                    title: '삭제 확인',
+                    content: '이 항목을 삭제하시겠습니까?',
+                    onConfirm: () {
+                      onDelete(routine['id']);
+                    },
+                  );
+                },
+              );
+            },
+          //=> onDelete(routine['id']),
             backgroundColor: Color(0xFFFF5050),
             foregroundColor: Colors.white,
             icon: Iconsax.trash,
