@@ -334,25 +334,27 @@ class _RegisterState extends State<Register> {
   Widget genderButton(String gender) {
     bool isSelected = _selectedGender == gender;
 
-    return Ink(
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB),
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB)),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10.0),
-        onTap: () {
-          setState(() {
-            _selectedGender = gender;
-          });
-        },
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 65.0, vertical: 15.0),
-          alignment: Alignment.center,
-          child: Text(gender == '남성' ? '남성' : '여성'),
+    return Expanded(
+      child: Ink(
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB),
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(color: isSelected ? const Color(0xFFD3EAFF) : Color(0xFFFBFBFB)),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10.0),
+          onTap: () {
+            setState(() {
+              _selectedGender = gender;
+            });
+          },
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 15.0),
+            alignment: Alignment.center,
+            child: Text(gender == '남성' ? '남성' : '여성'),
+          ),
         ),
       ),
     );
@@ -376,30 +378,30 @@ class _RegisterState extends State<Register> {
   Widget _buildPrivacyPolicyAgreement() {
     return Theme(
         data: ThemeData(
-        unselectedWidgetColor: Colors.grey[300], // 비활성화 상태의 체크박스 테두리 색상
-    ),
-    child: CheckboxListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
-    value: isPrivacyPolicyAgreed,
-    onChanged: isPrivacyPolicyAgreed != null ? _togglePrivacyPolicy : null,
-      title: GestureDetector(
-        child: Row(
-          children: [
-            Text(
-              '이용약관 동의',
-              style: TextStyle(fontSize: 15),
-            ),
-            Spacer(),
-            IconButton(
-              icon: Icon(Icons.arrow_forward_ios,size: 14,),
-              onPressed: _launchPrivacyPolicyUrl,
-            ),
-          ],
+          unselectedWidgetColor: Colors.grey[300], // 비활성화 상태의 체크박스 테두리 색상
         ),
-      ),
-      controlAffinity: ListTileControlAffinity.leading,
-      activeColor: Color(0xFFD3EAFF),
-    )
+        child: CheckboxListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+          value: isPrivacyPolicyAgreed,
+          onChanged: isPrivacyPolicyAgreed != null ? _togglePrivacyPolicy : null,
+          title: GestureDetector(
+            child: Row(
+              children: [
+                Text(
+                  '이용약관 동의',
+                  style: TextStyle(fontSize: 15),
+                ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(Icons.arrow_forward_ios,size: 14,),
+                  onPressed: _launchPrivacyPolicyUrl,
+                ),
+              ],
+            ),
+          ),
+          controlAffinity: ListTileControlAffinity.leading,
+          activeColor: Color(0xFFD3EAFF),
+        )
     );
   }
 
@@ -479,7 +481,6 @@ class _RegisterState extends State<Register> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         genderButton('남성'),
                         SizedBox(width: 10),
@@ -526,5 +527,3 @@ class _RegisterState extends State<Register> {
     );
   }
 }
-
-
