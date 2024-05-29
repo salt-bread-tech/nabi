@@ -252,7 +252,7 @@ class RoutineItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
-                flex: 3,
+                flex: 4,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -265,9 +265,8 @@ class RoutineItem extends StatelessWidget {
                   ],
                 ),
               ),
-              Spacer(),
               Flexible(
-                flex: 8,
+                flex: 10,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: List.generate(maxCount, (index) {
