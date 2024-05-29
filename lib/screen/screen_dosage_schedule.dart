@@ -27,6 +27,9 @@ class _DosageScheduleState extends State<DosageSchedule> {
   final List<String> time = ['아침', '점심', '저녁', '취침전'];
   final List<String> medicineTakingTimes = ['식전', '식중', '식후', '상관 없음'];
 
+  final GlobalKey<WidgetCalendarState> calendarKey = GlobalKey<WidgetCalendarState>();
+
+
   @override
   void initState() {
     super.initState();
@@ -209,28 +212,6 @@ print(todaySchedule);
     return categorizedSchedule;
   }
 
-  void _showDatePickerPopup(BuildContext context, Function(DateTime) onDateSelected) {
-    showModalBottomSheet(
-      backgroundColor: Colors.white,
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          height: 400,
-          color: Colors.white,
-          child: Column(
-            children: [
-              WidgetCalendarMonth(
-                onDateSelected: (selectedDay) {
-                  onDateSelected(selectedDay);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   void editDosageModal(BuildContext context, dynamic dosage) {
     String selectedTime = timesToInt[dosage['times']] ?? '알 수 없음';
@@ -254,13 +235,21 @@ print(todaySchedule);
                       Spacer(),
                       IconButton(
                         onPressed: () {
-                          _showDatePickerPopup(context, (selectedDay) {
-                            setState(() {
-                              selectedDate = selectedDay;
-                            });
-                          });
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return WidgetCalendarMonth(
+                                onDateSelected: (selectedDate) {
+                                  Navigator.pop(context);
+                                  setState(() {
+                                    this.selectedDate = selectedDate;
+                                  });
+                                },
+                              );
+                            },
+                          );
                         },
-                        icon: Icon(Iconsax.calendar_2,size: 20,),
+                        icon: Icon(Iconsax.calendar_2, size: 20),
                       ),
                       Text('${DateFormat('yyyy-MM-dd').format(selectedDate)}', style: TextStyle(fontSize: 14)),
                     ],
@@ -335,6 +324,7 @@ print(todaySchedule);
                           times: time.indexOf(selectedTime),
                           dosage: selectedDosage,
                         );
+                        calendarKey.currentState?.updateSelectedDay(selectedDate);
                         Navigator.pop(context);
                       },
                       child: Text('저장하기'),
@@ -388,7 +378,7 @@ print(todaySchedule);
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
-            WidgetCalendar2(onDateSelected: _handleDateChange),
+            WidgetCalendar2(onDateSelected: _handleDateChange, calendarKey: calendarKey),
             Expanded(
               child: ListView(
                 children: [

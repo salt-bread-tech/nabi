@@ -6,16 +6,24 @@ import '../assets/theme.dart';
 
 class WidgetCalendar2 extends StatefulWidget {
   final Function(DateTime) onDateSelected;
+  final GlobalKey<WidgetCalendarState> calendarKey;
 
-  WidgetCalendar2({required this.onDateSelected});
+  WidgetCalendar2({required this.onDateSelected, required this.calendarKey}) : super(key: calendarKey);
 
   @override
-  _WidgetCalendarState createState() => _WidgetCalendarState();
+  WidgetCalendarState createState() => WidgetCalendarState();
 }
 
-class _WidgetCalendarState extends State<WidgetCalendar2> {
+class WidgetCalendarState extends State<WidgetCalendar2> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
+
+  void updateSelectedDay(DateTime newDate) {
+    setState(() {
+      _selectedDay = newDate;
+      _focusedDay = newDate;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +52,7 @@ class _WidgetCalendarState extends State<WidgetCalendar2> {
               color: AppTheme.pastelYellow,
               shape: BoxShape.circle,
             ),
-            selectedTextStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w600),
+            selectedTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             todayTextStyle: TextStyle(color: Colors.black),
             canMarkersOverflow: false,
             markersAutoAligned: true,
