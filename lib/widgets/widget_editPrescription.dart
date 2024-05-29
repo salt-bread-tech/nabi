@@ -89,7 +89,7 @@ class _PrescriptionEditModalState extends State<PrescriptionEditModal> {
       padding: EdgeInsets.only(bottom: keyboardHeight),
       child: Container(
         width: double.infinity,
-        height: 180,
+        height: 170,
         padding: const EdgeInsets.all(20.0),
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -125,7 +125,7 @@ class _PrescriptionEditModalState extends State<PrescriptionEditModal> {
                           context: context,
                           builder: (BuildContext context) {
                             return Container(
-                              height: 300,
+                              height: 260,
                               color: Colors.white,
                               child: Column(
                                 children: [
@@ -166,18 +166,20 @@ class _PrescriptionEditModalState extends State<PrescriptionEditModal> {
                 Column(
                   children: widgets,
                 ),
+                SizedBox(height: 15),
                 Container(
                   width: double.infinity,
                   height: 55,
                   child: TextButton(
                     style: TextButton.styleFrom(
+                      backgroundColor: Color(0xFFEBEBEB),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     onPressed: _editPrescription,
                     child: Text(
-                      '확인',
+                      '수정',
                       style: TextStyle(color: Colors.black),
                     ),
                   ),

@@ -330,203 +330,218 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
   }
 
   void showAddMedicineModal(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize14 = screenWidth * 0.035;
+
     medicineNameController.clear();
     selectedTime = [];
     selectedMedicineTakingTimes = 0;
 
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-          return Container(
-              height: 400,
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          return Padding(
               padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                  height: 370,
+                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 300,
-                        child: TextField(
-                          controller: medicineNameController,
-                          decoration: InputDecoration(
-                            hintText: '약 이름',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: screenWidth * 0.7,
+                            child: TextField(
+                              controller: medicineNameController,
+                              decoration: InputDecoration(
+                                hintText: '약 이름',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
+                              ),
+                            ),
                           ),
-                        ),
+                          IconButton(
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MedicineSearch(
+                                        fromRoute: widget.fromRoute),
+                                  ),
+                                );
+                                setState(() {
+                                  medicineName = searchText!;
+                                  medicineNameController..text = medicineName;
+                                });
+                              },
+                              icon: Icon(Icons.search)),
+                        ],
                       ),
-                      IconButton(
-                          onPressed: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    MedicineSearch(fromRoute: widget.fromRoute),
-                              ),
-                            );
-                            setState(() {
-                              medicineName = searchText!;
-                              medicineNameController..text = medicineName;
-                            });
-                          },
-                          icon: Icon(Icons.search)),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Text('복용 시간'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: time
-                        .map((e) => ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (selectedTime.contains(e)) {
-                                    selectedTime.remove(e);
-                                  } else {
-                                    selectedTime.add(e);
-                                  }
-                                });
-                              },
-                              child: Text(e,
-                                  style: TextStyle(color: Colors.black)),
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                backgroundColor: selectedTime.contains(e)
-                                    ? AppTheme.pastelBlue
-                                    : Colors.grey[200],
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                  SizedBox(height: 10),
-                  Text('복용 방법'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: medicineTakingTimes
-                        .map((e) => ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  selectedMedicineTakingTimes =
-                                      medicineTakingTimes.indexOf(e);
-                                });
-                              },
-                              child: Text(e,
-                                  style: TextStyle(color: Colors.black)),
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                backgroundColor:
-                                    medicineTakingTimes.indexOf(e) ==
-                                            selectedMedicineTakingTimes
+                      SizedBox(height: 10),
+                      Text('복용 시간'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: time
+                            .map((e) => ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (selectedTime.contains(e)) {
+                                        selectedTime.remove(e);
+                                      } else {
+                                        selectedTime.add(e);
+                                      }
+                                    });
+                                  },
+                                  child: Text(e,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: fontSize14)),
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    backgroundColor: selectedTime.contains(e)
                                         ? AppTheme.pastelBlue
                                         : Colors.grey[200],
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                      SizedBox(height: 10),
+                      Text('복용 방법'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: medicineTakingTimes
+                            .map((e) => ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedMedicineTakingTimes =
+                                          medicineTakingTimes.indexOf(e);
+                                    });
+                                  },
+                                  child: Text(e,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: fontSize14)),
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    backgroundColor:
+                                        medicineTakingTimes.indexOf(e) ==
+                                                selectedMedicineTakingTimes
+                                            ? AppTheme.pastelBlue
+                                            : Colors.grey[200],
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                      SizedBox(height: 10),
+                      Text('복용량'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text('총'),
+                          Container(
+                            width: 50,
+                            child: TextField(
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 14),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              decoration: InputDecoration(
+                                hintText: '1',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
                               ),
-                            ))
-                        .toList(),
-                  ),
-                  SizedBox(height: 10),
-                  Text('복용량'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('총'),
-                      Container(
-                        width: 50,
-                        child: TextField(
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black, fontSize: 14),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          decoration: InputDecoration(
-                            hintText: '1',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
+                              onChanged: (value) {
+                                setState(() {
+                                  medicineTaking['days'] = int.parse(value);
+                                });
+                              },
+                            ),
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              medicineTaking['days'] = int.parse(value);
-                            });
-                          },
-                        ),
-                      ),
-                      Text('일'),
-                      Text('하루'),
-                      Container(
-                        alignment: Alignment.center,
-                        width: 50,
-                        child: Text('${selectedTime.length}'),
-                      ),
-                      Text('번'),
-                      Container(
-                        width: 50,
-                        child: TextField(
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black, fontSize: 14),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          decoration: InputDecoration(
-                            hintText: '1',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
-                            alignLabelWithHint: true,
+                          Text('일'),
+                          Text('하루'),
+                          Container(
+                            alignment: Alignment.center,
+                            width: 50,
+                            child: Text('${selectedTime.length}'),
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              medicineTaking['once'] = value;
-                            });
-                          },
-                        ),
+                          Text('번'),
+                          Container(
+                            width: 50,
+                            child: TextField(
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 14),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              decoration: InputDecoration(
+                                hintText: '1',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
+                                alignLabelWithHint: true,
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  medicineTaking['once'] = value;
+                                });
+                              },
+                            ),
+                          ),
+                          Text('정(포)'),
+                        ],
                       ),
-                      Text('정(포)'),
+                      SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        height: 55,
+                        child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Color(0xFFEBEBEB),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              addMedicine(
+                                prescriptionId: widget.id,
+                                medicineName: medicineNameController.text,
+                                once: medicineTaking['once'].toString(),
+                                days: medicineTaking['days'],
+                                time: selectedTime
+                                    .map((e) => time.indexOf(e))
+                                    .toList(),
+                                dosage: selectedMedicineTakingTimes,
+                              );
+                              Navigator.pop(context);
+                            },
+                            child: Text('등록하기',
+                                style: TextStyle(color: Colors.black))),
+                      ),
                     ],
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    height: 55,
-                    child: TextButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: Color(0xFFEBEBEB),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
-                          addMedicine(
-                            prescriptionId: widget.id,
-                            medicineName: medicineNameController.text,
-                            once: medicineTaking['once'].toString(),
-                            days: medicineTaking['days'],
-                            time: selectedTime
-                                .map((e) => time.indexOf(e))
-                                .toList(),
-                            dosage: selectedMedicineTakingTimes,
-                          );
-                          Navigator.pop(context);
-                        },
-                        child: Text('등록하기',
-                            style: TextStyle(color: Colors.black))),
-                  ),
-                ],
-              ));
+                  )));
         });
       },
     );
   }
 
   void showEditMedicineModal(BuildContext context, int index) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize14 = screenWidth * 0.035;
     var medicineTaking = prescription['medicineTakings'][index];
     selectedTime = medicineTaking['time']
         .map((e) => time[e])
@@ -537,196 +552,206 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
         medicineTakingTimes.indexOf(medicineTaking['dosage']);
     medicineNameController.text = medicineTaking['medicineName'];
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-          return Container(
-              height: 400,
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          return Padding(
               padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                  height: 370,
+                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 300,
-                        child: TextField(
-                          controller: medicineNameController,
-                          decoration: InputDecoration(
-                            hintText: '약 이름',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            width: screenWidth * 0.7,
+                            child: TextField(
+                              controller: medicineNameController,
+                              decoration: InputDecoration(
+                                hintText: '약 이름',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
+                              ),
+                            ),
                           ),
-                        ),
+                          IconButton(
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MedicineSearch(
+                                        fromRoute: widget.fromRoute),
+                                  ),
+                                );
+                                setState(() {
+                                  medicineName = searchText!;
+                                  medicineNameController..text = medicineName;
+                                });
+                              },
+                              icon: Icon(Icons.search)),
+                        ],
                       ),
-                      IconButton(
-                          onPressed: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    MedicineSearch(fromRoute: widget.fromRoute),
-                              ),
-                            );
-                            setState(() {
-                              medicineName = searchText!;
-                              medicineNameController..text = medicineName;
-                            });
-                          },
-                          icon: Icon(Icons.search)),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Text('복용 시간'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: time
-                        .map((e) => ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (selectedTime.contains(e)) {
-                                    selectedTime.remove(e);
-                                  } else {
-                                    selectedTime.add(e);
-                                  }
-                                });
-                              },
-                              child: Text(e,
-                                  style: TextStyle(color: Colors.black)),
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                backgroundColor: selectedTime.contains(e)
-                                    ? AppTheme.pastelBlue
-                                    : Colors.grey[200],
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                  SizedBox(height: 10),
-                  Text('복용 방법'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: medicineTakingTimes
-                        .map((e) => ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  selectedMedicineTakingTimes =
-                                      medicineTakingTimes.indexOf(e);
-                                });
-                              },
-                              child: Text(e,
-                                  style: TextStyle(color: Colors.black)),
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                backgroundColor:
-                                    medicineTakingTimes.indexOf(e) ==
-                                            selectedMedicineTakingTimes
+                      SizedBox(height: 10),
+                      Text('복용 시간'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: time
+                            .map((e) => ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (selectedTime.contains(e)) {
+                                        selectedTime.remove(e);
+                                      } else {
+                                        selectedTime.add(e);
+                                      }
+                                    });
+                                  },
+                                  child: Text(e,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: fontSize14)),
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    backgroundColor: selectedTime.contains(e)
                                         ? AppTheme.pastelBlue
                                         : Colors.grey[200],
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                      SizedBox(height: 10),
+                      Text('복용 방법'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: medicineTakingTimes
+                            .map((e) => ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedMedicineTakingTimes =
+                                          medicineTakingTimes.indexOf(e);
+                                    });
+                                  },
+                                  child: Text(e,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: fontSize14)),
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    backgroundColor:
+                                        medicineTakingTimes.indexOf(e) ==
+                                                selectedMedicineTakingTimes
+                                            ? AppTheme.pastelBlue
+                                            : Colors.grey[200],
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                      SizedBox(height: 10),
+                      Text('복용량'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text('총'),
+                          Container(
+                            width: 50,
+                            child: TextField(
+                              controller: TextEditingController()
+                                ..text = medicineTaking['days'].toString(),
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 14),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              decoration: InputDecoration(
+                                hintText: '1',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
                               ),
-                            ))
-                        .toList(),
-                  ),
-                  SizedBox(height: 10),
-                  Text('복용량'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('총'),
-                      Container(
-                        width: 50,
-                        child: TextField(
-                          controller: TextEditingController()
-                            ..text = medicineTaking['days'].toString(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black, fontSize: 14),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          decoration: InputDecoration(
-                            hintText: '1',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
+                              onChanged: (value) {
+                                setState(() {
+                                  medicineTaking['days'] = int.parse(value);
+                                });
+                              },
+                            ),
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              medicineTaking['days'] = int.parse(value);
-                            });
-                          },
-                        ),
-                      ),
-                      Text('일'),
-                      Text('하루'),
-                      Container(
-                        alignment: Alignment.center,
-                        width: 50,
-                        child: Text('${selectedTime.length}'),
-                      ),
-                      Text('번'),
-                      Container(
-                        width: 50,
-                        child: TextField(
-                          controller: TextEditingController()
-                            ..text = medicineTaking['once'].toString(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black, fontSize: 14),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          decoration: InputDecoration(
-                            hintText: '1',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
-                            alignLabelWithHint: true,
+                          Text('일'),
+                          Text('하루'),
+                          Container(
+                            alignment: Alignment.center,
+                            width: 50,
+                            child: Text('${selectedTime.length}'),
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              medicineTaking['once'] = value;
-                            });
-                          },
-                        ),
+                          Text('번'),
+                          Container(
+                            width: 50,
+                            child: TextField(
+                              controller: TextEditingController()
+                                ..text = medicineTaking['once'].toString(),
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 14),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              decoration: InputDecoration(
+                                hintText: '1',
+                                hintStyle: TextStyle(color: Colors.grey),
+                                border: InputBorder.none,
+                                alignLabelWithHint: true,
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  medicineTaking['once'] = value;
+                                });
+                              },
+                            ),
+                          ),
+                          Text('정(포)'),
+                        ],
                       ),
-                      Text('정(포)'),
+                      SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        height: 55,
+                        child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Color(0xFFEBEBEB),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              editMedicine(
+                                medicineId: medicineTaking['medicineId'],
+                                medicineName: medicineNameController.text,
+                                once: medicineTaking['once'].toString(),
+                                days: medicineTaking['days'],
+                                time: selectedTime
+                                    .map((e) => time.indexOf(e))
+                                    .toList(),
+                                dosage: selectedMedicineTakingTimes,
+                              );
+                              Navigator.pop(context);
+                            },
+                            child: Text('수정하기',
+                                style: TextStyle(color: Colors.black))),
+                      ),
                     ],
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    height: 55,
-                    child: TextButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: Color(0xFFEBEBEB),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () {
-                          editMedicine(
-                            medicineId: medicineTaking['medicineId'],
-                            medicineName: medicineNameController.text,
-                            once: medicineTaking['once'].toString(),
-                            days: medicineTaking['days'],
-                            time: selectedTime
-                                .map((e) => time.indexOf(e))
-                                .toList(),
-                            dosage: selectedMedicineTakingTimes,
-                          );
-                          Navigator.pop(context);
-                        },
-                        child: Text('수정하기',
-                            style: TextStyle(color: Colors.black))),
-                  ),
-                ],
-              ));
+                  )));
         });
       },
     );
@@ -734,6 +759,10 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize16 = screenWidth * 0.04;
+    double fontSize13 = screenWidth * 0.0325;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -741,7 +770,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
         elevation: 0,
         title: Text(
           '${prescription['prescriptionName']}',
-          style: TextStyle(color: Colors.black, fontSize: 17),
+          style: TextStyle(color: Colors.black, fontSize: fontSize16),
           textAlign: TextAlign.center,
         ),
         iconTheme: IconThemeData(color: Colors.black),
@@ -854,18 +883,21 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                               '${medicineTaking['medicineName']}',
                                               style: TextStyle(
                                                 color: Colors.black,
+                                                fontSize: fontSize13,
                                               ),
                                             ),
                                             Text(
                                               '${medicineTaking['time'].map((e) => time[e]).toList().join(' ')}',
                                               style: TextStyle(
                                                 color: Colors.grey,
+                                                fontSize: fontSize13,
                                               ),
                                             ),
                                             Text(
                                                 '${medicineTaking['days']}일 동안 하루에 ${medicineTaking['time'].length}번 ${medicineTaking['once']}정(포) ',
                                                 style: TextStyle(
                                                   color: Colors.grey,
+                                                  fontSize: fontSize13,
                                                 )),
                                           ],
                                         )),
@@ -924,17 +956,20 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                                       '${medicineTaking['registeredDosingSchedule'] ? registeredDosingScheduleText[1] : registeredDosingScheduleText[0]}',
                                                       style: TextStyle(
                                                         color: Colors.black,
+                                                        fontSize: fontSize13,
                                                       ))),
                                               Text(
                                                 ' ',
                                                 style: TextStyle(
                                                   color: Colors.grey,
+                                                  fontSize: fontSize13,
                                                 ),
                                               ),
                                               Text(
                                                 '${medicineTaking['dosage'] == '상관 없음' ? ' ' : '${medicineTaking['dosage']}'}',
                                                 style: TextStyle(
                                                   color: Colors.black,
+                                                  fontSize: fontSize13,
                                                 ),
                                               )
                                             ])),

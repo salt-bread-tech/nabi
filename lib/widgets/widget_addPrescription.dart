@@ -180,7 +180,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
       padding: EdgeInsets.only(bottom: keyboardHeight),
       child: Container(
         width: double.infinity,
-        height: 180,
+        height: 170,
         padding: const EdgeInsets.all(20.0),
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -216,7 +216,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                           context: context,
                           builder: (BuildContext context) {
                             return Container(
-                              height: 300,
+                              height: 260,
                               color: Colors.white,
                               child: Column(
                                 children: [
@@ -257,17 +257,19 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                 Column(
                   children: widgets,
                 ),
+                SizedBox(height: 15),
                 Container(
                   width: double.infinity,
                   height: 55,
                   child: TextButton(
                     style: TextButton.styleFrom(
+                      backgroundColor: Color(0xFFEBEBEB),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     onPressed: _registerPrescription,
-                    child: Text('완료', style: TextStyle(color: Colors.black)),
+                    child: Text('등록', style: TextStyle(color: Colors.black)),
                   ),
                 ),
               ],
