@@ -11,7 +11,7 @@ class BodyInfoEditorDialog extends StatefulWidget {
 }
 
 class _BodyInfoEditorDialogState extends State<BodyInfoEditorDialog> {
-  DateTime selectedDate = DateTime.tryParse(globals.birth ?? '') ?? DateTime.now();
+  DateTime selectedDate = DateTime.tryParse(globals.birth ?? '') ?? DateTime.now().toUtc();
   String? selectedGender = globals.gender;
 
   final TextEditingController birthDateController = TextEditingController();

@@ -21,7 +21,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   final TextEditingController _maxTermController = TextEditingController(); // Controller for max term input
   int _selectedFrequencyValue = 1;
   Color _selectedColor = Color(0xFFFFDFEB);
-  String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now().toUtc());
   int _selectedMaxTerm = 1;
 
   void _registerRoutine() async {

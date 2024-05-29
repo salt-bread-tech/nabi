@@ -26,7 +26,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now();
+    _selectedDate = DateTime.now().toUtc();
     _selectedDateRange = _formatDateRange(_selectedDate!);
     fetchRoutines();
   }

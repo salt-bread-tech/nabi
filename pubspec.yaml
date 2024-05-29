@@ -49,6 +49,7 @@ dependencies:
   table_calendar: ^3.0.8
   timelines: ^0.1.0
   webview_flutter: ^3.0.0
+  connectivity_plus: ^2.3.5
 
 
 

@@ -34,7 +34,7 @@ class _RegisterState extends State<Register> {
   final TextEditingController heightController = TextEditingController();
   final TextEditingController weightController = TextEditingController();
 
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTime.now().toUtc();
 
   String nicknameError = '';
   String idError = '';
