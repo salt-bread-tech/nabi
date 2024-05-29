@@ -239,6 +239,7 @@ class _DietScheduleState extends State<DietSchedule> {
 
   void showCustomModalBottomSheet(BuildContext context, int id, Food food,
       {required totalIngestionSize}) {
+    double screenWidth = MediaQuery.of(context).size.width;
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -287,7 +288,7 @@ class _DietScheduleState extends State<DietSchedule> {
                             children: <Widget>[
                               Container(
                                   alignment: Alignment.center,
-                                  width: 85,
+                                  width: screenWidth * 0.22,
                                   height: 50,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
@@ -315,7 +316,7 @@ class _DietScheduleState extends State<DietSchedule> {
                               SizedBox(width: 5),
                               Container(
                                 alignment: Alignment.center,
-                                width: 135,
+                                width: screenWidth * 0.35,
                                 height: 50,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
@@ -333,9 +334,15 @@ class _DietScheduleState extends State<DietSchedule> {
                                       onPressed: _decrementQuantity,
                                     ),
                                     Container(
-                                      width: 35,
+                                      width: screenWidth * 0.075,
                                       child: TextField(
                                         controller: _controller,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedQuantity = double.parse(
+                                                value.isEmpty ? '0' : value);
+                                          });
+                                        },
                                         textAlign: TextAlign.center,
                                         keyboardType:
                                             TextInputType.numberWithOptions(
@@ -355,7 +362,7 @@ class _DietScheduleState extends State<DietSchedule> {
                               SizedBox(width: 5),
                               Container(
                                   alignment: Alignment.center,
-                                  width: 85,
+                                  width: screenWidth * 0.22,
                                   height: 50,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),

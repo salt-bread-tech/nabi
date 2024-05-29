@@ -183,7 +183,6 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-
     return Padding(
       padding: const EdgeInsets.all(0.0),
       child: Container(
@@ -599,6 +598,10 @@ class _FoodSearchState extends State<FoodSearch> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize14 = screenWidth * 0.035;
+    double fontSize12 = screenWidth * 0.03;
+    double fontSize10 = screenWidth * 0.025;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -667,17 +670,17 @@ class _FoodSearchState extends State<FoodSearch> {
                             : food.name,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold)),
+                            fontSize: fontSize14, fontWeight: FontWeight.bold)),
                     SizedBox(width: 5),
                     Text('${food?.servingSize.toStringAsFixed(0)}g',
-                        style: TextStyle(fontSize: 10)),
+                        style: TextStyle(fontSize: fontSize10)),
                   ]),
                   subtitle: Text(
                       '탄수화물 ${food?.carbohydrate == 9999999.0 ? "정보없음" : "${food?.carbohydrate.toStringAsFixed(0)}g"} 단백질 ${food?.protein == 9999999.0 ? "정보없음" : "${food?.protein.toStringAsFixed(0)}g"} 지방 ${food?.fat == 9999999.0 ? "정보없음" : "${food?.fat.toStringAsFixed(0)}g"}',
-                      style: TextStyle(fontSize: 11)),
+                      style: TextStyle(fontSize: fontSize12)),
                   trailing: Text('${food?.calories.toStringAsFixed(0)}kcal',
                       style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                          TextStyle(fontSize: fontSize14, fontWeight: FontWeight.bold)),
                 ),
               );
             }
