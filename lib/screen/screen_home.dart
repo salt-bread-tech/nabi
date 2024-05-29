@@ -35,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> ingestionSchedule = [];
   String _selectedDateRange = '';
 
+  List<GestureDetector> widgetOrder = [];
+
   void _handleDateChange(DateTime newDate) {
     setState(() {
       selectedDate = newDate.toUtc();
@@ -60,7 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   FutureOr<Ingestion?> fetchIngestion() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
+    final String formattedDate =
+        DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
     final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
@@ -87,6 +90,228 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  GestureDetector ScheduleWidget() {
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ScheduleCalendar()),
+        );
+        refreshData();
+      },
+      child: Container(
+          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+                padding: EdgeInsets.only(left: 5),
+                margin: EdgeInsets.only(bottom: 10),
+                child: Text('일정')),
+            WidgetSchedule(
+              datetime: selectedDate.toUtc().toString(),
+              isWidget: true,
+            )
+          ])),
+    );
+  }
+
+  GestureDetector IngestionWidget() {
+    return GestureDetector(
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DietSchedule(),
+            ),
+          );
+          refreshData();
+        },
+        child: Container(
+            padding: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                  padding: EdgeInsets.only(left: 5),
+                  margin: EdgeInsets.only(bottom: 10),
+                  child: Text('식단')),
+              WidgetDiet(
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DietSchedule()),
+                  );
+                  refreshData();
+                },
+                isWidget: true,
+                userCalories: bmr ?? 2000,
+                breakfastCalories: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['breakfastKcal']
+                    : 0,
+                lunchCalories: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['lunchKcal']
+                    : 0,
+                dinnerCalories: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['dinnerKcal']
+                    : 0,
+                snackCalories: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['snackKcal']
+                    : 0,
+                totalProtein: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['totalProtein']
+                    : 0,
+                totalCarb: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['totalCarbohydrate']
+                    : 0,
+                totalFat: ingestionSchedule.isNotEmpty
+                    ? ingestionSchedule[0]['totalFat']
+                    : 0,
+              )
+            ])));
+  }
+
+  GestureDetector RoutineWidget() {
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RoutineScreen(),
+          ),
+        );
+        refreshData();
+      },
+      child: Container(
+          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              alignment: Alignment.topCenter,
+              child: RoutineListWidget(
+                key: ValueKey(
+                    DateFormat('yyyy-MM-dd').format(selectedDate.toUtc())),
+                datetime: DateFormat('yyyy-MM-dd').format(selectedDate.toUtc()),
+              ),
+            )
+          ])),
+    );
+  }
+
+  GestureDetector PrescriptionWidget() {
+    return GestureDetector(
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PrescriptionScreen(),
+            ),
+          );
+          refreshData();
+        },
+        child: Container(
+            padding: EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                  padding: EdgeInsets.only(left: 5),
+                  margin: EdgeInsets.only(bottom: 10),
+                  child: Text('처방전')),
+              WidgetPrescription(
+                  datetime:
+                      DateFormat('yyyy-MM-dd').format(selectedDate.toUtc()))
+            ])));
+  }
+
+  GestureDetector DosageWidget() {
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DosageSchedule(),
+          ),
+        );
+        refreshData();
+      },
+      child: Container(
+        padding: EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+                padding: EdgeInsets.only(left: 5),
+                margin: EdgeInsets.only(bottom: 10),
+                child: Text('의약품 복용 일정')),
+            WidgetDosage(
+                datetime: DateFormat('yyyy-MM-dd')
+                    .format(selectedDate.toUtc()))
+          ],
+        ),
+      ),
+    );
+  }
+
+
+
   String _formatDateRange(DateTime date) {
     int weekday = date.toUtc().weekday;
     DateTime startOfWeek = date.toUtc().subtract(Duration(days: weekday - 1));
@@ -111,219 +336,13 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: <Widget>[
-
               SizedBox(height: 20),
               Container(
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.only(left: 15),
               ),
               WidgetCalendar(onDateSelected: _handleDateChange),
-              SizedBox(height: 10),
-              GestureDetector(
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ScheduleCalendar()),
-                  );
-                  refreshData();
-                },
-                child: Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          spreadRadius: 1,
-                          blurRadius: 5,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                              padding: EdgeInsets.only(left: 5),
-                              margin: EdgeInsets.only(bottom: 10),
-                              child: Text('일정')),
-                          WidgetSchedule(
-                            datetime: selectedDate.toUtc().toString(),
-                            isWidget: true,
-                          )
-                        ])),
-              ),
-              SizedBox(height: 20),
-              Container(
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                            padding: EdgeInsets.only(left: 5),
-                            margin: EdgeInsets.only(bottom: 10),
-                            child: Text('식단')),
-                        WidgetDiet(
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DietSchedule()),
-                            );
-                            refreshData();
-                          },
-                          isWidget: true,
-                          userCalories: bmr ?? 2000,
-                          breakfastCalories: ingestionSchedule.isNotEmpty
-                              ? ingestionSchedule[0]['breakfastKcal']
-                              : 0,
-                          lunchCalories: ingestionSchedule.isNotEmpty
-                              ? ingestionSchedule[0]['lunchKcal']
-                              : 0,
-                          dinnerCalories: ingestionSchedule.isNotEmpty
-                              ? ingestionSchedule[0]['dinnerKcal']
-                              : 0,
-                          snackCalories: ingestionSchedule.isNotEmpty
-                              ? ingestionSchedule[0]['snackKcal']
-                              : 0,
-                          totalProtein: ingestionSchedule.isNotEmpty
-                              ? ingestionSchedule[0]['totalProtein']
-                              : 0,
-                          totalCarb: ingestionSchedule.isNotEmpty
-                              ? ingestionSchedule[0]['totalCarbohydrate']
-                              : 0,
-                          totalFat: ingestionSchedule.isNotEmpty
-                              ? ingestionSchedule[0]['totalFat']
-                              : 0,
-                        )
-                      ])),
-              SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => RoutineScreen(),
-                    ),
-                  );
-                  refreshData();
-                },
-                child: Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          spreadRadius: 1,
-                          blurRadius: 5,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            alignment: Alignment.topCenter,
-                            child: RoutineListWidget(
-                              key: ValueKey(DateFormat('yyyy-MM-dd')
-                                  .format(selectedDate.toUtc())),
-                              datetime:
-                              DateFormat('yyyy-MM-dd').format(selectedDate.toUtc()),
-                            ),
-                          )
-                        ])),
-              ),
-              SizedBox(height: 20),
-              GestureDetector(
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PrescriptionScreen(),
-                      ),
-                    );
-                    refreshData();
-                  },
-                  child: Container(
-                      padding: EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                padding: EdgeInsets.only(left: 5),
-                                margin: EdgeInsets.only(bottom: 10),
-                                child: Text('처방전')),
-                            WidgetPrescription(
-                                datetime: DateFormat('yyyy-MM-dd')
-                                    .format(selectedDate.toUtc()))
-                          ]))),
-              SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DosageSchedule(),
-                    ),
-                  );
-                  refreshData();
-                },
-                child: Container(
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                          padding: EdgeInsets.only(left: 5),
-                          margin: EdgeInsets.only(bottom: 10),
-                          child: Text('의약품 복용 일정')),
-                      WidgetDosage(
-                          datetime: DateFormat('yyyy-MM-dd')
-                              .format(selectedDate.toUtc()))
-                    ],
-                  ),
-                ),
-              ),
+              Reorderable
             ],
           ),
         ),

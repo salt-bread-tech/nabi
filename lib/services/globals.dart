@@ -12,4 +12,5 @@ DateTime selectedDate = DateTime.now();
 int userId = 1;
 int? dday;
 String? searchText;
-
+String? usedWidget;
+String? unusedWidget;
