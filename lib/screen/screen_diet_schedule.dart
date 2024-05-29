@@ -30,7 +30,7 @@ class _DietScheduleState extends State<DietSchedule> {
 
   void _handleDateChange(DateTime newDate) {
     setState(() {
-      selectedDate = newDate;
+      selectedDate = newDate.toUtc();
       fetchIngestion();
       fetchDietSchedule();
     });
@@ -39,7 +39,7 @@ class _DietScheduleState extends State<DietSchedule> {
   @override
   void initState() {
     super.initState();
-    selectedDate = DateTime.now();
+    selectedDate = DateTime.now().toUtc();
     fetchIngestion();
     fetchDietSchedule();
     _controller.text = _selectedGram == '인분'
@@ -60,7 +60,7 @@ class _DietScheduleState extends State<DietSchedule> {
   }
 
   Future<void> fetchDietSchedule() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
     final String url = '$baseUrl/diet/$formattedDate';
 
     try {
@@ -93,7 +93,7 @@ class _DietScheduleState extends State<DietSchedule> {
   }
 
   FutureOr<Ingestion?> fetchIngestion() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
     final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
@@ -419,7 +419,7 @@ class _DietScheduleState extends State<DietSchedule> {
                                 await updateIngestion(
                                   ingestionId: id,
                                   date: DateFormat('yyyy-MM-dd')
-                                      .format(selectedDate)
+                                      .format(selectedDate.toUtc())
                                       .toString(),
                                   times: _selectedMeal== '아침'
                                       ? 0

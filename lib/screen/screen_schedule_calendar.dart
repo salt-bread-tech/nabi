@@ -26,8 +26,8 @@ class ScheduleCalendar extends StatefulWidget {
 }
 
 class _ScheduleCalendarState extends State<ScheduleCalendar> {
-  DateTime _selectedDay = DateTime.now();
-  DateTime _focusedDay = DateTime.now();
+  DateTime _selectedDay = DateTime.now().toUtc();
+  DateTime _focusedDay = DateTime.now().toUtc();
   String datetime = 'today';
   Map<DateTime, List> _eventsList = {};
   String content = '';
@@ -37,8 +37,8 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
   @override
   void initState() {
     super.initState();
-    _selectedDay = DateTime.now();
-    datetime = DateFormat('yyyy-MM-dd').format(_selectedDay);
+    _selectedDay = DateTime.now().toUtc();
+    datetime = DateFormat('yyyy-MM-dd').format(_selectedDay.toUtc());
     selectedDate = _selectedDay;
     getSchedule();
   }
@@ -68,7 +68,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
     for (var key in data.keys) {
       List schedules = [];
       for (var jsonItem in data[key]) {
-        DateTime datetime = DateTime.parse(jsonItem['date']);
+        DateTime datetime = DateTime.parse(jsonItem['date']).toUtc();
         String text = jsonItem['text'];
         int ScheduleId = jsonItem['scheduleId'];
         schedules.add(ScheduleId.toString() +
@@ -105,7 +105,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
         },
         body: json.encode({
           'text': content,
-          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate),
+          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate.toUtc()),
         }),
       );
 
@@ -132,7 +132,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
         body: json.encode({
           'scheduleId': scheduleId,
           'text': _controller.text,
-          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate),
+          'date': DateFormat('yyyy-MM-ddTHH:mm:ss').format(selectedDate.toUtc()),
         }),
       );
 
@@ -223,11 +223,11 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                             Container(
                                               height: 200,
                                               child: CupertinoDatePicker(
-                                                initialDateTime: selectedDate,
+                                                initialDateTime: selectedDate.toUtc(),
                                                 onDateTimeChanged:
                                                     (DateTime newDateTime) {
                                                   setState(() {
-                                                    selectedDate = newDateTime;
+                                                    selectedDate = newDateTime.toUtc();
                                                   });
                                                 },
                                                 use24hFormat: true,
@@ -236,7 +236,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                             TextButton(
                                               onPressed: () {
                                                 Navigator.of(context)
-                                                    .pop(selectedDate);
+                                                    .pop(selectedDate.toUtc());
                                               },
                                               child: Text('확인',
                                                   style: TextStyle(
@@ -248,7 +248,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                     }).then((newDate) {
                                   if (newDate != null) {
                                     setModalState(() {
-                                      selectedDate = newDate;
+                                      selectedDate = newDate.toUtc();
                                     });
                                   }
                                 });
@@ -340,11 +340,11 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                             Container(
                                               height: 200,
                                               child: CupertinoDatePicker(
-                                                initialDateTime: selectedDate,
+                                                initialDateTime: selectedDate.toUtc(),
                                                 onDateTimeChanged:
                                                     (DateTime newDateTime) {
                                                   setState(() {
-                                                    selectedDate = newDateTime;
+                                                    selectedDate = newDateTime.toUtc();
                                                   });
                                                 },
                                                 use24hFormat: true,
@@ -365,7 +365,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                     }).then((newDate) {
                                   if (newDate != null) {
                                     setModalState(() {
-                                      selectedDate = newDate;
+                                      selectedDate = newDate.toUtc();
                                     });
                                   }
                                 });
@@ -481,11 +481,11 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
             },
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-                selectedDate = _selectedDay;
-                datetime = DateFormat('yyyy-MM-dd').format(_selectedDay);
-                getEventForDay(_selectedDay);
+                _selectedDay = selectedDay.toUtc();
+                _focusedDay = focusedDay.toUtc();
+                selectedDate = _selectedDay.toUtc();
+                datetime = DateFormat('yyyy-MM-dd').format(_selectedDay.toUtc());
+                getEventForDay(_selectedDay.toUtc());
               });
             },
             calendarFormat: CalendarFormat.month,
@@ -572,7 +572,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                                         .join(' '),
                                 selectedDate = DateTime.parse(
                                     DateFormat('yyyy-MM-dd')
-                                            .format(_selectedDay) +
+                                            .format(_selectedDay.toUtc()) +
                                         " " +
                                         getEventForDay(_selectedDay)[index]
                                             .split(' ')[1]),

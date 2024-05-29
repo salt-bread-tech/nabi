@@ -15,6 +15,7 @@ import '../models/model_diet.dart';
 import '../services/globals.dart';
 import '../services/globals.dart' as globals;
 import '../services/service_auth.dart';
+import '../services/service_home_widget.dart';
 import '../services/urls.dart';
 import '../widgets/widget_calendar.dart';
 import '../widgets/widget_diet.dart';
@@ -36,15 +37,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _handleDateChange(DateTime newDate) {
     setState(() {
-      selectedDate = newDate;
+      selectedDate = newDate.toUtc();
       fetchIngestion();
     });
   }
 
   void refreshData() {
     setState(() {
-      selectedDate = selectedDate;
-      _selectedDateRange = _formatDateRange(selectedDate);
+      selectedDate = selectedDate.toUtc();
+      _selectedDateRange = _formatDateRange(selectedDate.toUtc());
       fetchIngestion();
     });
   }
@@ -52,14 +53,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    selectedDate = DateTime.now();
-    _selectedDateRange = _formatDateRange(selectedDate);
+    selectedDate = DateTime.now().toUtc();
+    _selectedDateRange = _formatDateRange(selectedDate.toUtc());
     fetchIngestion();
     fetchUserInfo();
   }
 
   FutureOr<Ingestion?> fetchIngestion() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
     final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
@@ -87,17 +88,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _formatDateRange(DateTime date) {
-    int weekday = date.weekday;
-    DateTime startOfWeek = date.subtract(Duration(days: weekday - 1));
-    DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
-    return '${DateFormat('M.dd').format(startOfWeek)}~${DateFormat('M.dd').format(endOfWeek)}';
+    int weekday = date.toUtc().weekday;
+    DateTime startOfWeek = date.toUtc().subtract(Duration(days: weekday - 1));
+    DateTime endOfWeek = startOfWeek.toUtc().add(Duration(days: 6));
+    return '${DateFormat('M.dd').format(startOfWeek.toUtc())}~${DateFormat('M.dd').format(endOfWeek.toUtc())}';
   }
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final fontSize = screenSize.width * 0.036; // 화면 너비에 비례하여 폰트 크기 설정
-
+    getWidgetOrder();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -148,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               margin: EdgeInsets.only(bottom: 10),
                               child: Text('일정')),
                           WidgetSchedule(
-                            datetime: selectedDate.toString(),
+                            datetime: selectedDate.toUtc().toString(),
                             isWidget: true,
                           )
                         ])),
@@ -241,9 +242,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             alignment: Alignment.topCenter,
                             child: RoutineListWidget(
                               key: ValueKey(DateFormat('yyyy-MM-dd')
-                                  .format(selectedDate)),
+                                  .format(selectedDate.toUtc())),
                               datetime:
-                              DateFormat('yyyy-MM-dd').format(selectedDate),
+                              DateFormat('yyyy-MM-dd').format(selectedDate.toUtc()),
                             ),
                           )
                         ])),
@@ -282,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Text('처방전')),
                             WidgetPrescription(
                                 datetime: DateFormat('yyyy-MM-dd')
-                                    .format(selectedDate))
+                                    .format(selectedDate.toUtc()))
                           ]))),
               SizedBox(height: 20),
               GestureDetector(
@@ -318,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Text('의약품 복용 일정')),
                       WidgetDosage(
                           datetime: DateFormat('yyyy-MM-dd')
-                              .format(selectedDate))
+                              .format(selectedDate.toUtc()))
                     ],
                   ),
                 ),

@@ -154,7 +154,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
         'salt': salt,
         'cholesterol': cholesterol,
         'saturatedFattyAcid': saturatedFattyAcid,
-        'date': date.toIso8601String().split('T').first,
+        'date': date.toUtc().toIso8601String().split('T').first,
       }),
     );
 
@@ -173,7 +173,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
         'salt': salt,
         'cholesterol': cholesterol,
         'saturatedFattyAcid': saturatedFattyAcid,
-        'date': date.toIso8601String().split('T').first,
+        'date': date.toUtc().toIso8601String().split('T').first,
       }));
     } else {
       throw Exception('식사 기록 실패');
@@ -534,7 +534,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                             : widget.food.transFattyAcid *
                                 _selectedQuantity /
                                 widget.food.servingSize,
-                    date: selectedDate,
+                    date: selectedDate.toUtc(),
                   );
                   Navigator.pop(context);
                 },

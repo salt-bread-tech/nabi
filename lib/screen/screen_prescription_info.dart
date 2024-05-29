@@ -127,7 +127,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
   @override
   void initState() {
     super.initState();
-    selectedMonth = DateTime.now();
+    selectedMonth = DateTime.now().toUtc();
     getPrescription(widget.id);
   }
 
