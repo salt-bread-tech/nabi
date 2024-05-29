@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../services/globals.dart' as globals;
 import '../services/service_auth.dart';
-import '../widgets/widget_OCR_modal.dart';
 
 class UserScreen extends StatefulWidget {
   @override
@@ -25,6 +24,9 @@ class _UserScreenState extends State<UserScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final fontSize = screenSize.width * 0.036;
+
     if (_isLoading) {
       return Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -106,48 +108,36 @@ class _UserScreenState extends State<UserScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 20),
-                Text('기능 목록', style: TextStyle(fontSize: 16)),
+                Text('목록 보기', style: TextStyle(fontSize: 16)),
                 Divider(),
                 ListTile(
-                  title: Text('약 복용 루틴'),
+                  title: Text('의약품 복용 일정', style: TextStyle(fontSize: fontSize)),
                   onTap: () {
                     Navigator.pushNamed(context, '/DosageSchedule');
                   },
                 ),
                 ListTile(
-                  title: Text('복용할 약 추가'),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/MedicineSearch');
-                  },
-                ),
-                ListTile(
-                  title: Text('식단 관리'),
+                  title: Text('식단 관리' , style: TextStyle(fontSize: fontSize)),
                   onTap: () {
                     Navigator.pushNamed(context, '/DietSchedule');
                   },
                 ),
                 ListTile(
-                  title: Text('처방전 추가'),
-                  onTap: () {
-                    OCRModal.show(context);
-                  },
-                ),
-                ListTile(
-                  title: Text('처방전 화면'),
+                  title: Text('나만의 처방전', style: TextStyle(fontSize: fontSize)),
                   onTap: () {
                     Navigator.pushNamed(context, '/Prescription');
                   },
                 ),
                 ListTile(
-                  title: Text('루틴 화면'),
+                  title: Text('일정 관리', style: TextStyle(fontSize: fontSize)),
                   onTap: () {
-                    Navigator.pushNamed(context, '/routine');
+                    Navigator.pushNamed(context, '/schedule');
                   },
                 ),
                 ListTile(
-                  title: Text('웹툰 화면'),
+                  title: Text('습관 만들기', style: TextStyle(fontSize: fontSize)),
                   onTap: () {
-                    Navigator.pushNamed(context, '/webtoon');
+                    Navigator.pushNamed(context, '/routine');
                   },
                 ),
               ],

@@ -5,6 +5,7 @@ import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:doctor_nyang/screen/screen_dosage_schedule.dart';
 import 'package:doctor_nyang/screen/screen_home.dart';
 import 'package:doctor_nyang/screen/screen_intro.dart';
+import 'package:doctor_nyang/screen/screen_introForSettting.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_medicine_regist.dart';
 import 'package:doctor_nyang/screen/screen_medicine_search.dart';
@@ -80,6 +81,7 @@ class MyApp extends StatelessWidget {
         '/schedule' : (context) => ScheduleCalendar(),
         '/Setting': (context) => SettingsScreen(),
         '/Prescription' : (context) => PrescriptionScreen(),
+        '/introForSetting':(context) => IntroForSetting(),
       },
     );
   }

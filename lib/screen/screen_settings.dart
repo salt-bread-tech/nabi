@@ -40,7 +40,7 @@ class SettingsScreen extends StatelessWidget {
                 builder: (BuildContext context) => BodyInfoEditorDialog(),
               );
             }),
-            settingList(title: '웹툰 다시 보기', onTap: () {  Navigator.pushNamed(context, '/webtoon'); },),
+
             settingList(
               title: '로그아웃',
               onTap: () {
@@ -58,7 +58,14 @@ class SettingsScreen extends StatelessWidget {
             settingList(title: '개인정보 처리방침', onTap: (){
               _launchPrivacyPolicyUrl();
             }),
+            SizedBox(height: 30),
+            Container(
+              //padding: EdgeInsets.only(left: 15),
+              child: Text('확인하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
             Divider(),
+            settingList(title: '인트로 다시 보기', onTap: () {  Navigator.pushNamed(context, '/introForSetting'); },),
+            settingList(title: '웹툰 다시 보기', onTap: () {  Navigator.pushNamed(context, '/webtoon'); },),
           ],
         ),
       ),
