@@ -233,6 +233,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('복용 일정 추가하기', style: TextStyle(fontSize: 16)),
+                      Spacer(),
                       IconButton(
                         onPressed: () {
                           _showDatePickerPopup(context, (selectedDay) {
@@ -241,18 +242,14 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                             });
                           });
                         },
-                        icon: Icon(Icons.calendar_today),
+                        icon: Icon(Iconsax.calendar_2, size: 20),
                       ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text('복용 날짜: ${DateFormat('yyyy-MM-dd').format(selectedDate)}', style: TextStyle(fontSize: 14)),
-                      SizedBox(width: 10),
-                      Text('의약품명 : ${medicineTaking['medicineName']}', style: TextStyle(fontSize: 14)),
-                    ],
-                  ),
+                      Text('${DateFormat('yyyy-MM-dd').format(selectedDate)}', style: TextStyle(fontSize: 14)),
 
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Text('${medicineTaking['medicineName']}', style: TextStyle(fontSize: 14)),
                   SizedBox(height: 20),
                   Text('복용 시간'),
                   Row(
@@ -308,9 +305,9 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: () async{
                         print('$medicineId, ${DateFormat('yyyy-MM-dd').format(selectedDate)}, $selectedTime $selectedDosage');
-                        addDosage(
+                        await addDosage(
                           medicineId: medicineId,
                           date: DateFormat('yyyy-MM-dd').format(selectedDate),
                           time: selectedTime,
