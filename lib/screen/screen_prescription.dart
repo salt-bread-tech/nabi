@@ -153,6 +153,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
 
   void showPrescriptionAddModal() {
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
           return PrescriptionAddModal(
@@ -173,6 +174,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         .firstWhere((element) => element['prescriptionId'] == id)['name'];
     print(name);
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
           return PrescriptionEditModal(
