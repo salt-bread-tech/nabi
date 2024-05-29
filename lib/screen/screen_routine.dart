@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:doctor_nyang/widgets/widget_delete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +14,10 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import '../assets/theme.dart';
 
 class RoutineScreen extends StatefulWidget {
+  final DateTime selectedDate;
+
+  RoutineScreen({required this.selectedDate});
+
   @override
   _RoutineScreenState createState() => _RoutineScreenState();
 }
@@ -26,13 +31,13 @@ class _RoutineScreenState extends State<RoutineScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now().toUtc();
+    _selectedDate = widget.selectedDate;
     _selectedDateRange = _formatDateRange(_selectedDate!);
-    fetchRoutines();
+    fetchWeekRoutines(_selectedDate!);
   }
 
   void refreshRoutines() {
-    fetchRoutines();
+    fetchWeekRoutines(_selectedDate!);
   }
 
   void _presentRoutineAddSheet() {
@@ -83,7 +88,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
       _isLoading = true;
     });
 
-    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    String formattedDate = DateFormat('yyyy-MM-dd').format(date.toUtc());
     final url = Uri.parse('$baseUrl/routine/$formattedDate');
     try {
       final response = await http.get(url, headers: {
@@ -191,7 +196,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
 
       if (response.statusCode == 200) {
         print('루틴 삭제 성공');
-        fetchRoutines();
+        fetchWeekRoutines(_selectedDate!);
         return true;
       } else {
         throw Exception('루틴 삭제 실패: ${response.statusCode}');
@@ -218,7 +223,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: SpinKitPumpingHeart(color: AppTheme.pastelPink))
           : _routines.isEmpty
           ? Center(child: Text('루틴 없음'))
           : ListView.builder(
@@ -277,7 +282,6 @@ class RoutineItem extends StatelessWidget {
                 },
               );
             },
-          //=> onDelete(routine['id']),
             backgroundColor: Color(0xFFFF5050),
             foregroundColor: Colors.white,
             icon: Iconsax.trash,

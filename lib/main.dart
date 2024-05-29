@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:doctor_nyang/screen/screen_chat.dart';
@@ -86,14 +87,14 @@ class MyApp extends StatelessWidget {
         '/home': (context) => HomeScreen(),
         '/MyHomePage': (context) => MyHomePage(),
         '/chat': (context) => ChatScreen(),
-        '/DosageSchedule': (context) => DosageSchedule(),
+        '/DosageSchedule': (context) => DosageSchedule(selectedDate: DateTime.now().toUtc(),),
         '/MedicineSearch': (context) => MedicineSearch(),
         '/MedicineRegister': (context) => MedicineRegist(),
         '/DietSchedule': (context) => DietSchedule(),
-        '/FoodSearch': (context) => FoodSearch(),
-        '/routine': (context) => RoutineScreen(),
-        '/webtoon': (context) => WebtoonPage(),
-        '/schedule': (context) => ScheduleCalendar(),
+        '/FoodSearch' : (context) => FoodSearch(),
+        '/routine' : (context) => RoutineScreen(selectedDate: DateTime.now().toUtc(),),
+        '/webtoon' : (context) => WebtoonPage(),
+        '/schedule' : (context) => ScheduleCalendar(),
         '/Setting': (context) => SettingsScreen(),
         '/Prescription': (context) => PrescriptionScreen(),
         '/introForSetting': (context) => IntroForSetting(),
@@ -110,11 +111,15 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final storage = FlutterSecureStorage();
 
+
   @override
   void initState() {
     super.initState();
     _checkLoginStatus();
+
   }
+
+
 
   Future<void> _checkLoginStatus() async {
     String? token = await storage.read(key: 'token');
@@ -143,6 +148,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
+
+
+
+
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -151,10 +160,65 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController con = TextEditingController();
   int _currentIndex = 1;
+  late ConnectivityResult _connectionStatus;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _checkInitialConnection();
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> _checkInitialConnection() async {
+    _connectionStatus = await _connectivity.checkConnectivity();
+    if (_connectionStatus == ConnectivityResult.none) {
+      _showNetworkErrorDialog();
+    }
+  }
+
+  void _updateConnectionStatus(ConnectivityResult result) {
+    setState(() {
+      _connectionStatus = result;
+    });
+
+    if (_connectionStatus == ConnectivityResult.none) {
+      _showNetworkErrorDialog();
+    }
+  }
+
+
+
+  Future<void> _showNetworkErrorDialog() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('네트워크 오류'),
+          content: Text('인터넷에 연결되지 않았습니다. \n 확인을 누르면 로그아웃됩니다.'),
+          actions: [
+            TextButton(
+              child: Text('확인'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await logoutUser();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   final List<Widget> _children = [

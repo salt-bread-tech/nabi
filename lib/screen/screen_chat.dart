@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../assets/theme.dart';
+import '../services/service_auth.dart';
 import '../services/urls.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -31,12 +34,47 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
+    _checkInitialConnection();
     getChats();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> _checkInitialConnection() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      _showNetworkErrorDialog();
+    } else {
+      getChats();
+    }
+  }
+
+  Future<void> _showNetworkErrorDialog() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('네트워크 오류'),
+          content: Text('인터넷에 연결되지 않았습니다. \n 확인을 누르면 로그아웃됩니다.'),
+          actions: [
+            TextButton(
+              child: Text('확인'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await logoutUser();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _scrollListener() {
@@ -61,65 +99,70 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> feed() async {
     final url = Uri.parse('$baseUrl/feed');
-    final response = await http.get(url, headers: {
-      "Content-Type": "application/json; charset=UTF-8",
-      'Authorization': 'Bearer $token',
-    });
+    try {
+      final response = await http.get(url, headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+        'Authorization': 'Bearer $token',
+      });
 
-    if (response.statusCode == 200) {
-      final int feedData = json.decode(utf8.decode(response.bodyBytes));
-      if (feedData == 200) {
-        print('Feed success');
-        showCupertinoDialog(
-          context: context,
-          builder: (context) {
-            return CupertinoAlertDialog(
-              title: Text('고맙다냥!'),
-              content: Text('나비에게 먹이를 주었습니다.'),
-              actions: <Widget>[
-                CupertinoDialogAction(
-                  child: Text('확인'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            );
-          },
-        );
-        showPhoto();
-      } else if (feedData == 300) {
-        print('Already fed');
-        showCupertinoDialog(
-          context: context,
-          builder: (context) {
-            return CupertinoAlertDialog(
-              title: Text('이미 먹었다냥!'),
-              content: Text('이미 먹이를 주었습니다.'),
-              actions: <Widget>[
-                CupertinoDialogAction(
-                  child: Text('확인'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            );
-          },
-        );
+      if (response.statusCode == 200) {
+        final int feedData = json.decode(utf8.decode(response.bodyBytes));
+        if (feedData == 200) {
+          print('Feed success');
+          showCupertinoDialog(
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                title: Text('고맙다냥!'),
+                content: Text('나비에게 먹이를 주었습니다.'),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                    child: Text('확인'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+          showPhoto();
+        } else if (feedData == 300) {
+          print('Already fed');
+          showCupertinoDialog(
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                title: Text('이미 먹었다냥!'),
+                content: Text('이미 먹이를 주었습니다.'),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                    child: Text('확인'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } else {
+        print('Failed to load feed from server');
       }
-    } else {
-      print('Failed to load feed from server');
+    } catch (e) {
+      print('네트워크 에러: $e');
+      _showNetworkErrorDialog();
     }
-
   }
 
   Future<void> getChats() async {
     final url = Uri.parse('$baseUrl/chats/recent');
-    final response = await http.get(url, headers: {
-      "Content-Type": "application/json; charset=UTF-8",
-      'Authorization': 'Bearer $token',
-    });
+    try {
+      final response = await http.get(url, headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+        'Authorization': 'Bearer $token',
+      });
 
     if (response.statusCode == 200) {
       final List<dynamic> chatData =
@@ -149,12 +192,14 @@ class _ChatScreenState extends State<ChatScreen> {
           } else if (!aIsUser && bIsUser) {
             return 0;
           }
-          return 1;
-        }
-        return compare;
-      });
-    } else {
-      print('Failed to load chats from server');
+          return compare;
+        });
+      } else {
+        print('Failed to load chats from server');
+      }
+    } catch (e) {
+      print('네트워크 에러: $e');
+      _showNetworkErrorDialog();
     }
   }
 
@@ -191,9 +236,14 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     } catch (e) {
       print('네트워크 에러: $e');
+      _showNetworkErrorDialog();
+      setState(() {
+        _isLoading = false;
+      });
       return false;
     }
   }
+
 
   void _handleSendPressed(types.PartialText message) async {
     final content = message.text;
