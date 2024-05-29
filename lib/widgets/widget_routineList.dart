@@ -267,7 +267,7 @@ class RoutineItem extends StatelessWidget {
               ),
               Spacer(),
               Flexible(
-                flex: 7,
+                flex: 8,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: List.generate(maxCount, (index) {

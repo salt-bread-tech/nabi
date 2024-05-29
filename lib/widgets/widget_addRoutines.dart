@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 
 import '../services/service_routine.dart';
 
-
 class AddRoutineWidget extends StatefulWidget {
   final VoidCallback onRoutineAdded;
 
@@ -24,7 +23,6 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   Color _selectedColor = Color(0xFFFFDFEB);
   String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
   int _selectedMaxTerm = 1;
-
 
   void _registerRoutine() async {
     String colorCodeWithoutAlpha = _selectedColor.value.toRadixString(16)
@@ -50,7 +48,6 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
           SnackBar(content: Text("데일리 루틴 등록 실패: $e")));
     }
   }
-
 
   Widget firstField() {
     return Row(
@@ -83,10 +80,9 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
       ),
       controller: _routineController,
       maxLength: 9,
-      maxLengthEnforcement: MaxLengthEnforcement.enforced, // Optional: It enforces the limit
+      maxLengthEnforcement: MaxLengthEnforcement.enforced,
     );
   }
-
 
   Widget _buildMaxTermInput() {
     return TextField(
@@ -155,6 +151,8 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   }
 
   Widget _buildColorPicker() {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double baseSize = screenWidth / 31;
     final List<Color> _colorOptions = [
       Color(0xFFFFDFEB),
       Color(0xFFFFAAD3),
@@ -165,32 +163,35 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
       Color(0xFF9D79D8),
     ];
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: _colorOptions.map((color) {
-        bool isSelected = _selectedColor == color;
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedColor = color;
-            });
-          },
-          child: Container(
-            padding: EdgeInsets.all(1),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isSelected ? Colors.grey : Colors.transparent,
-                width: 1.5,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: _colorOptions.map((color) {
+          bool isSelected = _selectedColor == color;
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedColor = color;
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.all(1),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? Colors.grey : Colors.transparent,
+                  width: 1.5,
+                ),
+              ),
+              child: CircleAvatar(
+                backgroundColor: color,
+                radius: baseSize, // Use the calculated base size for the radius
               ),
             ),
-            child: CircleAvatar(
-              backgroundColor: color,
-              radius: 13,
-            ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -222,14 +223,15 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
                     ],
                   ),
                   SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 5),
-                      _buildColorPicker(),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 5),
+                        _buildColorPicker(),
+                      ],
+                    ),
                   ),
-                  Spacer(),
                   IconButton(
                       onPressed: (){_registerRoutine(); Navigator.of(context).pop();},  icon: Icon(Iconsax.send_15))
                 ],
