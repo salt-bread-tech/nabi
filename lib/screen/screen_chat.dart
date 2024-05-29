@@ -192,8 +192,9 @@ class _ChatScreenState extends State<ChatScreen> {
           } else if (!aIsUser && bIsUser) {
             return 0;
           }
-          return compare;
-        });
+        }
+        return compare;
+      });
       } else {
         print('Failed to load chats from server');
       }

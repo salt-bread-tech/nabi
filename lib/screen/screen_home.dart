@@ -332,7 +332,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
       onTap: () async {
         await Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => RoutineScreen()),
+          MaterialPageRoute(builder: (context) => RoutineScreen(selectedDate: selectedDate)),
         );
         refreshData();
       },
@@ -414,7 +414,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
       onTap: () async {
         await Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DosageSchedule()),
+          MaterialPageRoute(builder: (context) => DosageSchedule(selectedDate: selectedDate)),
         );
         refreshData();
       },
