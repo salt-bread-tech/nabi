@@ -182,8 +182,10 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Padding(
-      padding: MediaQuery.of(context).viewInsets,
+      padding: const EdgeInsets.all(0.0),
       child: Container(
         height: 530,
         padding: const EdgeInsets.all(30.0),
@@ -231,7 +233,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
               children: <Widget>[
                 Container(
                     alignment: Alignment.center,
-                    width: 85,
+                    width: screenWidth * 0.22,
                     height: 50,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -259,7 +261,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                 SizedBox(width: 5),
                 Container(
                   alignment: Alignment.center,
-                  width: 135,
+                  width: screenWidth * 0.35,
                   height: 50,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -270,6 +272,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                     color: Colors.white,
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       IconButton(
                         icon: Icon(Icons.remove,
@@ -279,9 +282,14 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                         },
                       ),
                       Container(
-                        width: 35,
+                        width: screenWidth * 0.075,
                         child: TextField(
                           controller: _controller,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedQuantity = double.parse(value);
+                            });
+                          },
                           textAlign: TextAlign.center,
                           keyboardType:
                               TextInputType.numberWithOptions(decimal: true),
@@ -300,7 +308,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                 SizedBox(width: 5),
                 Container(
                     alignment: Alignment.center,
-                    width: 85,
+                    width: screenWidth * 0.22,
                     height: 50,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
