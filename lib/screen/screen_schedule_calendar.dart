@@ -172,6 +172,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
 
   void showAddScheduleModal(BuildContext context, DateTime initialDate) {
     showModalBottomSheet(
+      isScrollControlled: true,
         context: context,
         builder: (BuildContext buildContext) {
           return StatefulBuilder(
@@ -181,7 +182,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                     bottom: MediaQuery.of(context).viewInsets.bottom),
                 child: Container(
                     width: double.infinity,
-                    height: 240,
+                    height: 230,
                     decoration: BoxDecoration(
                       color: AppTheme.appbackgroundColor,
                       borderRadius: BorderRadius.only(
@@ -288,6 +289,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
 
   void showEditScheduleModal(BuildContext context, int scheduleId) {
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         builder: (BuildContext buildContext) {
           return StatefulBuilder(
@@ -297,7 +299,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
                     bottom: MediaQuery.of(context).viewInsets.bottom),
                 child: Container(
                     width: double.infinity,
-                    height: 240,
+                    height: 230,
                     decoration: BoxDecoration(
                       color: AppTheme.appbackgroundColor,
                       borderRadius: BorderRadius.only(
@@ -415,6 +417,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
     getEventForDay(_selectedDay);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
