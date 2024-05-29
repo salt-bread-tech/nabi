@@ -38,7 +38,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
   }
 
   Future<void> fetchDosageSchedule() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
     final String url = '$baseUrl/dosage';
 
     try {
@@ -53,7 +53,6 @@ class _DosageScheduleState extends State<DosageSchedule> {
       if (response.statusCode == 200) {
         String responseBody = utf8.decode(response.bodyBytes);
         List<dynamic> allSchedule = json.decode(responseBody);
-
         List<dynamic> todaySchedule = allSchedule.where((schedule) {
           String scheduleDate = schedule['date'];
           return scheduleDate == formattedDate;
@@ -212,7 +211,6 @@ print(todaySchedule);
     return categorizedSchedule;
   }
 
-
   void editDosageModal(BuildContext context, dynamic dosage) {
     String selectedTime = timesToInt[dosage['times']] ?? '알 수 없음';
     int selectedDosage = dosage['dosage'];
@@ -265,9 +263,13 @@ print(todaySchedule);
                         onPressed: () {
                           setState(() {
                             selectedTime = e;
+                            // Automatically set dosage to "상관없음" if "취침전" is selected
+                            if (selectedTime == '취침전') {
+                              selectedDosage = medicineTakingTimes.indexOf('상관 없음');
+                            }
                           });
                         },
-                        child: Text(e, style: TextStyle(color: Colors.black,fontSize: 13)),
+                        child: Text(e, style: TextStyle(color: Colors.black, fontSize: 13)),
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
                           backgroundColor: selectedTime == e
