@@ -231,7 +231,7 @@ print(todaySchedule);
                 children: <Widget>[
                   Row(
                     children: [
-                      Text('복용 일정 수정하기', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text('복용 일정 수정하기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       Spacer(),
                       IconButton(
                         onPressed: () {
@@ -251,7 +251,7 @@ print(todaySchedule);
                         },
                         icon: Icon(Iconsax.calendar_2, size: 20),
                       ),
-                      Text('${DateFormat('yyyy-MM-dd').format(selectedDate)}', style: TextStyle(fontSize: 14)),
+                      Text('${DateFormat('yyyy-MM-dd').format(selectedDate)}', style: TextStyle(fontSize: 15)),
                     ],
                   ),
                   SizedBox(width: 10),
@@ -267,7 +267,7 @@ print(todaySchedule);
                             selectedTime = e;
                           });
                         },
-                        child: Text(e, style: TextStyle(color: Colors.black)),
+                        child: Text(e, style: TextStyle(color: Colors.black,fontSize: 13)),
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
                           backgroundColor: selectedTime == e
@@ -281,30 +281,32 @@ print(todaySchedule);
                     }).toList(),
                   ),
                   SizedBox(height: 20),
-                  Text('복용 방법'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: medicineTakingTimes.map((e) {
-                      return ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            selectedDosage = medicineTakingTimes.indexOf(e);
-                            print('Selected Dosage: $selectedDosage');
-                          });
-                        },
-                        child: Text(e, style: TextStyle(color: Colors.black)),
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: selectedDosage == medicineTakingTimes.indexOf(e)
-                              ? AppTheme.pastelBlue
-                              : Colors.grey[200],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                  if (selectedTime != '취침전') ...[
+                    Text('복용 방법'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: medicineTakingTimes.map((e) {
+                        return ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              selectedDosage = medicineTakingTimes.indexOf(e);
+                              print('Selected Dosage: $selectedDosage');
+                            });
+                          },
+                          child: Text(e, style: TextStyle(color: Colors.black, fontSize: 13)),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: selectedDosage == medicineTakingTimes.indexOf(e)
+                                ? AppTheme.pastelBlue
+                                : Colors.grey[200],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                   SizedBox(height: 20),
                   Container(
                     width: double.infinity,
@@ -457,7 +459,9 @@ print(todaySchedule);
             ),
             child: ListTile(
               title: Text('${dosage['medicineName']}'),
-              subtitle: Text('${timesToInt[dosage['times']]}, ${medicineTakingTimesToInt[dosage['dosage']]}'),
+              subtitle: dosage['times'] == 3
+                  ? Text('${timesToInt[dosage['times']]}')
+                  : Text('${timesToInt[dosage['times']]}, ${medicineTakingTimesToInt[dosage['dosage']]}'),
               trailing: Icon(
                 dosage['medicineTaken'] ? Icons.check : Icons.check,
                 color: dosage['medicineTaken'] ? Color(0xFF6696DE) : Colors.grey,

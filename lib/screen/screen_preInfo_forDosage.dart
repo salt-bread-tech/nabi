@@ -245,7 +245,6 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                         icon: Icon(Iconsax.calendar_2, size: 20),
                       ),
                       Text('${DateFormat('yyyy-MM-dd').format(selectedDate)}', style: TextStyle(fontSize: 14)),
-
                     ],
                   ),
                   SizedBox(height: 20),
@@ -261,7 +260,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                           selectedTime = time.indexOf(e);
                         });
                       },
-                      child: Text(e, style: TextStyle(color: Colors.black)),
+                      child: Text(e, style: TextStyle(color: Colors.black,fontSize: 13)),
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
                         backgroundColor: selectedTime == time.indexOf(e) ? AppTheme.pastelBlue : Colors.grey[200],
@@ -273,27 +272,32 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                         .toList(),
                   ),
                   SizedBox(height: 10),
-                  Text('복용 방법'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: medicineTakingTimes
-                        .map((e) => ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          selectedDosage = medicineTakingTimes.indexOf(e);
-                        });
-                      },
-                      child: Text(e, style: TextStyle(color: Colors.black)),
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: selectedDosage == medicineTakingTimes.indexOf(e) ? AppTheme.pastelBlue : Colors.grey[200],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ))
-                        .toList(),
-                  ),
+                  if (time[selectedTime] != '취침 전') ...[
+                    Text('복용 방법'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: medicineTakingTimes.map((e) {
+                        return ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              selectedDosage = medicineTakingTimes.indexOf(e);
+                              print('Selected Dosage: $selectedDosage');
+                            });
+                          },
+                          child: Text(e, style: TextStyle(color: Colors.black, fontSize: 13)),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: selectedDosage == medicineTakingTimes.indexOf(e)
+                                ? AppTheme.pastelBlue
+                                : Colors.grey[200],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                   SizedBox(height: 10),
                   Container(
                     width: double.infinity,

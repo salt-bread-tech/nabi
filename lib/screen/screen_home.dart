@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
+import 'package:doctor_nyang/screen/screen_dosage_schedule.dart';
 import 'package:doctor_nyang/screen/screen_prescription.dart';
 import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
@@ -17,6 +18,7 @@ import '../services/service_auth.dart';
 import '../services/urls.dart';
 import '../widgets/widget_calendar.dart';
 import '../widgets/widget_diet.dart';
+import '../widgets/widget_dosageSchedule.dart';
 import '../widgets/widget_routineList.dart';
 import '../widgets/widget_weekly_calendar.dart';
 import '../widgets/widget_prescription.dart';
@@ -108,19 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: 5),
-                    child: Text(
-                      '$nickName님 안녕하세요',
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
-              ),
+
               SizedBox(height: 20),
               Container(
                 alignment: Alignment.centerLeft,
@@ -253,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               key: ValueKey(DateFormat('yyyy-MM-dd')
                                   .format(selectedDate)),
                               datetime:
-                                  DateFormat('yyyy-MM-dd').format(selectedDate),
+                              DateFormat('yyyy-MM-dd').format(selectedDate),
                             ),
                           )
                         ])),
@@ -294,6 +284,45 @@ class _HomeScreenState extends State<HomeScreen> {
                                 datetime: DateFormat('yyyy-MM-dd')
                                     .format(selectedDate))
                           ]))),
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DosageSchedule(),
+                    ),
+                  );
+                  refreshData();
+                },
+                child: Container(
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          padding: EdgeInsets.only(left: 5),
+                          margin: EdgeInsets.only(bottom: 10),
+                          child: Text('의약품 복용 일정')),
+                      WidgetDosage(
+                          datetime: DateFormat('yyyy-MM-dd')
+                              .format(selectedDate))
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
