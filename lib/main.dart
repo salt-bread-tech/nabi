@@ -28,6 +28,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'assets/theme.dart';
 

@@ -271,8 +271,8 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                     ))
                         .toList(),
                   ),
-                  SizedBox(height: 10),
-                  if (time[selectedTime] != '취침 전') ...[
+                  SizedBox(height: 20),
+                  if (selectedTime != '취침전') ...[
                     Text('복용 방법'),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -313,7 +313,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                         print('$medicineId, ${DateFormat('yyyy-MM-dd').format(selectedDate)}, $selectedTime $selectedDosage');
                         await addDosage(
                           medicineId: medicineId,
-                          date: DateFormat('yyyy-MM-dd').format(selectedDate),
+                          date: DateFormat('yyyy-MM-dd').format(selectedDate.toUtc()),
                           time: selectedTime,
                           dosage: selectedDosage,
                         );
