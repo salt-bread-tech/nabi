@@ -24,9 +24,8 @@ class Schedule {
 }
 
 Future<List<Schedule>> fetchSchedule(String dateTime) async {
-  {
+  try {
     String datetime = dateTime.toString().substring(0, 10);
-
     final url = Uri.parse('$baseUrl/schedule/$datetime');
     final response = await http.get(
       url,
@@ -35,29 +34,35 @@ Future<List<Schedule>> fetchSchedule(String dateTime) async {
         'Authorization': 'Bearer $token',
       },
     );
-    List<Schedule> schedules = [];
-    final decodedBody = utf8.decode(response.bodyBytes);
-    final data = json.decode(decodedBody);
 
-    if (data is int) {
-      throw Exception('조회 실패 ${response.statusCode}');
+    if (response.statusCode == 200) {
+      List<Schedule> schedules = [];
+      final decodedBody = utf8.decode(response.bodyBytes);
+      final data = json.decode(decodedBody);
+
+      if (data is int) {
+        throw Exception('조회 실패 ${response.statusCode}');
+      }
+
+      for (var jsonItem in data[dateTime]) {
+        String text = jsonItem['text'];
+        DateTime datetime = DateTime.parse(jsonItem['date']);
+        bool isDone = DateTime.now().isAfter(datetime) ? true : false;
+        Schedule schedule = Schedule(text: text, date: datetime, isDone: isDone);
+        schedules.add(schedule);
+      }
+      schedules.sort((a, b) => a.date.compareTo(b.date));
+
+      return schedules;
+    } else {
+      throw Exception('Failed to load schedule');
     }
-
-    for (var jsonItem in data[dateTime]) {
-      String text = jsonItem['text'];
-      DateTime datetime = DateTime.parse(jsonItem['date']);
-      bool isDone = DateTime.now().isAfter(datetime) ? true : false;
-      Schedule schedule =
-      Schedule(text: text, date: datetime, isDone: isDone);
-      schedules.add(schedule);
-    }
-    schedules.sort((a, b) => a.date.compareTo(b.date));
-
-
-    return schedules;
+  } catch (e) {
+    print('error: $e');
+    return []; // Return an empty list on error
   }
-
 }
+
 
 class WidgetSchedule extends StatefulWidget {
   final String datetime;

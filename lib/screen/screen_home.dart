@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:doctor_nyang/screen/screen_dosage_schedule.dart';
+import 'package:doctor_nyang/screen/screen_login.dart';
 import 'package:doctor_nyang/screen/screen_prescription.dart';
 import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
@@ -58,6 +59,31 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchUserInfo();
   }
 
+  Future<void> _showNetworkErrorDialog() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('네트워크 오류'),
+          content: Text('인터넷에 연결되지 않았습니다. \n 확인을 누르면 로그아웃됩니다.'),
+          actions: [
+            TextButton(
+              child: Text('확인'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await logoutUser();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   FutureOr<Ingestion?> fetchIngestion() async {
     final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
     final String url = '$baseUrl/ingestion/total/$formattedDate';
@@ -83,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       print('error: $e');
+      _showNetworkErrorDialog();
     }
   }
 
