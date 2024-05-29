@@ -16,7 +16,12 @@ import '../widgets/widget_delete.dart';
 import '../widgets/widget_weeklyCalendar2.dart';
 import '../widgets/widget_weekly_calendar.dart';
 
+
 class DosageSchedule extends StatefulWidget {
+  final DateTime selectedDate;
+
+  DosageSchedule({required this.selectedDate});
+
   @override
   _DosageScheduleState createState() => _DosageScheduleState();
 }
@@ -29,11 +34,10 @@ class _DosageScheduleState extends State<DosageSchedule> {
 
   final GlobalKey<WidgetCalendarState> calendarKey = GlobalKey<WidgetCalendarState>();
 
-
   @override
   void initState() {
     super.initState();
-    selectedDate = DateTime.now();
+    selectedDate = widget.selectedDate;
     fetchDosageSchedule();
   }
 
@@ -57,7 +61,7 @@ class _DosageScheduleState extends State<DosageSchedule> {
           String scheduleDate = schedule['date'];
           return scheduleDate == formattedDate;
         }).toList();
-print(todaySchedule);
+        print(todaySchedule);
         setState(() {
           dosageSchedule = todaySchedule;
         });
@@ -136,7 +140,6 @@ print(todaySchedule);
     }
   }
 
-
   Future<void> deleteMedicine(int dosageId) async {
     final url = Uri.parse('$baseUrl/dosage/$dosageId');
 
@@ -178,6 +181,7 @@ print(todaySchedule);
     setState(() {
       selectedDate = newDate;
       fetchDosageSchedule();
+      calendarKey.currentState?.updateSelectedDay(newDate);
     });
   }
 
@@ -343,8 +347,6 @@ print(todaySchedule);
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     var categorizedSchedule = categorizeDosage();
@@ -382,7 +384,11 @@ print(todaySchedule);
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Column(
           children: [
-            WidgetCalendar2(onDateSelected: _handleDateChange, calendarKey: calendarKey),
+            WidgetCalendar2(
+                onDateSelected: _handleDateChange,
+                calendarKey: calendarKey,
+                initialSelectedDate: selectedDate
+            ),
             Expanded(
               child: ListView(
                 children: [

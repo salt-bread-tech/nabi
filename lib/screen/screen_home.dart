@@ -242,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => RoutineScreen(),
+                      builder: (context) => RoutineScreen(selectedDate: selectedDate),
                     ),
                   );
                   refreshData();
@@ -317,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DosageSchedule(),
+                      builder: (context) => DosageSchedule(selectedDate: selectedDate),
                     ),
                   );
                   refreshData();
