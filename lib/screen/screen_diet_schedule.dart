@@ -27,11 +27,10 @@ class DietSchedule extends StatefulWidget {
 class _DietScheduleState extends State<DietSchedule> {
   List<dynamic> dietSchedule = [];
   List<dynamic> ingestionSchedule = [];
-  DateTime _selectedDate = selectedDate;
 
   void _handleDateChange(DateTime newDate) {
     setState(() {
-      _selectedDate = newDate.toUtc();
+      widgetSelectedDate = newDate.toUtc();
       fetchIngestion();
       fetchDietSchedule();
     });
@@ -42,7 +41,7 @@ class _DietScheduleState extends State<DietSchedule> {
     super.initState();
     fetchIngestion();
     fetchDietSchedule();
-    _selectedDate = selectedDate;
+    widgetSelectedDate = selectedDate;
     _controller.text = _selectedGram == '인분'
         ? _selectedQuantity.toString()
         : _selectedQuantity.toStringAsFixed(0);
@@ -61,7 +60,7 @@ class _DietScheduleState extends State<DietSchedule> {
   }
 
   Future<void> fetchDietSchedule() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate.toUtc());
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(widgetSelectedDate.toUtc());
     final String url = '$baseUrl/diet/$formattedDate';
 
     try {
@@ -94,7 +93,7 @@ class _DietScheduleState extends State<DietSchedule> {
   }
 
   FutureOr<Ingestion?> fetchIngestion() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate.toUtc());
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(widgetSelectedDate.toUtc());
     final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
@@ -420,7 +419,7 @@ class _DietScheduleState extends State<DietSchedule> {
                                 await updateIngestion(
                                   ingestionId: id,
                                   date: DateFormat('yyyy-MM-dd')
-                                      .format(_selectedDate.toUtc())
+                                      .format(widgetSelectedDate.toUtc())
                                       .toString(),
                                   times: _selectedMeal== '아침'
                                       ? 0
@@ -461,9 +460,9 @@ class _DietScheduleState extends State<DietSchedule> {
                                   transFattyAcid: food.transFattyAcid >= 9999999
                                       ? 9999999
                                       : food.transFattyAcid * calculate,
-                                );
+                                ); 
                                 print(
-                                    'ingedtionId: $id, date: $_selectedDate, times: ${_selectedMeal == '아침' ? 0 : _selectedMeal == '점심' ? 1 : _selectedMeal == '저녁' ? 2 : 3}, servingSize: ${food.servingSize}, totalIngestionSize: ${_selectedGram == '인분' ? food.servingSize * _selectedQuantity : _selectedQuantity}, calories: ${_selectedGram == '인분' ? food.calories * _selectedQuantity : food.calories * _selectedQuantity / food.servingSize}, carbohydrate: ${_selectedGram == '인분' ? food.carbohydrate * _selectedQuantity : food.carbohydrate * _selectedQuantity / food.servingSize}, protein: ${_selectedGram == '인분' ? food.protein * _selectedQuantity : food.protein * _selectedQuantity / food.servingSize}, fat: ${_selectedGram == '인분' ? food.fat * _selectedQuantity : food.fat * _selectedQuantity / food.servingSize}, sugars: ${_selectedGram == '인분' ? food.sugars * _selectedQuantity : food.sugars * _selectedQuantity / food.servingSize}, salt: ${_selectedGram == '인분' ? food.salt * _selectedQuantity : food.salt * _selectedQuantity / food.servingSize}, cholesterol: ${_selectedGram == '인분' ? food.cholesterol * _selectedQuantity : food.cholesterol * _selectedQuantity / food.servingSize}, saturatedFattyAcid: ${_selectedGram == '인분' ? food.saturatedFattyAcid * _selectedQuantity : food.saturatedFattyAcid * _selectedQuantity / food.servingSize}, transFattyAcid: ${_selectedGram == '인분' ? food.transFattyAcid * _selectedQuantity : food.transFattyAcid * _selectedQuantity / food.servingSize}');
+                                    'ingedtionId: $id, date: $widgetSelectedDate, times: ${widgetSelectedDate == '아침' ? 0 : widgetSelectedDate == '점심' ? 1 : widgetSelectedDate == '저녁' ? 2 : 3}, servingSize: ${food.servingSize}, totalIngestionSize: ${_selectedGram == '인분' ? food.servingSize * _selectedQuantity : _selectedQuantity}, calories: ${_selectedGram == '인분' ? food.calories * _selectedQuantity : food.calories * _selectedQuantity / food.servingSize}, carbohydrate: ${_selectedGram == '인분' ? food.carbohydrate * _selectedQuantity : food.carbohydrate * _selectedQuantity / food.servingSize}, protein: ${_selectedGram == '인분' ? food.protein * _selectedQuantity : food.protein * _selectedQuantity / food.servingSize}, fat: ${_selectedGram == '인분' ? food.fat * _selectedQuantity : food.fat * _selectedQuantity / food.servingSize}, sugars: ${_selectedGram == '인분' ? food.sugars * _selectedQuantity : food.sugars * _selectedQuantity / food.servingSize}, salt: ${_selectedGram == '인분' ? food.salt * _selectedQuantity : food.salt * _selectedQuantity / food.servingSize}, cholesterol: ${_selectedGram == '인분' ? food.cholesterol * _selectedQuantity : food.cholesterol * _selectedQuantity / food.servingSize}, saturatedFattyAcid: ${_selectedGram == '인분' ? food.saturatedFattyAcid * _selectedQuantity : food.saturatedFattyAcid * _selectedQuantity / food.servingSize}, transFattyAcid: ${_selectedGram == '인분' ? food.transFattyAcid * _selectedQuantity : food.transFattyAcid * _selectedQuantity / food.servingSize}');
                                 Navigator.pop(context);
                               },
                               child: Text(
@@ -517,32 +516,7 @@ class _DietScheduleState extends State<DietSchedule> {
               children: <Widget>[
                 WidgetCalendar(onDateSelected: _handleDateChange),
                 SizedBox(height: 20),
-                WidgetDiet(
-                  onTap: () {},
-                  isWidget: false,
-                  userCalories: bmr ?? 2000,
-                  breakfastCalories: ingestionSchedule.isNotEmpty
-                      ? ingestionSchedule[0]['breakfastKcal']
-                      : 0,
-                  lunchCalories: ingestionSchedule.isNotEmpty
-                      ? ingestionSchedule[0]['lunchKcal']
-                      : 0,
-                  dinnerCalories: ingestionSchedule.isNotEmpty
-                      ? ingestionSchedule[0]['dinnerKcal']
-                      : 0,
-                  snackCalories: ingestionSchedule.isNotEmpty
-                      ? ingestionSchedule[0]['snackKcal']
-                      : 0,
-                  totalProtein: ingestionSchedule.isNotEmpty
-                      ? ingestionSchedule[0]['totalProtein']
-                      : 0,
-                  totalCarb: ingestionSchedule.isNotEmpty
-                      ? ingestionSchedule[0]['totalCarbohydrate']
-                      : 0,
-                  totalFat: ingestionSchedule.isNotEmpty
-                      ? ingestionSchedule[0]['totalFat']
-                      : 0,
-                ),
+                WidgetDiet(date: widgetSelectedDate),
                 SizedBox(height: 20),
                 Column(
                   children: List<Widget>.generate(dietSchedule.length, (index) {
