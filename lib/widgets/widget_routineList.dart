@@ -231,6 +231,7 @@ class RoutineItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final fontSize = screenSize.width * 0.03; // 화면 너비에 비례하여 폰트 크기 설정
+    final circleSize = screenSize.width * 0.06; // 화면 너비에 비례하여 원 크기 설정
 
     int currentCount = routine['counts'];
     int maxCount = routine['max'];
@@ -277,8 +278,8 @@ class RoutineItem extends StatelessWidget {
                         onTap: () => onCountChange(index),
                         child: Container(
                           margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                          height: 23,
-                          width: 23,
+                          height: circleSize,
+                          width: circleSize,
                           decoration: BoxDecoration(
                             color: index < currentCount
                                 ? Color(int.parse("0xFF$colorCode"))
