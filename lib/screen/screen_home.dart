@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             WidgetCalendar(onDateSelected: _handleDateChange),
             SizedBox(height: 20),
-            ReorderableColumn(),
+            ReorderableColumn(selectedDate: selectedDate),
           ]),
         ),
       ),
@@ -97,6 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class ReorderableColumn extends StatefulWidget {
+  final DateTime selectedDate;
+
+  ReorderableColumn({required this.selectedDate});
+
   @override
   _ReorderableColumnState createState() => _ReorderableColumnState();
 }
@@ -111,18 +115,29 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
 
   void refreshData() {
     setState(() {
-      selectedDate = selectedDate.toUtc();
+      selectedDate = selectedDate;
       fetchIngestion();
+      checkNetworkConnection();
+      getWidgetOrder();
     });
   }
 
   @override
   void initState() {
     super.initState();
+    selectedDate;
     fetchIngestion();
     fetchUserInfo();
     checkNetworkConnection();
     getWidgetOrder();
+  }
+
+  @override
+  void didUpdateWidget(ReorderableColumn oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedDate != oldWidget.selectedDate) {
+      refreshData();
+    }
   }
 
   Future<void> checkNetworkConnection() async {
@@ -159,11 +174,11 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   }
   FutureOr<Ingestion?> fetchIngestion() async {
     final String formattedDate =
-        DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
+        DateFormat('yyyy-MM-dd').format(selectedDate);
     final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
-      print('Fetching ingestion for date: $formattedDate'); // 로그 추가
+      print('Fetching ingestion for date: $formattedDate');
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -507,15 +522,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   Widget _buildOverlayedWidget(Widget widget, String key, bool isActive) {
     return Stack(
       children: [
-        widget,
-         Positioned(
-          top: 0,
-          right: 0,
-          child: IconButton(
-            icon: Icon(isActive ? Icons.remove_circle : Icons.add_circle, color: Colors.grey.withOpacity(0.1)),
-            onPressed: () => _toggleWidget(key),
-          ),
-        ),
+        widget
       ],
     );
   }
@@ -537,6 +544,9 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
     setState(() {
       if (_usedWidgetKeys.contains(key)) {
         final index = _usedWidgetKeys.indexOf(key);
+        if (_usedWidgetKeys.length == 1) {
+          return;
+        }
         _usedWidgetKeys.removeAt(index);
         _unusedWidgetKeys.add(key);
         _unusedWidgets.add(_buildWidgetByKey(key, false));
@@ -565,7 +575,19 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
             return Padding(
               key: ValueKey(_usedWidgetKeys[index]),
               padding: const EdgeInsets.all(8.0),
-              child: widget,
+              child:  Stack(
+                children: [
+                  widget,
+                  showAllWidgets ? Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: Icon(Icons.remove_circle, color: Colors.grey.withOpacity(0.1)),
+                      onPressed: () => _toggleWidget(_usedWidgetKeys[index]),
+                    ),
+                  ) : Container() ,
+                ],
+              ),
             );
           }).toList(),
           onReorder: _onReorder,
@@ -577,7 +599,19 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
           return Padding(
             key: ValueKey(_unusedWidgetKeys[index]),
             padding: const EdgeInsets.all(8.0),
-            child: widget,
+            child: Stack(
+              children: [
+                widget,
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: Icon(Icons.add_circle, color: Colors.grey.withOpacity(0.1)),
+                    onPressed: () => _toggleWidget(key),
+                  ),
+                ),
+              ],
+            ),
           );
         }).toList() else Container(),
       ],

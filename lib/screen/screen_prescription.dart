@@ -56,7 +56,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
   @override
   void initState() {
     super.initState();
-    selectedMonth = DateTime.now().toUtc();
+    selectedMonth = selectedDate;
     getPrescriptionList();
   }
 

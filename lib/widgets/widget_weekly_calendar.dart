@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:doctor_nyang/services/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -16,7 +17,7 @@ class WidgetCalendar extends StatefulWidget {
 }
 
 class _WidgetCalendarState extends State<WidgetCalendar> {
-  DateTime _selectedDay = DateTime.now();
+  DateTime _selectedDay = selectedDate;
   DateTime _focusedDay = DateTime.now();
   String datetime = 'today';
 

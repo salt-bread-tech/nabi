@@ -27,10 +27,11 @@ class DietSchedule extends StatefulWidget {
 class _DietScheduleState extends State<DietSchedule> {
   List<dynamic> dietSchedule = [];
   List<dynamic> ingestionSchedule = [];
+  DateTime _selectedDate = selectedDate;
 
   void _handleDateChange(DateTime newDate) {
     setState(() {
-      selectedDate = newDate.toUtc();
+      _selectedDate = newDate.toUtc();
       fetchIngestion();
       fetchDietSchedule();
     });
@@ -39,9 +40,9 @@ class _DietScheduleState extends State<DietSchedule> {
   @override
   void initState() {
     super.initState();
-    selectedDate = DateTime.now().toUtc();
     fetchIngestion();
     fetchDietSchedule();
+    _selectedDate = selectedDate;
     _controller.text = _selectedGram == '인분'
         ? _selectedQuantity.toString()
         : _selectedQuantity.toStringAsFixed(0);
@@ -60,7 +61,7 @@ class _DietScheduleState extends State<DietSchedule> {
   }
 
   Future<void> fetchDietSchedule() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate.toUtc());
     final String url = '$baseUrl/diet/$formattedDate';
 
     try {
@@ -93,7 +94,7 @@ class _DietScheduleState extends State<DietSchedule> {
   }
 
   FutureOr<Ingestion?> fetchIngestion() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate.toUtc());
     final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
@@ -419,7 +420,7 @@ class _DietScheduleState extends State<DietSchedule> {
                                 await updateIngestion(
                                   ingestionId: id,
                                   date: DateFormat('yyyy-MM-dd')
-                                      .format(selectedDate.toUtc())
+                                      .format(_selectedDate.toUtc())
                                       .toString(),
                                   times: _selectedMeal== '아침'
                                       ? 0
@@ -462,7 +463,7 @@ class _DietScheduleState extends State<DietSchedule> {
                                       : food.transFattyAcid * calculate,
                                 );
                                 print(
-                                    'ingedtionId: $id, date: $selectedDate, times: ${_selectedMeal == '아침' ? 0 : _selectedMeal == '점심' ? 1 : _selectedMeal == '저녁' ? 2 : 3}, servingSize: ${food.servingSize}, totalIngestionSize: ${_selectedGram == '인분' ? food.servingSize * _selectedQuantity : _selectedQuantity}, calories: ${_selectedGram == '인분' ? food.calories * _selectedQuantity : food.calories * _selectedQuantity / food.servingSize}, carbohydrate: ${_selectedGram == '인분' ? food.carbohydrate * _selectedQuantity : food.carbohydrate * _selectedQuantity / food.servingSize}, protein: ${_selectedGram == '인분' ? food.protein * _selectedQuantity : food.protein * _selectedQuantity / food.servingSize}, fat: ${_selectedGram == '인분' ? food.fat * _selectedQuantity : food.fat * _selectedQuantity / food.servingSize}, sugars: ${_selectedGram == '인분' ? food.sugars * _selectedQuantity : food.sugars * _selectedQuantity / food.servingSize}, salt: ${_selectedGram == '인분' ? food.salt * _selectedQuantity : food.salt * _selectedQuantity / food.servingSize}, cholesterol: ${_selectedGram == '인분' ? food.cholesterol * _selectedQuantity : food.cholesterol * _selectedQuantity / food.servingSize}, saturatedFattyAcid: ${_selectedGram == '인분' ? food.saturatedFattyAcid * _selectedQuantity : food.saturatedFattyAcid * _selectedQuantity / food.servingSize}, transFattyAcid: ${_selectedGram == '인분' ? food.transFattyAcid * _selectedQuantity : food.transFattyAcid * _selectedQuantity / food.servingSize}');
+                                    'ingedtionId: $id, date: $_selectedDate, times: ${_selectedMeal == '아침' ? 0 : _selectedMeal == '점심' ? 1 : _selectedMeal == '저녁' ? 2 : 3}, servingSize: ${food.servingSize}, totalIngestionSize: ${_selectedGram == '인분' ? food.servingSize * _selectedQuantity : _selectedQuantity}, calories: ${_selectedGram == '인분' ? food.calories * _selectedQuantity : food.calories * _selectedQuantity / food.servingSize}, carbohydrate: ${_selectedGram == '인분' ? food.carbohydrate * _selectedQuantity : food.carbohydrate * _selectedQuantity / food.servingSize}, protein: ${_selectedGram == '인분' ? food.protein * _selectedQuantity : food.protein * _selectedQuantity / food.servingSize}, fat: ${_selectedGram == '인분' ? food.fat * _selectedQuantity : food.fat * _selectedQuantity / food.servingSize}, sugars: ${_selectedGram == '인분' ? food.sugars * _selectedQuantity : food.sugars * _selectedQuantity / food.servingSize}, salt: ${_selectedGram == '인분' ? food.salt * _selectedQuantity : food.salt * _selectedQuantity / food.servingSize}, cholesterol: ${_selectedGram == '인분' ? food.cholesterol * _selectedQuantity : food.cholesterol * _selectedQuantity / food.servingSize}, saturatedFattyAcid: ${_selectedGram == '인분' ? food.saturatedFattyAcid * _selectedQuantity : food.saturatedFattyAcid * _selectedQuantity / food.servingSize}, transFattyAcid: ${_selectedGram == '인분' ? food.transFattyAcid * _selectedQuantity : food.transFattyAcid * _selectedQuantity / food.servingSize}');
                                 Navigator.pop(context);
                               },
                               child: Text(
