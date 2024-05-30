@@ -599,9 +599,9 @@ class _FoodSearchState extends State<FoodSearch> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double fontSize14 = screenWidth * 0.035;
-    double fontSize12 = screenWidth * 0.03;
-    double fontSize10 = screenWidth * 0.025;
+    double fontSize14 = 14;
+    double fontSize12 = 12;
+    double fontSize10 = 10;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(

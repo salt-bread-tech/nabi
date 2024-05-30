@@ -482,7 +482,7 @@ class _DietScheduleState extends State<DietSchedule> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final fontSize = screenSize.width * 0.032;
+    final fontSize = 12.0;
 
     return Scaffold(
         backgroundColor: Colors.white,
