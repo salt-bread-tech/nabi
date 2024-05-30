@@ -164,38 +164,37 @@ class _ChatScreenState extends State<ChatScreen> {
         'Authorization': 'Bearer $token',
       });
 
-      if (response.statusCode == 200) {
-        final List<dynamic> chatData =
-        json.decode(utf8.decode(response.bodyBytes));
-        setState(() {
-          _messages = chatData.map((data) {
-            final bool isUser = data['user'];
-            final String text = data['content'];
-            final String timestamp = data['createAt'];
-            print('content: $text, time: $timestamp');
-            final String messageId = DateTime.now().toString();
-            return types.TextMessage(
-              author: isUser ? _user : types.User(id: 'nabi'),
-              createdAt: DateTime.parse(timestamp).millisecondsSinceEpoch,
-              id: messageId,
-              text: text,
-            );
-          }).toList();
-        });
-        _messages.sort((a, b) {
-          int compare = b.createdAt!.compareTo(a.createdAt as int);
-          if (compare == 0) {
-            bool aIsUser = a.author.id == '0';
-            bool bIsUser = b.author.id == '1';
-            if (aIsUser && !bIsUser) {
-              return -1;
-            } else if (!aIsUser && bIsUser) {
-              return 0;
-            }
-            return 1;
+    if (response.statusCode == 200) {
+      final List<dynamic> chatData =
+          json.decode(utf8.decode(response.bodyBytes));
+      setState(() {
+        _messages = chatData.map((data) {
+          final bool isUser = data['user'];
+          final String text = data['content'];
+          final String timestamp = data['createAt'];
+          print('content: $text, time: $timestamp');
+          final String messageId = DateTime.now().toUtc().toString();
+          return types.TextMessage(
+            author: isUser ? _user : types.User(id: 'nabi'),
+            createdAt: DateTime.parse(timestamp).toUtc().millisecondsSinceEpoch,
+            id: messageId,
+            text: text,
+          );
+        }).toList();
+      });
+      _messages.sort((a, b) {
+        int compare = b.createdAt!.compareTo(a.createdAt as int);
+        if (compare == 0) {
+          bool aIsUser = a.author.id == '0';
+          bool bIsUser = b.author.id == '1';
+          if (aIsUser && !bIsUser) {
+            return -1;
+          } else if (!aIsUser && bIsUser) {
+            return 0;
           }
-          return compare;
-        });
+        }
+        return compare;
+      });
       } else {
         print('Failed to load chats from server');
       }

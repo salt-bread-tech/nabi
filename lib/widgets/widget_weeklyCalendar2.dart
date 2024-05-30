@@ -87,6 +87,52 @@ class WidgetCalendarState extends State<WidgetCalendar2> {
             widget.onDateSelected(selectedDay);
           },
           calendarFormat: CalendarFormat.week,
+          calendarBuilders: CalendarBuilders(
+            selectedBuilder: (context, day, focusedDay) {
+              return Container(
+                  width: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.pastelBlue.withOpacity(0.5),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${day.day}',
+                      style: TextStyle().copyWith(),
+                    ),
+                  ));
+            },
+            defaultBuilder: (context, day, focusedDay) {
+              return Center(
+                child: Text(
+                  '${day.day}',
+                  style: TextStyle().copyWith(),
+                ),
+              );
+            },
+            outsideBuilder: (context, day, focusedDay) {
+              return Center(
+                child: Text(
+                  '${day.day}',
+                  style: TextStyle().copyWith(color: Colors.grey),
+                ),
+              );
+            },
+            todayBuilder: (context, day, focusedDay) {
+              return Container(
+                  width: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppTheme.pastelYellow,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${day.day}',
+                      style: TextStyle().copyWith(),
+                    ),
+                  ));
+            },
+          ),
         ),
       ],
     );

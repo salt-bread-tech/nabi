@@ -23,6 +23,7 @@ import 'package:doctor_nyang/services/service_auth.dart';
 import 'package:doctor_nyang/widgets/widget_OCR_modal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -42,18 +43,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white, // 상태바 색상
+      statusBarIconBrightness: Brightness.dark, // 상태바 아이콘 색상
+      systemNavigationBarColor: Colors.white, // 내비게이션 바 색상
+      systemNavigationBarIconBrightness: Brightness.dark, // 내비게이션 바 아이콘 색상
+    ));
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top] // 상단바만 표시
+        );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(backgroundColor: Colors.white, scrolledUnderElevation: 0),
+        appBarTheme: AppBarTheme(
+            backgroundColor: Colors.white, scrolledUnderElevation: 0),
         cardColor: Colors.white,
-        cupertinoOverrideTheme: CupertinoThemeData(barBackgroundColor: Colors.white),
-        bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white, elevation: 0),
+        cupertinoOverrideTheme:
+            CupertinoThemeData(barBackgroundColor: Colors.white),
+        bottomSheetTheme:
+            BottomSheetThemeData(backgroundColor: Colors.white, elevation: 0),
         dialogBackgroundColor: Colors.white,
         brightness: Brightness.light,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        splashColor: Colors.transparent, // 잉크 투명하게
+        splashColor: Colors.transparent,
+        // 잉크 투명하게
         highlightColor: Colors.transparent, // 하이라이트 투명하게
       ),
       localizationsDelegates: [
@@ -68,7 +82,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
-        '/intro':(context) => IntroPage(),
+        '/intro': (context) => IntroPage(),
         '/home': (context) => HomeScreen(),
         '/MyHomePage': (context) => MyHomePage(),
         '/chat': (context) => ChatScreen(),
@@ -81,12 +95,13 @@ class MyApp extends StatelessWidget {
         '/webtoon' : (context) => WebtoonPage(),
         '/schedule' : (context) => ScheduleCalendar(),
         '/Setting': (context) => SettingsScreen(),
-        '/Prescription' : (context) => PrescriptionScreen(),
-        '/introForSetting':(context) => IntroForSetting(),
+        '/Prescription': (context) => PrescriptionScreen(),
+        '/introForSetting': (context) => IntroForSetting(),
       },
     );
   }
 }
+
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -157,19 +172,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      body: Center(
-        child: SpinKitPumpingHeart(color: AppTheme.pastelPink)
-      )
-    );
+        body: Center(child: SpinKitPumpingHeart(color: AppTheme.pastelPink)));
   }
 }
 
 
 
 class MyHomePage extends StatefulWidget {
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }

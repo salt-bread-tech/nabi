@@ -11,7 +11,6 @@ class PrescriptionAddModal extends StatefulWidget {
   final DateTime initialDate;
   final Function(List<Widget>) onAdd;
 
-
   PrescriptionAddModal({required this.initialDate, required this.onAdd});
 
   @override
@@ -24,9 +23,11 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
 
   _PrescriptionAddModalState() : _selectedDay = DateTime.now();
 
-  final TextEditingController _prescriptionNameController = TextEditingController();
+  final TextEditingController _prescriptionNameController =
+      TextEditingController();
 
-  Future<void> addPrescription({required String name, required String date}) async {
+  Future<void> addPrescription(
+      {required String name, required String date}) async {
     final String url = '$baseUrl/prescriptions';
 
     try {
@@ -64,7 +65,6 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
       );
     }
   }
-
 
   @override
   void initState() {
@@ -173,12 +173,14 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
   @override
   Widget build(BuildContext context) {
     final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fontSize16 = screenWidth * 0.04;
 
     return Padding(
       padding: EdgeInsets.only(bottom: keyboardHeight),
       child: Container(
         width: double.infinity,
-        height: 180 + widgets.length * 80.0,
+        height: 170,
         padding: const EdgeInsets.all(20.0),
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -195,15 +197,17 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   SizedBox(
-                    width: 180,
+                    width: screenWidth * 0.5,
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: '처방전 이름',
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                        hintStyle:
+                            TextStyle(color: Colors.grey, fontSize: fontSize16),
                         border: InputBorder.none,
                       ),
                       controller: _prescriptionNameController,
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      style:
+                          TextStyle(color: Colors.black, fontSize: fontSize16),
                     ),
                   ),
                   TextButton(
@@ -212,7 +216,7 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                           context: context,
                           builder: (BuildContext context) {
                             return Container(
-                              height: 300,
+                              height: 260,
                               color: Colors.white,
                               child: Column(
                                 children: [
@@ -221,7 +225,8 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                                     child: CupertinoDatePicker(
                                       mode: CupertinoDatePickerMode.date,
                                       initialDateTime: _selectedDay,
-                                      onDateTimeChanged: (DateTime newDateTime) {
+                                      onDateTimeChanged:
+                                          (DateTime newDateTime) {
                                         setState(() {
                                           _selectedDay = newDateTime;
                                         });
@@ -233,7 +238,8 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Text('확인' , style: TextStyle(color: Colors.black)),
+                                    child: Text('확인',
+                                        style: TextStyle(color: Colors.black)),
                                   ),
                                 ],
                               ),
@@ -242,7 +248,8 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                     },
                     child: Text(
                         '${DateFormat('yyyy년 MM월 dd일').format(_selectedDay)}',
-                        style: TextStyle(color: Colors.black, fontSize: 16)),
+                        style: TextStyle(
+                            color: Colors.black, fontSize: fontSize16)),
                   ),
                 ]),
             Column(
@@ -250,17 +257,19 @@ class _PrescriptionAddModalState extends State<PrescriptionAddModal> {
                 Column(
                   children: widgets,
                 ),
+                SizedBox(height: 15),
                 Container(
                   width: double.infinity,
                   height: 55,
                   child: TextButton(
                     style: TextButton.styleFrom(
+                      backgroundColor: Color(0xFFEBEBEB),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     onPressed: _registerPrescription,
-                    child: Text('완료', style: TextStyle(color: Colors.black)),
+                    child: Text('등록', style: TextStyle(color: Colors.black)),
                   ),
                 ),
               ],

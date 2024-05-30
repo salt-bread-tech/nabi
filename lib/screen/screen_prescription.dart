@@ -51,12 +51,12 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
   List<dynamic> prescriptions = [];
   List<Widget> widgets = [];
   Map<String, Prescription> prescription = {};
-  DateTime _selectedDay = DateTime.now();
+  DateTime _selectedDay = DateTime.now().toUtc();
 
   @override
   void initState() {
     super.initState();
-    selectedMonth = DateTime.now();
+    selectedMonth = DateTime.now().toUtc();
     getPrescriptionList();
   }
 
@@ -82,7 +82,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         setState(() {
           if (selectedMonth != null) {
             _prescriptions = _prescriptions.where((element) {
-              DateTime date = DateTime.parse(element['date']);
+              DateTime date = DateTime.parse(element['date']).toUtc();
               return date.year == selectedMonth.year &&
                   date.month == selectedMonth.month;
             }).toList();
@@ -153,6 +153,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
 
   void showPrescriptionAddModal() {
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
           return PrescriptionAddModal(
@@ -173,10 +174,11 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
         .firstWhere((element) => element['prescriptionId'] == id)['name'];
     print(name);
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         builder: (BuildContext context) {
           return PrescriptionEditModal(
-            initialDate: initialDate,
+            initialDate: initialDate.toUtc(),
             id: id,
             name: name,
             onAdd: (List<Widget> addedWidgets) {
@@ -242,7 +244,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                     onPressed: () {
                       setState(() {
                         selectedMonth = DateTime(
-                            selectedMonth.year, selectedMonth.month + 1);
+                            selectedMonth.year, selectedMonth.month + 1).toUtc();
                         getPrescriptionList();
                       });
                     },
@@ -276,7 +278,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen> {
                                   onPressed: (context) => {
                                     showPrescriptionEditModal(
                                         DateTime.parse(
-                                            prescriptions[index]['date']),
+                                            prescriptions[index]['date']).toUtc(),
                                         prescriptions[index]['prescriptionId'],
                                         prescriptions[index]['name'])
                                   },

@@ -18,7 +18,7 @@ class Schedule {
   factory Schedule.fromJson(Map<String, dynamic> json) {
     return Schedule(
       text: json['text'],
-      date: DateTime.parse(json['date']),
+      date: DateTime.parse(json['date']).toUtc(),
     );
   }
 }
