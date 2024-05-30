@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
@@ -23,11 +22,18 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   Color _selectedColor = Color(0xFFFFDFEB);
   String startDate = DateFormat('yyyy-MM-dd').format(DateTime.now().toUtc());
   int _selectedMaxTerm = 1;
+  bool _isRoutineNameEmpty = false;
 
   void _registerRoutine() async {
-    String colorCodeWithoutAlpha = _selectedColor.value.toRadixString(16)
-        .substring(2)
-        .toUpperCase();
+    setState(() {
+      _isRoutineNameEmpty = _routineController.text.isEmpty;
+    });
+
+    if (_isRoutineNameEmpty) {
+      return;
+    }
+
+    String colorCodeWithoutAlpha = _selectedColor.value.toRadixString(16).substring(2).toUpperCase();
     int maxTerm = int.tryParse(_maxTermController.text) ?? 1;
 
     try {
@@ -39,32 +45,47 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
         maxTerm: maxTerm,
       );
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("데일리 루틴 등록 성공")));
+          SnackBar(content: Text("습관 등록 성공")));
       widget.onRoutineAdded();
-      print(' Name: ${_routineController
-          .text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}, maxTerm : $maxTerm');
+      print(' Name: ${_routineController.text}, Max Perform: ${_selectedFrequencyValue}, Color: ${colorCodeWithoutAlpha}, Date: ${startDate}, maxTerm : $maxTerm');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("데일리 루틴 등록 실패: $e")));
+          SnackBar(content: Text("습관 등록 실패: $e")));
     }
   }
 
   Widget firstField() {
-    return Row(
+    return Column(
       children: [
-        Expanded(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            _buildRoutineNameInput()
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildRoutineNameInput()
+                ],
+              ),
+            ),
+            SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildMaxTermInput(),
+                ],
+              ),
+            ),
           ],
         ),
-        ),
-        SizedBox(width: 20),
-        Expanded(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildMaxTermInput(),
-          ],))
+        if (_isRoutineNameEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              '습관명을 입력하세요.',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
       ],
     );
   }
@@ -103,11 +124,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
       context: context,
       builder: (BuildContext builder) {
         return Container(
-          height: MediaQuery
-              .of(context)
-              .copyWith()
-              .size
-              .height / 3,
+          height: MediaQuery.of(context).copyWith().size.height / 3,
           child: CupertinoPicker(
             backgroundColor: CupertinoColors.white,
             onSelectedItemChanged: (int value) {
@@ -132,7 +149,6 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
       onTap: () => _showFrequencyPicker(context),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 3.0, horizontal: 8),
-
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -233,7 +249,13 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
                     ),
                   ),
                   IconButton(
-                      onPressed: (){_registerRoutine(); Navigator.of(context).pop();},  icon: Icon(Iconsax.send_15))
+                      onPressed: () {
+                        _registerRoutine();
+                        if (!_isRoutineNameEmpty) {
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      icon: Icon(Iconsax.send_15))
                 ],
               ),
             ],
