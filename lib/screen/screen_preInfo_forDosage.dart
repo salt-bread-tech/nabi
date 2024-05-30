@@ -232,7 +232,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('복용 일정 추가하기', style: TextStyle(fontSize: 16)),
+                      Text('복용 일정 추가하기', style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600)),
                       Spacer(),
                       IconButton(
                         onPressed: () {
@@ -247,8 +247,8 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                       Text('${DateFormat('yyyy-MM-dd').format(selectedDate)}', style: TextStyle(fontSize: 14)),
                     ],
                   ),
-                  SizedBox(height: 20),
-                  Text('${medicineTaking['medicineName']}', style: TextStyle(fontSize: 14)),
+                  SizedBox(height: 10),
+                  Text('의약품명 : ${medicineTaking['medicineName']}', style: TextStyle(fontSize: 15)),
                   SizedBox(height: 20),
                   Text('복용 시간'),
                   Row(
@@ -429,7 +429,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                                         topLeft: Radius.circular(30),
                                         bottomLeft: Radius.circular(30),
                                       ),
-                                      color: AppTheme.pastelYellow,
+                                      color: Color(0xFFE8F3FF),
                                     ),
                                     child: Column(
                                       crossAxisAlignment:
@@ -454,6 +454,20 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoforDosage> {
                                             )),
                                       ],
                                     )),
+                                Container(
+                                  padding: EdgeInsets.symmetric(vertical: 20,horizontal: 20),decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(30),
+                                    bottomRight: Radius.circular(30),),
+                                  color: Colors.white,
+                                ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text('',style: TextStyle(fontSize: 13),),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),

@@ -160,7 +160,7 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
               Container(
                 margin: EdgeInsets.all(5),
                 width: double.infinity,
-                child: Text('루틴을 불러오는 중입니다...'),
+                child: Text('습관을 불러오는 중입니다...'),
               ),
             );
           } else if (!snapshot.hasData && _routines.isEmpty) {
@@ -168,7 +168,7 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
               Container(
                 margin: EdgeInsets.all(5),
                 width: double.infinity,
-                child: Text('등록된 루틴이 없습니다.'),
+                child: Text('등록된 습관이 없습니다.'),
               ),
             );
           } else if (snapshot.connectionState == ConnectionState.done) {
@@ -187,7 +187,7 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
               Container(
                 margin: EdgeInsets.all(5),
                 width: double.infinity,
-                child: Text('루틴을 불러오는 중 오류가 발생했습니다.'),
+                child: Text('습관을 불러오는 중 오류가 발생했습니다.'),
               ),
             );
           }
@@ -215,7 +215,6 @@ int getWeekNumber(DateTime date) {
   int weekNumber = ((date.difference(firstDayOfFirstWeek).inDays) ~/ 7) + 1;
   return weekNumber;
 }
-
 class RoutineItem extends StatelessWidget {
   final Map routine;
   final Function(int) onDelete;
@@ -238,56 +237,61 @@ class RoutineItem extends StatelessWidget {
     String routineName = routine['name'];
     String colorCode = routine['color'];
 
-    return Slidable(
-      key: Key(routine['id'].toString()),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        color: Color(0xFFF6F6F6),
-        elevation: 0,
-        child: Padding(
-          padding: EdgeInsets.all(15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                flex: 4,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(routineName, style: TextStyle(fontSize: fontSize)),
-                    SizedBox(height: 1),
-                    Text(
-                      '$currentCount/$maxCount',
-                      style: TextStyle(fontSize: fontSize, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              Flexible(
-                flex: 10,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: List.generate(maxCount, (index) {
-                    return GestureDetector(
-                      onTap: () => onCountChange(index),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                        height: 23,
-                        width: 23,
-                        decoration: BoxDecoration(
-                          color: index < currentCount
-                              ? Color(int.parse("0xFF$colorCode"))
-                              : Color(0xFFD9D9D9),
-                          shape: BoxShape.circle,
-                        ),
+    return GestureDetector(
+      onTap: () {
+        // Handle navigation tap here
+      },
+      child: Slidable(
+        key: Key(routine['id'].toString()),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          color: Color(0xFFF6F6F6),
+          elevation: 0,
+          child: Padding(
+            padding: EdgeInsets.all(15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  flex: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(routineName, style: TextStyle(fontSize: fontSize)),
+                      SizedBox(height: 1),
+                      Text(
+                        '$currentCount/$maxCount',
+                        style: TextStyle(fontSize: fontSize, color: Colors.grey),
                       ),
-                    );
-                  }),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Flexible(
+                  flex: 10,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: List.generate(maxCount, (index) {
+                      return GestureDetector(
+                        onTap: () => onCountChange(index),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                          height: 23,
+                          width: 23,
+                          decoration: BoxDecoration(
+                            color: index < currentCount
+                                ? Color(int.parse("0xFF$colorCode"))
+                                : Color(0xFFD9D9D9),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

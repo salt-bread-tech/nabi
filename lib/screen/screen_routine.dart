@@ -225,7 +225,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
       body: _isLoading
           ? Center(child: SpinKitPumpingHeart(color: AppTheme.pastelPink))
           : _routines.isEmpty
-          ? Center(child: Text('루틴 없음'))
+          ? Center(child: Text('습관이 없습니다. \n + 버튼을 눌러 습관을 추가해 보세요',textAlign:TextAlign.center,))
           : ListView.builder(
         itemCount: _routines.length,
         itemBuilder: (context, index) {
@@ -303,6 +303,8 @@ class RoutineItem extends StatelessWidget {
           title: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Flexible(flex: 4,
+              child:
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -314,7 +316,7 @@ class RoutineItem extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(width: 0),
+        ),
             ],
           ),
           trailing: Row(
