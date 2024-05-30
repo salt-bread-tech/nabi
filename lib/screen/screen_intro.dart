@@ -33,6 +33,7 @@ class _IntroPageState extends State<IntroPage> {
             indicator(images),
             startButton(),
             registerButton(),
+            SizedBox(height: 10),
           ],
         ),
       ),

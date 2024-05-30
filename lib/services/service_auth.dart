@@ -63,7 +63,7 @@ Future<void> fetchDday() async {
       loginInfo = jsonDecode(responseBody);
       {
         globals.dday = loginInfo['days'];
-        print({globals.dday});
+        //print({globals.dday});
       };
     } else {
       throw Exception('Failed to fetch user info: ${response.statusCode}');
@@ -87,7 +87,7 @@ Future<bool> login(String id, String password, BuildContext context) async {
 
       switch (responseData['code']) {
         case 'SU':
-          print('로그인 성공: 토큰 = ${responseData['token']}');
+          //print('로그인 성공: 토큰 = ${responseData['token']}');
             globals.token = responseData['token'];
 
             //로그인 성공 시 사용자 정보 저장

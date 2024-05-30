@@ -172,7 +172,6 @@ class _ChatScreenState extends State<ChatScreen> {
             final bool isUser = data['user'];
             final String text = data['content'];
             final String timestamp = data['createAt'];
-            print('content: $text, time: $timestamp');
             final String messageId = DateTime.now().toUtc().toString();
             return types.TextMessage(
               author: isUser ? _user : types.User(id: 'nabi'),
