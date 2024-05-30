@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:doctor_nyang/screen/screen_diet_schedule.dart';
 import 'package:doctor_nyang/screen/screen_dosage_schedule.dart';
 import 'package:doctor_nyang/screen/screen_login.dart';
@@ -117,10 +118,19 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   @override
   void initState() {
     super.initState();
-    selectedDate = DateTime.now().toUtc();
+    selectedDate = DateTime.now();
+    _selectedDateRange = _formatDateRange(selectedDate);
     fetchIngestion();
     fetchUserInfo();
-    getWidgetOrder();
+    checkNetworkConnection();
+  }
+
+  Future<void> checkNetworkConnection() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      _showNetworkErrorDialog();
+      getWidgetOrder();
+    }
   }
 
   Future<void> _showNetworkErrorDialog() async {
@@ -147,13 +157,13 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
       },
     );
   }
-
   FutureOr<Ingestion?> fetchIngestion() async {
     final String formattedDate =
         DateFormat('yyyy-MM-dd').format(selectedDate.toUtc());
     final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
+      print('Fetching ingestion for date: $formattedDate'); // 로그 추가
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -170,10 +180,11 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
           ingestionSchedule = [ingestion];
         });
       } else {
+        print('Failed to load ingestion: ${response.statusCode}'); // 오류 로그 추가
         throw Exception('Failed to load ingestion');
       }
     } catch (e) {
-      print('error: $e');
+      print('Error fetching ingestion: $e'); // 오류 로그 추가
       _showNetworkErrorDialog();
     }
   }

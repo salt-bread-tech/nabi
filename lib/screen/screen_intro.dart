@@ -11,7 +11,7 @@ class _IntroPageState extends State<IntroPage> {
   int activeIndex = 0;
   final List<String> images = ['images/intro_chat.png', 'images/intro_widget.png'];
   final List<String> texts = ['나비와 행복한 시간 보내기', '건강한 일상생활 만들기'];
-  final List<String> texts2 = ['귀여운 고양이 나비와 일상적인 대화를 통해 \n 심리 상태를 공유하고 상담 가능해요', '일정, 식단, 의약품 복용 일정 관리 \n 습관 만들기, 나만의 처방전 만들기 등 \n 다양한 기능을 통해  건강한 일상생활 만들기'];
+  final List<String> texts2 = ['당신의 친구, 귀여운 고양이 \'나비\'와 일상 대화를 나눠보세요. \n 심리 상태를 나눔으로서 정서적 지원을 받을 수 있어요.', '일정, 식단, 의약품 복용 일정 관리 \n 습관 만들기, 나만의 처방전 만들기 등 \n 다양한 기능을 통해 건강한 일상생활을 만들 수 있어요'];
 
   @override
   Widget build(BuildContext context) {
