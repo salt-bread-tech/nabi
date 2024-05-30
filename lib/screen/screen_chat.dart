@@ -164,37 +164,39 @@ class _ChatScreenState extends State<ChatScreen> {
         'Authorization': 'Bearer $token',
       });
 
-    if (response.statusCode == 200) {
-      final List<dynamic> chatData =
-          json.decode(utf8.decode(response.bodyBytes));
-      setState(() {
-        _messages = chatData.map((data) {
-          final bool isUser = data['user'];
-          final String text = data['content'];
-          final String timestamp = data['createAt'];
-          print('content: $text, time: $timestamp');
-          final String messageId = DateTime.now().toUtc().toString();
-          return types.TextMessage(
-            author: isUser ? _user : types.User(id: 'nabi'),
-            createdAt: DateTime.parse(timestamp).toUtc().millisecondsSinceEpoch,
-            id: messageId,
-            text: text,
-          );
-        }).toList();
-      });
-      _messages.sort((a, b) {
-        int compare = b.createdAt!.compareTo(a.createdAt as int);
-        if (compare == 0) {
-          bool aIsUser = a.author.id == '0';
-          bool bIsUser = b.author.id == '1';
-          if (aIsUser && !bIsUser) {
-            return -1;
-          } else if (!aIsUser && bIsUser) {
-            return 0;
+      if (response.statusCode == 200) {
+        final List<dynamic> chatData =
+            json.decode(utf8.decode(response.bodyBytes));
+        setState(() {
+          _messages = chatData.map((data) {
+            final bool isUser = data['user'];
+            final String text = data['content'];
+            final String timestamp = data['createAt'];
+            print('content: $text, time: $timestamp');
+            final String messageId = DateTime.now().toUtc().toString();
+            return types.TextMessage(
+              author: isUser ? _user : types.User(id: 'nabi'),
+              createdAt:
+                  DateTime.parse(timestamp).toUtc().millisecondsSinceEpoch,
+              id: messageId,
+              text: text,
+            );
+          }).toList();
+        });
+        _messages.sort((a, b) {
+          int compare = b.createdAt!.compareTo(a.createdAt as int);
+          if (compare == 0) {
+            bool aIsUser = a.author.id == '0';
+            bool bIsUser = b.author.id == '1';
+            if (aIsUser && !bIsUser) {
+              return 0;
+            } else if (!aIsUser && bIsUser) {
+              return 0;
+            }
+            return 1;
           }
-        }
-        return compare;
-      });
+          return compare;
+        });
       } else {
         print('Failed to load chats from server');
       }
@@ -245,7 +247,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-
   void _handleSendPressed(types.PartialText message) async {
     final content = message.text;
 
@@ -274,9 +275,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void showFedResult() {
-
-  }
+  void showFedResult() {}
 
   @override
   Widget build(BuildContext context) {
@@ -298,27 +297,30 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              _isPressed == false ? Chat(
-                theme: const DefaultChatTheme(
-                  inputBackgroundColor: Colors.white,
-                  inputTextColor: Colors.black,
-                  primaryColor: Color(0xFFFFFACD),
-                  sentMessageBodyTextStyle: TextStyle(color: Colors.black87),
-                  receivedMessageBodyTextStyle:
-                      TextStyle(color: Colors.black87),
-                  secondaryColor: Color(0xFFD3EAFF),
-                  messageBorderRadius: 20.0,
-                  backgroundColor: Colors.transparent,
-                  sendButtonIcon: Icon(Iconsax.send_1),
-                ),
-                messages: _messages,
-                onSendPressed: _handleSendPressed,
-                user: _user,
-                l10n: ChatL10nEn(
-                  inputPlaceholder: '나비와 대화하기',
-                ),
-                // scrollController: _scrollController,
-              ) : Container(),
+              _isPressed == false
+                  ? Chat(
+                      theme: const DefaultChatTheme(
+                        inputBackgroundColor: Colors.white,
+                        inputTextColor: Colors.black,
+                        primaryColor: Color(0xFFFFFACD),
+                        sentMessageBodyTextStyle:
+                            TextStyle(color: Colors.black87),
+                        receivedMessageBodyTextStyle:
+                            TextStyle(color: Colors.black87),
+                        secondaryColor: Color(0xFFD3EAFF),
+                        messageBorderRadius: 20.0,
+                        backgroundColor: Colors.transparent,
+                        sendButtonIcon: Icon(Iconsax.send_1),
+                      ),
+                      messages: _messages,
+                      onSendPressed: _handleSendPressed,
+                      user: _user,
+                      l10n: ChatL10nEn(
+                        inputPlaceholder: '나비와 대화하기',
+                      ),
+                      // scrollController: _scrollController,
+                    )
+                  : Container(),
               Positioned(
                   child: _isLoading
                       ? SpinKitPumpingHeart(color: AppTheme.pastelPink)
