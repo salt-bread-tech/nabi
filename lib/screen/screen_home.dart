@@ -119,10 +119,10 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
-    _selectedDateRange = _formatDateRange(selectedDate);
     fetchIngestion();
     fetchUserInfo();
     checkNetworkConnection();
+    getWidgetOrder();
   }
 
   Future<void> checkNetworkConnection() async {
