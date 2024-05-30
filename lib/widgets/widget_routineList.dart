@@ -124,7 +124,7 @@ class _RoutineListWidgetState extends State<RoutineListWidget> {
   @override
   Widget build(BuildContext context) {
     // Set a dynamic font size based on the screen width
-    final fontSize = 12.0;
+    final fontSize = MediaQuery.of(context).size.width * 0.034;
 
     return Container(
       width: double.infinity,
@@ -230,7 +230,7 @@ class RoutineItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final fontSize = 12.0; // 화면 너비에 비례하여 폰트 크기 설정
+    final fontSize = screenSize.width * 0.03; // 화면 너비에 비례하여 폰트 크기 설정
 
     int currentCount = routine['counts'];
     int maxCount = routine['max'];

@@ -401,7 +401,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                   child: Text(e,
                                       style: TextStyle(
                                           color: Colors.black,
-                                          )),
+                                          fontSize: fontSize14)),
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     backgroundColor: selectedTime.contains(e)
@@ -429,7 +429,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                   child: Text(e,
                                       style: TextStyle(
                                           color: Colors.black,
-                                          )),
+                                          fontSize: fontSize14)),
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     backgroundColor:
@@ -615,7 +615,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                   child: Text(e,
                                       style: TextStyle(
                                           color: Colors.black,
-                                          )),
+                                          fontSize: fontSize14)),
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     backgroundColor: selectedTime.contains(e)
@@ -643,7 +643,7 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                   child: Text(e,
                                       style: TextStyle(
                                           color: Colors.black,
-                                          )),
+                                          fontSize: fontSize14)),
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     backgroundColor:
@@ -883,18 +883,21 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                               '${medicineTaking['medicineName']}',
                                               style: TextStyle(
                                                 color: Colors.black,
+                                                fontSize: fontSize13,
                                               ),
                                             ),
                                             Text(
                                               '${medicineTaking['time'].map((e) => time[e]).toList().join(' ')}',
                                               style: TextStyle(
                                                 color: Colors.grey,
+                                                fontSize: fontSize13,
                                               ),
                                             ),
                                             Text(
                                                 '${medicineTaking['days']}일 동안 하루에 ${medicineTaking['time'].length}번 ${medicineTaking['once']}정(포) ',
                                                 style: TextStyle(
                                                   color: Colors.grey,
+                                                  fontSize: fontSize13,
                                                 )),
                                           ],
                                         )),
@@ -953,18 +956,20 @@ class _PrescriptionInfoScreenState extends State<PrescriptionInfoScreen> {
                                                       '${medicineTaking['registeredDosingSchedule'] ? registeredDosingScheduleText[1] : registeredDosingScheduleText[0]}',
                                                       style: TextStyle(
                                                         color: Colors.black,
-
+                                                        fontSize: fontSize13,
                                                       ))),
                                               Text(
                                                 ' ',
                                                 style: TextStyle(
                                                   color: Colors.grey,
+                                                  fontSize: fontSize13,
                                                 ),
                                               ),
                                               Text(
                                                 '${medicineTaking['dosage'] == '상관 없음' ? ' ' : '${medicineTaking['dosage']}'}',
                                                 style: TextStyle(
                                                   color: Colors.black,
+                                                  fontSize: fontSize13,
                                                 ),
                                               )
                                             ])),
