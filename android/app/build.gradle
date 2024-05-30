@@ -29,7 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.example.doctor_nyang"
+    namespace "bread.salt.nabi"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
