@@ -33,9 +33,12 @@
 - 사용자의 일정 실행 여부 체크 및 진행 상태 추적
 
 ### 📏 신체 정보 관리
+
 - 키와 몸무게 등록을 통한 BMI, BMR 계산
 
 ### 🎛 위젯 기능
 - 사용자가 원하는 메인 화면 레이아웃 구성 가능
 - 간단한 제스쳐로 메인 화면을 자유롭게 커스터마이징 가능
+
+<img width="1357" alt="Frame 27" src="https://github.com/salt-bread-tech/nabi/assets/100851180/cf66a3cc-d2ce-49a5-be43-e0d1d7d1b09c">
 
