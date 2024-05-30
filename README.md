@@ -2,7 +2,8 @@
 
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fsalt-bread-tech%2Fnabi&count_bg=%23D3EAFF&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
-<img width="1357" alt="Frame 27" src="https://github.com/salt-bread-tech/nabi/assets/100851180/cf66a3cc-d2ce-49a5-be43-e0d1d7d1b09c">
+<img width="1357" alt="Frame 27" src="https://github.com/salt-bread-tech/nabi/assets/100851180/bbddedd8-fde0-4f16-b5ad-7a33f67ce6dd">
+
 
 > 일상 대화 챗봇 '나비'와 함께하는 자기 관리 애플리케이션
 
