@@ -37,7 +37,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   void _handleDateChange(DateTime newDate) {
     setState(() {
       selectedDate = newDate.toUtc();
@@ -63,19 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        toolbarHeight: 10,
         backgroundColor: Colors.white,
         leading: Container(),
-        actions: [
-          IconButton(
-            icon: Icon(Iconsax.sort, color: Colors.black),
-            onPressed: (){
-              setState(() {
-                showAllWidgets = !showAllWidgets;
-                print('showAllWidgets: $showAllWidgets');
-              });
-            }
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -89,6 +78,32 @@ class _HomeScreenState extends State<HomeScreen> {
             WidgetCalendar(onDateSelected: _handleDateChange),
             SizedBox(height: 20),
             ReorderableColumn(selectedDate: selectedDate),
+            Container(
+              margin: EdgeInsets.only(top: 20),
+              width: screenSize.width * 0.3,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: Colors.grey.withOpacity(0.5)),
+              ),
+              child:TextButton(
+                onPressed: () {
+                  setState(() {
+                    showAllWidgets = !showAllWidgets;
+                    print('showAllWidgets: $showAllWidgets');
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.menu, size: fontSize, color: Colors.grey),
+                    SizedBox.fromSize(size: Size(5, 0)),
+                    Text('위젯 편집',
+                        style:
+                            TextStyle(fontSize: fontSize, color: Colors.grey),
+                        textAlign: TextAlign.center),
+                  ],
+                )),)
           ]),
         ),
       ),
@@ -172,9 +187,9 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
       },
     );
   }
+
   FutureOr<Ingestion?> fetchIngestion() async {
-    final String formattedDate =
-        DateFormat('yyyy-MM-dd').format(selectedDate);
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
     final String url = '$baseUrl/ingestion/total/$formattedDate';
 
     try {
@@ -358,7 +373,8 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
       onTap: () async {
         await Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => RoutineScreen(selectedDate: selectedDate)),
+          MaterialPageRoute(
+              builder: (context) => RoutineScreen(selectedDate: selectedDate)),
         );
         refreshData();
       },
@@ -440,7 +456,8 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
       onTap: () async {
         await Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DosageSchedule(selectedDate: selectedDate)),
+          MaterialPageRoute(
+              builder: (context) => DosageSchedule(selectedDate: selectedDate)),
         );
         refreshData();
       },
@@ -521,9 +538,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
 
   Widget _buildOverlayedWidget(Widget widget, String key, bool isActive) {
     return Stack(
-      children: [
-        widget
-      ],
+      children: [widget],
     );
   }
 
@@ -575,17 +590,21 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
             return Padding(
               key: ValueKey(_usedWidgetKeys[index]),
               padding: const EdgeInsets.all(8.0),
-              child:  Stack(
+              child: Stack(
                 children: [
                   widget,
-                  showAllWidgets ? Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: Icon(Icons.remove_circle, color: Colors.grey.withOpacity(0.1)),
-                      onPressed: () => _toggleWidget(_usedWidgetKeys[index]),
-                    ),
-                  ) : Container() ,
+                  showAllWidgets
+                      ? Positioned(
+                          top: 0,
+                          right: 0,
+                          child: IconButton(
+                            icon: Icon(Icons.remove_circle,
+                                color: Colors.grey.withOpacity(0.3)),
+                            onPressed: () =>
+                                _toggleWidget(_usedWidgetKeys[index]),
+                          ),
+                        )
+                      : Container(),
                 ],
               ),
             );
@@ -593,27 +612,30 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
           onReorder: _onReorder,
         ),
         if (showAllWidgets)
-        ..._unusedWidgets.map((widget) {
-          int index = _unusedWidgets.indexOf(widget);
-          String key = _unusedWidgetKeys[index];
-          return Padding(
-            key: ValueKey(_unusedWidgetKeys[index]),
-            padding: const EdgeInsets.all(8.0),
-            child: Stack(
-              children: [
-                widget,
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: IconButton(
-                    icon: Icon(Icons.add_circle, color: Colors.grey.withOpacity(0.1)),
-                    onPressed: () => _toggleWidget(key),
+          ..._unusedWidgets.map((widget) {
+            int index = _unusedWidgets.indexOf(widget);
+            String key = _unusedWidgetKeys[index];
+            return Padding(
+              key: ValueKey(_unusedWidgetKeys[index]),
+              padding: const EdgeInsets.all(8.0),
+              child: Stack(
+                children: [
+                  widget,
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: Icon(Icons.add_circle,
+                          color: Colors.grey.withOpacity(0.3)),
+                      onPressed: () => _toggleWidget(key),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        }).toList() else Container(),
+                ],
+              ),
+            );
+          }).toList()
+        else
+          Container(),
       ],
     );
   }

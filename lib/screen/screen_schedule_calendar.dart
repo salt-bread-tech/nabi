@@ -36,7 +36,8 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
   @override
   void initState() {
     super.initState();
-    _selectedDay =selectedDate;
+    _selectedDay = selectedDate;
+    _focusedDay = selectedDate;
     datetime = DateFormat('yyyy-MM-dd').format(_selectedDay);
     selectedDate = _selectedDay;
     getSchedule();
@@ -171,7 +172,7 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
 
   void showAddScheduleModal(BuildContext context, DateTime initialDate) {
     showModalBottomSheet(
-      isScrollControlled: true,
+        isScrollControlled: true,
         context: context,
         builder: (BuildContext buildContext) {
           return StatefulBuilder(
@@ -481,10 +482,11 @@ class _ScheduleCalendarState extends State<ScheduleCalendar> {
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
+                _focusedDay = _selectedDay;
                 selectedDate = _selectedDay;
                 datetime = DateFormat('yyyy-MM-dd').format(_selectedDay);
-                getEventForDay(_selectedDay);
+                getEventForDay(_focusedDay);
+                getSchedule();
               });
             },
             calendarFormat: CalendarFormat.month,
