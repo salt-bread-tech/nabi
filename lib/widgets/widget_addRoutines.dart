@@ -79,7 +79,7 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
         counter: Offstage(),  // Hides the counter
       ),
       controller: _routineController,
-      maxLength: 9,
+      //maxLength: 9,
       maxLengthEnforcement: MaxLengthEnforcement.enforced,
     );
   }

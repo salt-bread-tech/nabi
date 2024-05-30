@@ -28,7 +28,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'assets/theme.dart';
 
@@ -104,6 +103,36 @@ class _SplashScreenState extends State<SplashScreen> {
 
   }
 
+  @override
+  void dispose() {
+    //_connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> _showNetworkErrorDialog() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('네트워크 오류'),
+          content: Text('인터넷에 연결되지 않았습니다. \n 확인을 누르면 로그아웃됩니다.'),
+          actions: [
+            TextButton(
+              child: Text('확인'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await logoutUser();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
 
   Future<void> _checkLoginStatus() async {
@@ -139,8 +168,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
 
 
-
-
 class MyHomePage extends StatefulWidget {
 
   @override
@@ -150,65 +177,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController con = TextEditingController();
   int _currentIndex = 1;
-  late ConnectivityResult _connectionStatus;
-  final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-    _checkInitialConnection();
   }
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
     super.dispose();
-  }
-
-  Future<void> _checkInitialConnection() async {
-    _connectionStatus = await _connectivity.checkConnectivity();
-    if (_connectionStatus == ConnectivityResult.none) {
-      _showNetworkErrorDialog();
-    }
-  }
-
-  void _updateConnectionStatus(ConnectivityResult result) {
-    setState(() {
-      _connectionStatus = result;
-    });
-
-    if (_connectionStatus == ConnectivityResult.none) {
-      _showNetworkErrorDialog();
-    }
-  }
-
-
-
-  Future<void> _showNetworkErrorDialog() async {
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('네트워크 오류'),
-          content: Text('인터넷에 연결되지 않았습니다. \n 확인을 누르면 로그아웃됩니다.'),
-          actions: [
-            TextButton(
-              child: Text('확인'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await logoutUser();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => Login()),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   final List<Widget> _children = [
