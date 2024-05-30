@@ -9,9 +9,11 @@ import 'package:doctor_nyang/screen/screen_routine.dart';
 import 'package:doctor_nyang/screen/screen_schedule_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:doctor_nyang/widgets/widget_schedule.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import '../models/model_diet.dart';
 import '../services/globals.dart';
@@ -25,15 +27,16 @@ import '../widgets/widget_routineList.dart';
 import '../widgets/widget_weekly_calendar.dart';
 import '../widgets/widget_prescription.dart';
 
+int selectedTab = 0;
+bool isNetworkError = false;
+bool showAllWidgets = false;
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int selectedTab = 0;
-  late DateTime selectedDate;
-  String _selectedDateRange = '';
 
   void _handleDateChange(DateTime newDate) {
     setState(() {
@@ -44,7 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void refreshData() {
     setState(() {
       selectedDate = selectedDate.toUtc();
-      _selectedDateRange = _formatDateRange(selectedDate.toUtc());
     });
   }
 
@@ -52,14 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     selectedDate = DateTime.now().toUtc();
-    _selectedDateRange = _formatDateRange(selectedDate.toUtc());
-  }
-
-  String _formatDateRange(DateTime date) {
-    int weekday = date.toUtc().weekday;
-    DateTime startOfWeek = date.toUtc().subtract(Duration(days: weekday - 1));
-    DateTime endOfWeek = startOfWeek.toUtc().add(Duration(days: 6));
-    return '${DateFormat('M.dd').format(startOfWeek.toUtc())}~${DateFormat('M.dd').format(endOfWeek.toUtc())}';
   }
 
   @override
@@ -69,9 +63,19 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 10,
         backgroundColor: Colors.white,
         leading: Container(),
+        actions: [
+          IconButton(
+            icon: Icon(Iconsax.sort, color: Colors.black),
+            onPressed: (){
+              setState(() {
+                showAllWidgets = !showAllWidgets;
+                print('showAllWidgets: $showAllWidgets');
+              });
+            }
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -98,10 +102,7 @@ class ReorderableColumn extends StatefulWidget {
 }
 
 class _ReorderableColumnState extends State<ReorderableColumn> {
-  int selectedTab = 0;
-  late DateTime selectedDate;
   List<dynamic> ingestionSchedule = [];
-
   List<dynamic> _usedWidgets = [];
   List<dynamic> _unusedWidgets = [];
   List<String> _usedWidgetKeys = [];
@@ -118,7 +119,6 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   @override
   void initState() {
     super.initState();
-    selectedDate = DateTime.now();
     fetchIngestion();
     fetchUserInfo();
     checkNetworkConnection();
@@ -508,7 +508,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
     return Stack(
       children: [
         widget,
-        Positioned(
+         Positioned(
           top: 0,
           right: 0,
           child: IconButton(
@@ -570,6 +570,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
           }).toList(),
           onReorder: _onReorder,
         ),
+        if (showAllWidgets)
         ..._unusedWidgets.map((widget) {
           int index = _unusedWidgets.indexOf(widget);
           String key = _unusedWidgetKeys[index];
@@ -578,7 +579,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
             padding: const EdgeInsets.all(8.0),
             child: widget,
           );
-        }).toList(),
+        }).toList() else Container(),
       ],
     );
   }
