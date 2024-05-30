@@ -55,9 +55,9 @@ class SettingsScreen extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) => deletionConfirmDialog(),
                 ); },),
-            settingList(title: '개인정보 처리방침', onTap: (){
-              _launchPrivacyPolicyUrl();
-            }),
+            settingList(title: '개인정보 처리방침', onTap:
+              _launchPrivacyPolicyUrl
+            ),
             SizedBox(height: 30),
             Container(
               //padding: EdgeInsets.only(left: 15),
