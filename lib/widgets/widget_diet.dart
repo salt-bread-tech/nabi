@@ -38,7 +38,7 @@ class _WidgetDietState extends State<WidgetDiet> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final fontSize = 12.0;
+    final fontSize = screenSize.width * 0.032;
     double screenWidth = screenSize.width;
     double columnWidth = screenWidth * 0.1;
 
