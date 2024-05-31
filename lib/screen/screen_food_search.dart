@@ -534,7 +534,7 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
                             : widget.food.transFattyAcid *
                                 _selectedQuantity /
                                 widget.food.servingSize,
-                    date: selectedDate.toUtc(),
+                    date: widgetSelectedDate.toUtc(),
                   );
                   Navigator.pop(context);
                 },
@@ -552,8 +552,6 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
 }
 
 class FoodSearch extends StatefulWidget {
-  const FoodSearch({super.key});
-
   @override
   _FoodSearchState createState() => _FoodSearchState();
 }

@@ -30,6 +30,7 @@ import '../widgets/widget_prescription.dart';
 int selectedTab = 0;
 bool isNetworkError = false;
 bool showAllWidgets = false;
+List<dynamic> ingestionSchedule = [];
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -40,12 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handleDateChange(DateTime newDate) {
     setState(() {
       selectedDate = newDate.toUtc();
-    });
-  }
-
-  void refreshData() {
-    setState(() {
-      selectedDate = selectedDate.toUtc();
     });
   }
 
@@ -121,7 +116,6 @@ class ReorderableColumn extends StatefulWidget {
 }
 
 class _ReorderableColumnState extends State<ReorderableColumn> {
-  List<dynamic> ingestionSchedule = [];
   List<dynamic> _usedWidgets = [];
   List<dynamic> _unusedWidgets = [];
   List<String> _usedWidgetKeys = [];
@@ -131,7 +125,6 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   void refreshData() {
     setState(() {
       selectedDate = selectedDate;
-      fetchIngestion();
       checkNetworkConnection();
       getWidgetOrder();
     });
@@ -141,7 +134,6 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   void initState() {
     super.initState();
     selectedDate;
-    fetchIngestion();
     fetchUserInfo();
     checkNetworkConnection();
     getWidgetOrder();
@@ -150,8 +142,10 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   @override
   void didUpdateWidget(ReorderableColumn oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.selectedDate != oldWidget.selectedDate) {
-      refreshData();
+    if (oldWidget.selectedDate != widget.selectedDate) {
+      setState(() {
+        getWidgetOrder();
+      });
     }
   }
 
@@ -186,37 +180,6 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
         );
       },
     );
-  }
-
-  FutureOr<Ingestion?> fetchIngestion() async {
-    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-    final String url = '$baseUrl/ingestion/total/$formattedDate';
-
-    try {
-      print('Fetching ingestion for date: $formattedDate');
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        String responseBody = utf8.decode(response.bodyBytes);
-        Map<String, dynamic> ingestion = json.decode(responseBody);
-
-        setState(() {
-          ingestionSchedule = [ingestion];
-        });
-      } else {
-        print('Failed to load ingestion: ${response.statusCode}'); // 오류 로그 추가
-        throw Exception('Failed to load ingestion');
-      }
-    } catch (e) {
-      print('Error fetching ingestion: $e'); // 오류 로그 추가
-      _showNetworkErrorDialog();
-    }
   }
 
   Future<void> getWidgetOrder() async {
@@ -298,6 +261,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
   }
 
   Widget IngestionWidget({required bool isActive}) {
+
     return GestureDetector(
       key: ValueKey('1'),
       onTap: () async {
@@ -330,36 +294,7 @@ class _ReorderableColumnState extends State<ReorderableColumn> {
               child: Text('식단'),
             ),
             WidgetDiet(
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DietSchedule()),
-                );
-                refreshData();
-              },
-              isWidget: true,
-              userCalories: bmr ?? 2000,
-              breakfastCalories: ingestionSchedule.isNotEmpty
-                  ? ingestionSchedule[0]['breakfastKcal']
-                  : 0,
-              lunchCalories: ingestionSchedule.isNotEmpty
-                  ? ingestionSchedule[0]['lunchKcal']
-                  : 0,
-              dinnerCalories: ingestionSchedule.isNotEmpty
-                  ? ingestionSchedule[0]['dinnerKcal']
-                  : 0,
-              snackCalories: ingestionSchedule.isNotEmpty
-                  ? ingestionSchedule[0]['snackKcal']
-                  : 0,
-              totalProtein: ingestionSchedule.isNotEmpty
-                  ? ingestionSchedule[0]['totalProtein']
-                  : 0,
-              totalCarb: ingestionSchedule.isNotEmpty
-                  ? ingestionSchedule[0]['totalCarbohydrate']
-                  : 0,
-              totalFat: ingestionSchedule.isNotEmpty
-                  ? ingestionSchedule[0]['totalFat']
-                  : 0,
+              date: selectedDate,
             ),
           ],
         ),
