@@ -93,11 +93,16 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   Widget _buildRoutineNameInput() {
     return TextField(
       autocorrect: false,
+      textInputAction: TextInputAction.done,
+      enableSuggestions: false, // 자동완성 끄기
+      onSubmitted: (value) {
+        FocusScope.of(context).unfocus();
+      },
       decoration: InputDecoration(
         hintText: '습관명 입력하기',
         border: InputBorder.none,
         contentPadding: EdgeInsets.only(top: 11, right: 15),
-        counter: Offstage(),  // Hides the counter
+        counter: Offstage(),
       ),
       controller: _routineController,
       //maxLength: 9,
@@ -108,7 +113,9 @@ class _AddRoutineWidgetState extends State<AddRoutineWidget> {
   Widget _buildMaxTermInput() {
     return TextField(
       autocorrect: false,
-      keyboardType: TextInputType.number, // Ensure numeric input
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.done,
+      enableSuggestions: false, // 자동완성 끄기
       decoration: InputDecoration(
         hintText: '1',
         suffixText: '주 동안 반복',

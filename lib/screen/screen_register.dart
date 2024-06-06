@@ -52,13 +52,13 @@ class _RegisterState extends State<Register> {
       passwordError = passwordController.text.isEmpty ? '비밀번호를 입력해주세요.' : '';
       confirmPasswordError = confirmPWController.text.isEmpty ? '비밀번호 확인을 입력해주세요.' : '';
       birthDateError = birthDateController.text.isEmpty ? '생년월일을 입력해주세요.' : '';
-      genderError = _selectedGender == 'none' ? '성별을 선택해주세요.' : '';
+      //genderError = _selectedGender == 'none' ? '성별을 선택해주세요.' : '';
       heightError = heightController.text.isEmpty ? '키를 입력해주세요.' : '';
       weightError = weightController.text.isEmpty ? '몸무게를 입력해주세요.' : '';
     });
   }
 
-  void validateGender() {
+  /*void validateGender() {
     if (_selectedGender == 'none') {
       setState(() {
         genderError = '성별을 선택해주세요.';
@@ -70,7 +70,9 @@ class _RegisterState extends State<Register> {
     }
   }
 
-  Future<bool> register(String nickname, String id, String password, String birthDate, String gender, double height, double weight, int age, BuildContext context) async {
+   */
+
+  Future<bool> register(String nickname, String id, String password, BuildContext context) async {
     final url = Uri.parse('$baseUrl/user');
 
     try {
@@ -81,11 +83,6 @@ class _RegisterState extends State<Register> {
           'nickname': nickname,
           'id': id,
           'password': password,
-          'birthDate': birthDate,
-          'sex': gender,
-          'height': height,
-          'weight': weight,
-          'age': age,
         }),
       );
 
@@ -169,7 +166,7 @@ class _RegisterState extends State<Register> {
 
   Future<void> attemptRegister() async {
     validateFields();
-    validateGender();
+    //validateGender();
     _validatePasswordRequirements();
     if (!isPrivacyPolicyAgreed) {
       showCupertinoDialog(
@@ -201,13 +198,15 @@ class _RegisterState extends State<Register> {
       final nickname = nicknameController.text;
       final id = emailController.text;
       final password = passwordController.text;
-      final birthDate = birthDateController.text;
+      /*final birthDate = birthDateController.text;
       final sex = _selectedGender;
       final height = double.tryParse(heightController.text);
       final weight = double.tryParse(weightController.text);
       final age = calculateAge(selectedDate);
 
-      await register(nickname, id, password, birthDate, sex, height!, weight!, age, context);
+       */
+
+      await register(nickname, id, password ,context);
     }
   }
 
@@ -283,7 +282,7 @@ class _RegisterState extends State<Register> {
       ],
     );
   }
-
+/*
   // 키, 몸무게
   Widget _buildBMIField() {
     return Column(
@@ -387,6 +386,8 @@ class _RegisterState extends State<Register> {
     );
   }
 
+ */
+
   void _togglePrivacyPolicy(bool? newValue) {
     setState(() {
       isPrivacyPolicyAgreed = newValue ?? false;
@@ -488,7 +489,7 @@ class _RegisterState extends State<Register> {
                 _buildIdField(),
                 SizedBox(height: 15),
                 _buildPasswordField(),
-                SizedBox(height: 15),
+               /* SizedBox(height: 15),
                 Text('생년월일', style: TextStyle(fontSize: 13)),
                 SizedBox(height: 5),
                 GestureDetector(
@@ -531,6 +532,8 @@ class _RegisterState extends State<Register> {
             ),
             SizedBox(height: 15),
             _buildBMIField(),
+
+                */
             SizedBox(height: 20),
             _buildPrivacyPolicyAgreement(),
             Row(
@@ -554,6 +557,8 @@ class _RegisterState extends State<Register> {
             ),
           ],
         ),
+    ]
+    ),
       ),
     );
   }

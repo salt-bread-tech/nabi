@@ -35,6 +35,9 @@ class CustomTextFormField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: isPassword,
+        autocorrect: false,
+        textInputAction: TextInputAction.done,
+        enableSuggestions: false,
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.w500,
@@ -95,6 +98,9 @@ class CustomErrorTextFormField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: isPassword,
+        autocorrect: false,
+        textInputAction: TextInputAction.done,
+        enableSuggestions: false,
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.w500,
