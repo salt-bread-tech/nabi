@@ -76,7 +76,7 @@ class _UserScreenState extends State<UserScreen> {
                     Text(globals.nickName ?? '이름',
                         style: TextStyle(fontSize: 20)),
                     SizedBox(height: 5),
-                    Text(globals.birth ?? '생년월일',
+                   /* Text(globals.birth ?? '생년월일',
                         style: TextStyle(fontSize: 12)),
                     Row(
                       children: [
@@ -98,6 +98,8 @@ class _UserScreenState extends State<UserScreen> {
                       'BMR : ${globals.bmr?.truncate().toString() ?? 'bmr'}',
                       style: TextStyle(fontSize: 12),
                     ),
+
+                    */
                   ],
                 ),
               ],

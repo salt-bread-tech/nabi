@@ -32,7 +32,7 @@ class SettingsScreen extends StatelessWidget {
               onChanged: (bool newValue) {},
             ),
 
-             */
+
             settingList(title: '신체 정보 수정하기', onTap: (){
               fetchUserInfo();
               showDialog(
@@ -40,7 +40,7 @@ class SettingsScreen extends StatelessWidget {
                 builder: (BuildContext context) => BodyInfoEditorDialog(),
               );
             }),
-
+*/
             settingList(
               title: '로그아웃',
               onTap: () {
