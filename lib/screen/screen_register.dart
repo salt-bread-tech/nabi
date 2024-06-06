@@ -51,10 +51,10 @@ class _RegisterState extends State<Register> {
       idError = emailController.text.isEmpty ? '아이디를 입력해주세요.' : '';
       passwordError = passwordController.text.isEmpty ? '비밀번호를 입력해주세요.' : '';
       confirmPasswordError = confirmPWController.text.isEmpty ? '비밀번호 확인을 입력해주세요.' : '';
-      birthDateError = birthDateController.text.isEmpty ? '생년월일을 입력해주세요.' : '';
+      //birthDateError = birthDateController.text.isEmpty ? '생년월일을 입력해주세요.' : '';
       //genderError = _selectedGender == 'none' ? '성별을 선택해주세요.' : '';
-      heightError = heightController.text.isEmpty ? '키를 입력해주세요.' : '';
-      weightError = weightController.text.isEmpty ? '몸무게를 입력해주세요.' : '';
+      //heightError = heightController.text.isEmpty ? '키를 입력해주세요.' : '';
+      //weightError = weightController.text.isEmpty ? '몸무게를 입력해주세요.' : '';
     });
   }
 
@@ -121,7 +121,7 @@ class _RegisterState extends State<Register> {
           });
           break;
 
-        case 'HVF': // 키 범위 에러
+        /*case 'HVF': // 키 범위 에러
           print('키 범위 에러: ${responseData['message']}');
           setState(() {
             heightError = '키 범위 에러 (251 초과, 65 미만)';
@@ -134,6 +134,8 @@ class _RegisterState extends State<Register> {
             weightError = '체중 범위 에러 (769 초과, 6 미만)';
           });
           break;
+
+         */
 
         case 'CF': // 올바른 형식이 아님(유효성 검사)
           print('올바르지 않은 요청: ${responseData['message']}');
@@ -191,9 +193,11 @@ class _RegisterState extends State<Register> {
         idError.isEmpty &&
         passwordError.isEmpty &&
         confirmPasswordError.isEmpty &&
-        birthDateError.isEmpty &&
+        /*birthDateError.isEmpty &&
         heightError.isEmpty &&
         weightError.isEmpty &&
+
+         */
         isPasswordConfirmed) {
       final nickname = nicknameController.text;
       final id = emailController.text;

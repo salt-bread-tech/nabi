@@ -33,12 +33,14 @@ Future<void> fetchUserInfo() async {
         globals.nickName = userInfo['nickName'];
         globals.id = userInfo['id'];
         globals.birth = userInfo['birth'];
-        globals.height = userInfo['height'];
+       /* globals.height = userInfo['height'];
         globals.weight = userInfo['weight'];
         globals.gender = userInfo['gender'];
         globals.age = userInfo['age'];
         globals.bmi = userInfo['bmiRangeName'];
         globals.bmr = userInfo['bmr'];
+
+        */
         print({globals.nickName});
       };
     } else {
