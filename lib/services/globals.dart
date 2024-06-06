@@ -2,7 +2,7 @@ String? nickName;
 String? birth;
 double? height;
 double? weight;
-double? bmr;
+double? bmr = 2000;
 String? bmi;
 String? gender;
 int? age;
